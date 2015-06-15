@@ -1,24 +1,18 @@
 #ifndef VKPIXMAPPROVIDER_H
 #define VKPIXMAPPROVIDER_H
 
-#include <QQuickImageProvider>
-#include <QDebug>
-#include <QFile>
-#include <QStandardPaths>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QNetworkAccessManager>
+#include <QDeclarativeImageProvider>
 
-class VK;
-class VKPixmapProvider : public QQuickImageProvider
+class VKPixmapProvider : public QDeclarativeImageProvider
 {
+    Q_OBJECT
 public:
-    explicit VKPixmapProvider(QQmlEngine* engine, ImageType type, Flags flags = 0);
-    virtual QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize);
+    explicit VKPixmapProvider(QObject *parent = 0);
 
-private:
+signals:
 
-    QQmlEngine* m_engine;
+public slots:
+
 };
 
 #endif // VKPIXMAPPROVIDER_H

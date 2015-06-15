@@ -34,17 +34,11 @@
 
 #include <sailfishapp.h>
 #include "vk.h"
-
+#include "vkmessanges.h"
 #include <QtQml>
 #include <QDebug>
 #include "vkpixmapprovider.h"
-#include "vkabstractcontainer.h"
-#include "vkcontainerdialog.h"
-#include "vkcontainermessage.h"
-#include "vkcontaineruser.h"
-#include "vkcontainerchaticon.h"
-#include "qmllist.h"
-#include "vkstorage.h"
+
 
 int main(int argc, char *argv[])
 {
@@ -60,18 +54,11 @@ int main(int argc, char *argv[])
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
     QScopedPointer<QQuickView> view(SailfishApp::createView());
 
-    qmlRegisterType<VK>("harbour.vk.VK", 1, 0, "VK");
-    qmlRegisterType<VKContainerDialog>();
-    qmlRegisterType<VKContainerMessage>();
-    qmlRegisterType<VKContainerUser>();
-    qmlRegisterType<VKAbstractContainer>();
-    qmlRegisterType<VKContainerChatIcon>();
-    qmlRegisterType<VKStorage>();
-    qmlRegisterType<QmlList>();
+    qmlRegisterType<VK>("harbour.bashreader.VK", 1, 0, "VK");
+    qmlRegisterType<VKMessanges>("harbour.bashreader.VKMessanges", 1, 0, "VKMessanges");
 
-    QQmlEngine* engine = view->engine();
 
-    engine->addImageProvider(QLatin1String("vkontakte"), new VKPixmapProvider(engine, QQmlImageProviderBase::Pixmap));
+    view->engine()->addImageProvider(QLatin1String("vkontakte"), new VKPixmapProvider(QQuickImageProvider::Image));
     view->setSource(SailfishApp::pathTo("qml/harbour-vk.qml"));
     view->show();
 

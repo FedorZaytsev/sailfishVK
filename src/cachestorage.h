@@ -2,7 +2,6 @@
 #define CACHESTORAGE_H
 
 #include <QObject>
-#include <QMap>
 
 class CacheStorage : public QObject
 {
@@ -13,7 +12,7 @@ public:
 signals:
 
 public slots:
-private:
+
 };
 
 #endif // CACHESTORAGE_H
