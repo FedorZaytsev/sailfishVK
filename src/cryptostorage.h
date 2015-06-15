@@ -3,16 +3,6 @@
 
 #include <QObject>
 
-class CryptoStorage : public QObject
-{
-    Q_OBJECT
-public:
-    explicit CryptoStorage(QObject *parent = 0);
-
-signals:
-
-public slots:
-
-};
+QString crypt(QString data);
 
 #endif // CRYPTOSTORAGE_H

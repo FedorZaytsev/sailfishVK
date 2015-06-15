@@ -1,6 +1,6 @@
 #include "cryptostorage.h"
 
-CryptoStorage::CryptoStorage(QObject *parent) :
-    QObject(parent)
-{
+
+QString crypt(QString data) {
+    return data;
 }
