@@ -184,8 +184,8 @@ QString VKStorage::accessToken() const {
 }
 
 void VKStorage::setAccessToken(QString accessToken) {
-    qDebug()<<"aceesTokent set";
-    Q_ASSERT(accessToken != "");
+    //qDebug()<<"aceesTokent set";
+    //Q_ASSERT(accessToken != "");
     m_accessToken = accessToken;
     /*QSqlQuery query;
     query.prepare("INSERT OR REPLACE INTO common(param_name, param) VALUES('access_token', :token)");
@@ -221,8 +221,8 @@ int VKStorage::ourUserId() const {
 }
 
 void VKStorage::setOurUserId(int ourUserId) {
-    qDebug()<<"set user id"<<ourUserId;
-    Q_ASSERT(ourUserId);
+    //qDebug()<<"set user id"<<ourUserId;
+    //Q_ASSERT(ourUserId);
     m_ourUserId = ourUserId;
     /*QSqlQuery query;
     query.prepare("INSERT OR REPLACE INTO common(param_name, param) VALUES('user_id', :userid)");

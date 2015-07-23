@@ -179,6 +179,8 @@ void VK::sendNetworkRequest(VKAbstractHandler *handler) {
 void VK::dropAuthorization() {
     m_VKStorage.setAccessToken("");
     m_VKStorage.setOurUserId(-1);
+    delete m_longPoll;
+    m_longPoll = new VKLongPollServer(&m_VKStorage, this);
 }
 
 void VK::requestFinished(QNetworkReply* reply) {

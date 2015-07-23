@@ -45,10 +45,12 @@ ApplicationWindow
         onHandlerReady: {
             Handlers.ready(name, handler)
         }
+
         onDisplayError: {
             console.log(reason, type)
 
             pageStack.completeAnimation()
+
             if (type !== VK.ERROR_HANDLER_NOTHING) {
                 pageStack.clear()
             }

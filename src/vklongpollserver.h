@@ -64,24 +64,6 @@ public:
     Q_INVOKABLE VKLPAbstract*           at(int idx);
     Q_INVOKABLE void                    clean();
 
-/*
-    Q_INVOKABLE int                     messagesCount();
-    Q_INVOKABLE VKContainerDialog*      messagesAt(int i);
-    Q_INVOKABLE void                    messagesRemove(int i);
-
-    Q_INVOKABLE int                     vkupdateCount(int type);
-    Q_INVOKABLE QList<int>              vkupdateAt(int type, int i);
-    Q_INVOKABLE void                    vkupdateRemove(int type, int i);
-    Q_INVOKABLE void                    vkupdateClear(int type);
-
-    Q_INVOKABLE int                     updateMsgCount();
-    Q_INVOKABLE VKContainerMessage*     updateMsgAt(int i);
-    Q_INVOKABLE void                    updateMsgRemove(int i);
-
-    Q_INVOKABLE int                     restoreMsgCount();
-    Q_INVOKABLE VKContainerMessage*     restoreMsgAt(int i);
-    Q_INVOKABLE void                    restoreMsgRemove(int i);
-*/
 private:
     QString                             key() const                         {return m_key;}
     void                                setKey(const QString &key)          {m_key = key;}

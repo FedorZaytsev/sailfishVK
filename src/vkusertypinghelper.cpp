@@ -3,7 +3,6 @@
 VKUserTypingHelper::VKUserTypingHelper(QObject *parent) :
     QObject(parent)
 {
-    qDebug()<<"created";
     m_timer.setInterval(1000);
     m_timer.stop();
     QObject::connect(&m_timer, &QTimer::timeout, this, &VKUserTypingHelper::timeout);
