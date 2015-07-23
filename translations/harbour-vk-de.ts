@@ -24,6 +24,17 @@
     </message>
 </context>
 <context>
+    <name>MessageField</name>
+    <message>
+        <source>Hi</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SecondPage</name>
     <message>
         <source>Nested Page</source>

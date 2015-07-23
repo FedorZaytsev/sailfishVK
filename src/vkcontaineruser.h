@@ -7,7 +7,7 @@
 #include "vkstorage.h"
 #include "vkabstractcontainer.h"
 
-//class VKContainerUser;
+class VKContainerUser;
 class VKStorage;
 class VKContainerUser : public VKAbstractContainer
 {
@@ -15,8 +15,9 @@ class VKContainerUser : public VKAbstractContainer
 public:
     explicit VKContainerUser(QObject *parent = 0);
 
-    static VKContainerUser* fromJson(VKStorage *storage, QJsonObject &obj);
+    static VKContainerUser* fromJson(VKStorage *storage, const QJsonObject &obj);
     static VKContainerUser* fromSql(VKStorage *storage, QSqlQuery &query);
+    void copyTo(VKContainerUser* user);
 
     Q_INVOKABLE int id() const              { return m_id; }
     Q_INVOKABLE QString firstName() const   { return m_firstName; }
@@ -24,6 +25,7 @@ public:
     Q_INVOKABLE QString iconSmall() const   { return m_iconSmall; }
     Q_INVOKABLE QString iconMedium() const  { return m_iconMedium; }
     Q_INVOKABLE QString iconLarge() const   { return m_iconLarge; }
+    Q_INVOKABLE bool isValid() const        { return m_valid; }
 
     void setId(int arg)                     { m_id = arg; }
     void setFirstName(QString arg)          { m_firstName = arg; }
@@ -31,6 +33,7 @@ public:
     void setIconSmall(QString arg)          { m_iconSmall = arg; }
     void setIconMedium(QString arg)         { m_iconMedium = arg; }
     void setIconLarge(QString arg)          { m_iconLarge = arg; }
+    void valid(bool b)                      { m_valid = b; }
 private:
     int m_id;
     QString m_firstName;
@@ -38,6 +41,7 @@ private:
     QString m_iconSmall;
     QString m_iconMedium;
     QString m_iconLarge;
+    bool m_valid;
 };
 
 

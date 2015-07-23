@@ -15,9 +15,7 @@ VKHandlerDialogs::VKHandlerDialogs(VKStorage *storage, QObject *parent) :
 
 VKHandlerDialogs::~VKHandlerDialogs()
 {
-    for (auto el : m_data) {
-        delete el;
-    }
+    qDebug()<<"VKHandlerDialogs::~VKHandlerDialogs";
 }
 
 const QNetworkRequest VKHandlerDialogs::processRequest() {
@@ -35,32 +33,32 @@ const QNetworkRequest VKHandlerDialogs::processRequest() {
     "i = i+1;"
 "}"
 "return {\"user\":API.users.get({\"user_ids\":%4,\"fields\":\"photo_50,photo_100\"})[0],\"dialogs\":result%5};"
-                ).arg(m_offset).arg(m_previewLength).arg(m_count).arg(m_storage->ourUserId())
-            .arg(m_longPollRequested ? ",\"longPoll\":API.messages.getLongPollServer({\"use_ssl\":1,\"need_pts\":1})" : "");
+).arg(m_offset).arg(m_previewLength).arg(m_count).arg(m_storage->ourUserId())
+.arg(m_longPollRequested ? ",\"longPoll\":API.messages.getLongPollServer({\"use_ssl\":1,\"need_pts\":1})" : "");
     QList<QPair<QString,QString>> args;
     args.push_back({"code",exec});
     return generateRequest("execute", args);
 }
 
-bool VKHandlerDialogs::processReply(QJsonObject *reply) {
-    QJsonObject ourUser = reply->value("user").toObject();
+void VKHandlerDialogs::processReply(QJsonValue *reply) {
+    QJsonObject ourUser = reply->toObject().value("user").toObject();
 
     VKContainerUser* ourUserParsed = VKContainerUser::fromJson(storage(), ourUser);
     storage()->addUser(ourUserParsed);
     delete ourUserParsed;
 
-    QJsonArray dialogs = reply->value("dialogs").toArray();
+    QJsonArray dialogs = reply->toObject().value("dialogs").toArray();
 
     for (auto e : dialogs) {
         auto el = e.toObject();
         Q_ASSERT(el.value("item").isObject());
         Q_ASSERT(el.value("users").isArray());
         VKContainerDialog* dialog = VKContainerDialog::fromJson(storage(), el.value("item").toObject(), el.value("users").toArray());
-        storage()->addDialog(dialog);
-        delete dialog;
+        dialog->setParent(this);
+        m_dialogs.push_back(dialog);
     }
-    storage()->debugPrint();
-    return true;
+
+    emit ready(this);
 }
 
 QString VKHandlerDialogs::name() {
@@ -86,6 +84,21 @@ void VKHandlerDialogs::setUnread(int unread) {
 
 void VKHandlerDialogs::setLongPoll(bool b) {
     m_longPollRequested = b;
+}
+
+QList<VKAbstractContainer *> &VKHandlerDialogs::dialogs()
+{
+    return m_dialogs;
+}
+
+VKAbstractContainer* VKHandlerDialogs::at(int idx)
+{
+    return m_dialogs[idx];
+}
+
+int VKHandlerDialogs::count()
+{
+    return m_dialogs.count();
 }
 
 

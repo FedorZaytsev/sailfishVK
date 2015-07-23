@@ -9,23 +9,24 @@ class VKHandlerLongPollUpdateData : public VKAbstractHandler
 public:
     explicit VKHandlerLongPollUpdateData(VKStorage* storage, QObject *parent = 0);
     virtual const QNetworkRequest processRequest();
-    virtual bool processReply(QJsonObject*);
-    virtual QString name() {return "";}
+    virtual void processReply(QJsonValue*);
+    virtual QString name() {return "longPoll";}
             void setUserIds(QList<QString> &userIds);
-            void setMsgIds(QList<QString>& msgIds);
-            //QList<VKContainerMessage*>& messages() {return m_messages;}
-            //QList<VKContainerUser*>& users() {return m_users;}
-            QJsonObject& data() {return m_data;}
+            void setMsgIds(QList<QString> &msgIds);
+            void setChatIds(QList<QString> &chatIds);
+            void setCheckIds(QList<QString> &checkIds);
+            void setRemoved(QList<QString> &removed);
+
 signals:
-    void dataReady();
 public slots:
 private:
+
     QList<QString> m_userIds;
     QList<QString> m_msgIds;
-    
-    QJsonObject m_data;
-    //QList<VKContainerMessage*> m_messages;
-    //QList<VKContainerUser*> m_users;
+    QList<QString> m_chatIds;
+    QList<QString> m_checkIds;
+    QList<QString> m_removed;
+
 };
 
 #endif // VKHANDLERLONGPOLLUPDATEDATA_H

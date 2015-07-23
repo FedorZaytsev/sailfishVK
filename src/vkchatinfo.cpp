@@ -3,6 +3,7 @@
 VKChatInfo::VKChatInfo(QObject *parent) :
     QObject(parent)
 {
+    Q_ASSERT(0);
 }
 
 bool VKChatInfo::isChat() const {
@@ -26,6 +27,7 @@ int VKChatInfo::adminId() const {
 }
 
 void VKChatInfo::parseChatInfo(QJsonObject &message) {
+    Q_UNUSED(message);
     qDebug()<<"VKChatInfo::parseChatInfo not implemented";
 }
 

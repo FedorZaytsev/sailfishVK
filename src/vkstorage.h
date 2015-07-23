@@ -40,7 +40,7 @@ public:
 
     bool userExist(int id) const;
 
-    Q_INVOKABLE QList<VKAbstractContainer*> getHistory();
+    Q_INVOKABLE void getHistory();
 
     int ourUserId() const;
     void setOurUserId(int ourUserId);
@@ -56,6 +56,7 @@ public slots:
 private:
     QMap<QString, QVector<QSqlQueryModel*>> m_models;
     QString     m_accessToken;
+    VKContainerUser* m_ourUser;
     int         m_ourUserId;
 };
 

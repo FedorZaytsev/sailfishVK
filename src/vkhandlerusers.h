@@ -12,14 +12,20 @@ class VKHandlerUsers : public VKAbstractHandler
 public:
     explicit VKHandlerUsers(VKStorage *storage, QObject *parent = 0);
     virtual const QNetworkRequest processRequest();
-    //virtual void processReply(QJsonObject*);
-    //virtual QString name();
+    virtual void processReply(QJsonValue *reply);
+    virtual QString name();
     void setUsers(QVector<int> ids);
+    void setFields(QString fields);
+
+    Q_INVOKABLE int count();
+    Q_INVOKABLE VKContainerUser* get(int i);
 signals:
 
 public slots:
 private:
-    QSet<int> m_users;
+    QVector<int> m_userIds;
+    QString m_fields;
+    QVector<VKContainerUser*> m_users;
 };
 
 #endif // VKHANDLERUSERS_H

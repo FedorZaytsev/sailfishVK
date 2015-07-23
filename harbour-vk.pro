@@ -12,6 +12,7 @@
 # The name of your application
 TARGET = harbour-vk
 QT += sql
+QMAKE_CXXFLAGS += -Werror
 
 CONFIG += sailfishapp c++11
 
@@ -40,7 +41,35 @@ SOURCES += src/harbour-vk.cpp \
     src/vklongpollupdateparser.cpp \
     src/vklongpollcontainer.cpp \
     src/vkhandlerlongpollupdatedata.cpp \
-    src/qmllist.cpp
+    src/qmllist.cpp \
+    src/vkcontainerattachments.cpp \
+    src/vkcontainerphoto.cpp \
+    src/vkcontainervideo.cpp \
+    src/vkhandlermarkasread.cpp \
+    src/qmlnetworkaccessmanagerfactory.cpp \
+    src/vkcontaineraudio.cpp \
+    src/vkcontainerdocument.cpp \
+    src/vklpabstract.cpp \
+    src/vklpmessagedelete.cpp \
+    src/vkhandlersendmessage.cpp \
+    src/vklpmessageflagschange.cpp \
+    src/vklpeventtype.cpp \
+    src/vklpflags.cpp \
+    src/vklpmessageflagsset.cpp \
+    src/vklpmessageflagsreset.cpp \
+    src/vklpmessagenew.cpp \
+    src/vklpmessagemarkincoming.cpp \
+    src/vklpmessagemarkoutcoming.cpp \
+    src/vklpuseroffline.cpp \
+    src/vklpuseronline.cpp \
+    src/vklpchatupdated.cpp \
+    src/vkcontainermessageaction.cpp \
+    src/vklpusertyping.cpp \
+    src/vklpchatusertyping.cpp \
+    src/vklpvideocall.cpp \
+    src/vklpcounterupdate.cpp \
+    src/vkusertypinghelper.cpp \
+    src/debug.cpp
 
 OTHER_FILES += qml/harbour-vk.qml \
     qml/cover/CoverPage.qml \
@@ -56,24 +85,30 @@ OTHER_FILES += qml/harbour-vk.qml \
     qml/pages/DialogComponent.qml \
     qml/pages/DialogElement.qml \
     qml/pages/Messages.qml \
-    qml/pages/MessageComponent.qml \
-    qml/pages/__MessageElement.qml \
     qml/pages/Friends.qml \
     qml/pages/DialogIconHolder.qml \
     qml/pages/FriendComponent.qml \
-    qml/pages/MessageFwdElement.qml \
-    qml/pages/MessageData.qml \
-    qml/pages/MultiImage.qml \
     qml/handlers.js \
     qml/cache.js \
-    qml/pages/ImageCached.qml
+    qml/pages/MessageData.qml \
+    qml/pages/MessageComponent.qml \
+    qml/pages/DebugHello.qml \
+    qml/pages/MessageField.qml \
+    qml/pages/MessageFooter.qml \
+    qml/pages/ImageFullScreen.qml \
+    qml/pages/ImageViewFullScreen.qml \
+    qml/pages/MessageMultiImage.qml \
+    qml/pages/MessageVideo.qml \
+    qml/pages/DebugError.qml
 
 # to disable building translations every time, comment out the
 # following CONFIG line
 CONFIG += sailfishapp_i18n
 TRANSLATIONS += translations/harbour-vk-de.ts
+CONFIG += precompile_header
+PRECOMPILED_HEADER += src/debug.h
+#DEFINES += "VK_DEBUG"
 
-# DEFINES += "PREVIEW_LENGTH=16"
 
 HEADERS += \
     src/vk.h \
@@ -100,7 +135,34 @@ HEADERS += \
     src/vklongpollupdateparser.h \
     src/vklongpollcontainer.h \
     src/vkhandlerlongpollupdatedata.h \
-    src/qmllist.h
+    src/qmllist.h \
+    src/vkcontainerattachments.h \
+    src/vkcontainerphoto.h \
+    src/vkcontainervideo.h \
+    src/vkhandlermarkasread.h \
+    src/qmlnetworkaccessmanagerfactory.h \
+    src/vkcontaineraudio.h \
+    src/vkcontainerdocument.h \
+    src/vklpabstract.h \
+    src/vklpmessagedelete.h \
+    src/vkhandlersendmessage.h \
+    src/vklpmessageflagschange.h \
+    src/vklpeventtype.h \
+    src/vklpflags.h \
+    src/vklpmessageflagsset.h \
+    src/vklpmessageflagsreset.h \
+    src/vklpmessagenew.h \
+    src/vklpmessagemarkincoming.h \
+    src/vklpmessagemarkoutcoming.h \
+    src/vklpuseroffline.h \
+    src/vklpuseronline.h \
+    src/vklpchatupdated.h \
+    src/vkcontainermessageaction.h \
+    src/vklpusertyping.h \
+    src/vklpchatusertyping.h \
+    src/vklpvideocall.h \
+    src/vklpcounterupdate.h \
+    src/vkusertypinghelper.h
 
 RESOURCES +=
 

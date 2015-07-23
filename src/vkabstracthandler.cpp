@@ -5,10 +5,9 @@ VKAbstractHandler::VKAbstractHandler(VKStorage* storage,QObject *parent) :
 {
     m_storage = storage;
     Q_ASSERT(parent);
-
 }
 
-QList<VKAbstractContainer *> VKAbstractHandler::data()
+QJsonValue VKAbstractHandler::data()
 {
     return m_data;
 }

@@ -2,7 +2,7 @@
 #define VKABSTRACTCONTAINER_H
 
 #include <QObject>
-//#include "vkstorage.h"
+#include <QDebug>
 
 class VKAbstractContainer : public QObject
 {

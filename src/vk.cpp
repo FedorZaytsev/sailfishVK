@@ -3,6 +3,7 @@
 #include "vklongpollserver.h"
 #include "vklongpollupdateparser.h"
 
+VK* __vk_object = NULL;
 
 //todo https://vk.com/dev/api_nohttps
 //todo VK::ERROR_CAPTHA
@@ -12,6 +13,12 @@
 VK::VK(QObject *parent) :
     QObject(parent)
 {
+    if (__vk_object) {
+        qFatal("cannot create more than one VK object");
+    } else {
+        __vk_object = this;
+    }
+
     m_manager = new QNetworkAccessManager(this);
     QObject::connect(m_manager, &QNetworkAccessManager::finished, this, &VK::requestFinished);
     QDir dir = QDir(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)).filePath(QCoreApplication::applicationName());
@@ -32,7 +39,7 @@ VK::~VK() {
 }
 
 void VK::storageError(QString msg) {
-    qDebug()<<msg;
+    qDebug()<<"Storage error"<<msg;
 }
 
 void VK::timerRequest(VKAbstractHandler *handler) {
@@ -43,9 +50,23 @@ void VK::timerRequest(VKAbstractHandler *handler) {
     sendNetworkRequest(handler);
 }
 
-void VK::displayErrorMessage(QString err, int displayType) {
-    qDebug()<<"ERROR:"<<err;
-    qFatal("VK::displayErrorMessage not implemented");
+void VK::sendHandlertoScript(VKAbstractHandler *handler) {
+    sendContainersToScript(handler);
+}
+
+void VK::processHandler(VKAbstractHandler *handler) {
+    sendNetworkRequest(handler);
+}
+
+void VK::displayErrorMessage(QString err, ErrorHandlers displayType) {
+    //Q_UNUSED(displayType);
+    //qDebug()<<"ERROR:"<<err;
+    //qFatal("VK::displayErrorMessage not implemented");
+    static bool flag;
+    if (!flag) {
+        flag = true;
+        emit displayError(err, displayType);
+    }
 }
 
 QString VK::getAuthPageUrl() {
@@ -62,8 +83,9 @@ void VK::downloadImageToCache(QString url) {
     m_manager->get(QNetworkRequest(url));
 }
 
-void VK::sendContainersToScript(VKAbstractHandler *handler) {
-    emit handlerReady(handler->name(),  new QmlList(handler->data()));
+void VK::sendContainersToScript(VKAbstractHandler* handler) {
+    qDebug()<<"sendContainersToScript";
+    emit handlerReady(handler->name(),  handler);
 }
 
 bool VK::updateAccessToken(QString str_url) {
@@ -84,23 +106,79 @@ bool VK::updateAccessToken(QString str_url) {
 
 
 void VK::getDialogs(int offset) {
-    qDebug()<<"getDialogs"<<offset;
+    //Q_ASSERT(0);
+    qDebug()<<"VK::getDialogs offset"<<offset;
     Q_ASSERT(initialized());
 
-    VKHandlerDialogs* dialogHandler = new VKHandlerDialogs(&m_VKStorage, this);
+    VKHandlerDialogs* dialogHandler = new VKHandlerDialogs(&storage(), this);
     dialogHandler->setOffset(offset);
     dialogHandler->setLongPoll(!m_longPoll->initilized());
+    QObject::connect(dialogHandler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
+    QObject::connect(dialogHandler, &VKAbstractHandler::sendRequest, this, &VK::processHandler);
 
     sendNetworkRequest(dialogHandler);
 }
 
+
+void VK::getMessages(int id, bool isChat, int offset) {
+    Q_ASSERT(initialized());
+
+    VKHandlerMessages* messagesHandler = new VKHandlerMessages(&storage(), this);
+    if (isChat) {
+        messagesHandler->setChatId(id);
+    } else {
+        messagesHandler->setUserId(id);
+    }
+    messagesHandler->setOffset(offset);
+    messagesHandler->setCount(20);
+    QObject::connect(messagesHandler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
+    QObject::connect(messagesHandler, &VKAbstractHandler::sendRequest, this, &VK::processHandler);
+
+    sendNetworkRequest(messagesHandler);
+}
+
+void VK::markAsRead(QList<int> msgs) {
+    qDebug()<<msgs;
+
+
+    VKHandlerMarkAsRead* handler = new VKHandlerMarkAsRead(&storage(), this);
+
+    handler->setMsgs(msgs);
+    QObject::connect(handler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
+    QObject::connect(handler, &VKAbstractHandler::sendRequest, this, &VK::processHandler);
+
+    sendNetworkRequest(handler);
+
+}
+
+void VK::sendMessage(int userId, bool isChat, QString text, QString forward, QString attachments) {
+    auto handler = new VKHandlerSendMessage(&storage(), this);
+
+    handler->setAttachments(attachments);
+    handler->setForward(forward);
+    handler->setIsChat(isChat);
+    handler->setText(text);
+    handler->setUserId(userId);
+    QObject::connect(handler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
+    QObject::connect(handler, &VKAbstractHandler::sendRequest, this, &VK::processHandler);
+
+    sendNetworkRequest(handler);
+}
+
+
 void VK::sendNetworkRequest(VKAbstractHandler *handler) {
     Q_ASSERT(handler);
+
     QNetworkRequest request = handler->processRequest();
     qDebug()<<request.url().toString();
     QNetworkReply *reply = m_manager->get(request);
 
     m_networkReplies[reply] = handler;
+}
+
+void VK::dropAuthorization() {
+    m_VKStorage.setAccessToken("");
+    m_VKStorage.setOurUserId(-1);
 }
 
 void VK::requestFinished(QNetworkReply* reply) {
@@ -121,8 +199,8 @@ void VK::requestFinished(QNetworkReply* reply) {
             if (object.value("error").type() != QJsonValue::Undefined) {
                 errorHandler(object.value("error").toObject(), handler);
             } else {
-                QJsonValue response = object.value("response");
-                if (response.type() != QJsonValue::Undefined && response.isObject()) {
+                if (object.contains("response")) {
+                    QJsonValue response = object.value("response");
                     QJsonObject responseObject = response.toObject();
                     
                     QJsonObject longPoll = responseObject.value("longPoll").toObject();
@@ -134,47 +212,14 @@ void VK::requestFinished(QNetworkReply* reply) {
                                         longPoll.value("pts").toInt());
                     }
                     
-                    if (handler->processReply(&responseObject)) {
-                        emit needToUpdate();
-                    }
-
-                    //sendContainersToScript(handler);
-
-                    m_networkReplies.remove(reply);
-                    //delete handler;//care
+                    handler->processReply(&response);
 
                 } else {
-                    qFatal("no response or response type if not an object");
+                    qCritical()<<"no response";
                 }
             }
         } else {
-            QUrl filePath(QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + reply->url().path());
-            qDebug()<<filePath.adjusted(QUrl::RemoveFilename)<<"\n"<<reply->url().path();
-            QDir dir(filePath.adjusted(QUrl::RemoveFilename).toString());
-            if (!dir.exists()) {
-                qDebug()<<"folder"<<dir.path()<<"not exists";
-                dir.mkpath(".");
-                qDebug()<<dir.exists();
-            }
-
-            qDebug()<<"File downloaded to"<<filePath;
-            QFile file(filePath.toString());
-            if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-                qDebug()<<"Cannot open file"<<filePath;
-                return;
-            }
-            //file.write(reply->readAll());
-            QImage* img2 = new QImage();
-            img2->loadFromData(reply->readAll());
-
-            QString fileName = filePath.fileName();
-
-            qDebug()<<"file extension"<<fileName.mid(fileName.lastIndexOf(".")+1).toUpper().toStdString().c_str();
-            if (img2->isNull() || !img2->save(&file, "JPG")) {
-                qWarning()<<"Cannot save image"<<filePath;
-            }
-            file.close();
-            emit fileDownloaded(reply->url().toString(), filePath.toString());
+            qCritical()<<"error";
         }
     } else {
         qCritical()<<"Reply error"<<reply->errorString();
@@ -260,7 +305,7 @@ return API.users.get({\"user_ids\":\"%1\",\"fields\":\"%2\"});\
     qDebug()<<execute;
 
     args.push_back({"code", execute.replace("+","%2B")});
-    sendRequest("execute", args, identificator, additional);
+                       sendRequest("execute", args, identificator, additional);
 }
 
 
@@ -278,19 +323,6 @@ return API.friends.get({\"user_id\":%1,\"order\":\"hints\",\"fields\":\"photo_10
     args.push_back({"code", execute.replace("+","%2B")});
     sendRequest("execute", args, identificator, additional);
 }
-
-void VK::getMessages(QString identificator, QString additional, int id, bool isChat, int offset) {
-    Q_ASSERT(initialized());
-
-    QList<QPair<QString,QString>> args;
-    QString execute = QString("\
-return API.messages.getHistory({\"offset\":%1,\"count\":20,\"%2_id\":%3});\
-").arg(offset).arg(isChat?"chat":"user").arg(id);
-
-    args.push_back({"code", execute.replace("+","%2B")});
-    sendRequest("execute", args, identificator, additional);
-}
-
 
 bool VK::isOurUserAuthorized() {
     return m_VKStorage.isAuthorizred();

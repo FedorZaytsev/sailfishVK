@@ -21,7 +21,7 @@ public:
     explicit VKHandlerDialogs(VKStorage* storage, QObject *parent = 0);
              ~VKHandlerDialogs();
     virtual const QNetworkRequest processRequest();
-    virtual bool processReply(QJsonObject *reply);
+    virtual void processReply(QJsonValue *reply);
     virtual QString name();
 
     void setOffset(int offset);
@@ -29,6 +29,10 @@ public:
     void setPreviewLength(int previewLength);
     void setUnread(int unread);
     void setLongPoll(bool b);
+
+    QList<VKAbstractContainer*> &dialogs();
+    Q_INVOKABLE VKAbstractContainer* at(int idx);
+    Q_INVOKABLE int count();
 
 signals:
 
@@ -40,6 +44,7 @@ private:
     u_int32_t m_previewLength;
     u_int32_t m_unread;
     bool m_longPollRequested;
+    QList<VKAbstractContainer*> m_dialogs;
 };
 
 #endif // VKHEADERDIALOGS_H

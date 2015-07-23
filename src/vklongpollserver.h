@@ -10,12 +10,41 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QObject>
+#include <QPair>
 #include "vkabstracthandler.h"
+#include "vklpeventtype.h"
+#include "vklpabstract.h"
 
+#include "vklpmessagedelete.h"
+#include "vklpmessageflagschange.h"
+#include "vklpmessageflagsreset.h"
+#include "vklpmessageflagsset.h"
+#include "vklpmessagenew.h"
+#include "vklpmessagemarkincoming.h"
+#include "vklpmessagemarkoutcoming.h"
+#include "vklpuseroffline.h"
+#include "vklpuseronline.h"
+#include "vklpchatupdated.h"
+#include "vklpusertyping.h"
+#include "vklpchatusertyping.h"
+#include "vklpcounterupdate.h"
+
+#define MAX_USER_ID 2000000000
 //Long Poll server
 //Have his own parser, network manager and so on
 
-#include <QObject>
+/*
+class E_VKUPDATE : public QObject
+{
+    Q_OBJECT
+public:
+    E_VKUPDATE(QObject *parent = 0) : QObject(parent) {}
+
+
+};*/
+
+
 class VKStorage;
 class VK;
 class VKHandlerLongPollUpdateData;
@@ -24,34 +53,62 @@ class VKLongPollServer : public VKAbstractHandler
     Q_OBJECT
 public:
     explicit VKLongPollServer(VKStorage *storage, QObject *parent = 0);
-    void init(VK* vk, VKStorage* storage, QString key, QString server, int ts, int pts);
-    bool initilized() {return key() != "" && ts() != 0;}
+    void                                init(VK* vk, VKStorage* storage, QString key, QString server, int ts, int pts);
+    bool                                initilized() {return key() != "" && ts() != 0;}
+
+    virtual QString                     name() {return "longPollServer";}
+    virtual const QNetworkRequest       processRequest() {qCritical("never called"); return QNetworkRequest();}
+    virtual void                        processReply(QJsonValue*) {qCritical("never called");}
+
+    Q_INVOKABLE int                     count();
+    Q_INVOKABLE VKLPAbstract*           at(int idx);
+    Q_INVOKABLE void                    clean();
+
+/*
+    Q_INVOKABLE int                     messagesCount();
+    Q_INVOKABLE VKContainerDialog*      messagesAt(int i);
+    Q_INVOKABLE void                    messagesRemove(int i);
+
+    Q_INVOKABLE int                     vkupdateCount(int type);
+    Q_INVOKABLE QList<int>              vkupdateAt(int type, int i);
+    Q_INVOKABLE void                    vkupdateRemove(int type, int i);
+    Q_INVOKABLE void                    vkupdateClear(int type);
+
+    Q_INVOKABLE int                     updateMsgCount();
+    Q_INVOKABLE VKContainerMessage*     updateMsgAt(int i);
+    Q_INVOKABLE void                    updateMsgRemove(int i);
+
+    Q_INVOKABLE int                     restoreMsgCount();
+    Q_INVOKABLE VKContainerMessage*     restoreMsgAt(int i);
+    Q_INVOKABLE void                    restoreMsgRemove(int i);
+*/
 private:
-    QString                 key() const                         {return m_key;}
-    void                    setKey(const QString &key)          {m_key = key;}
-    QString                 server() const                      {return m_server;}
-    void                    setServer(const QString &server)    {m_server = server;}
-    int                     ts() const                          {return m_ts;}
-    void                    setTs(int ts)                       {m_ts = ts;}
-    int                     pts() const                         {return m_pts;}
-    void                    setPts(int pts)                     {m_pts = pts;}
-    VKStorage*              storage() const                     {return m_storage;}
-    void                    setStorage(VKStorage *storage)      {m_storage = storage;}
-    QNetworkAccessManager&  manager()                           {return m_manager;}
-    void                    setVK(VK *vk)                       {m_vk = vk;}
-    VK*                     vk()                                {return m_vk;}
-    void                    request();
-    void                    processUpdate(QJsonArray &update);
-    virtual const QNetworkRequest processRequest() {qCritical("never called"); return QNetworkRequest();}
-    virtual bool processReply(QJsonObject*) {qCritical("never called"); return true;}
-    virtual QString name() {return "longPollUpdate";}
-    //void                    getUsersFromFwd(QString data, QSet<int> ids);
+    QString                             key() const                         {return m_key;}
+    void                                setKey(const QString &key)          {m_key = key;}
+    QString                             server() const                      {return m_server;}
+    void                                setServer(const QString &server)    {m_server = server;}
+    int                                 ts() const                          {return m_ts;}
+    void                                setTs(int ts)                       {m_ts = ts;}
+    int                                 pts() const                         {return m_pts;}
+    void                                setPts(int pts)                     {m_pts = pts;}
+    VKStorage*                          storage() const                     {return m_storage;}
+    void                                setStorage(VKStorage *storage)      {m_storage = storage;}
+    QNetworkAccessManager&              manager()                           {return m_manager;}
+    void                                setVK(VK *vk)                       {m_vk = vk;}
+    VK*                                 vk()                                {return m_vk;}
+    void                                request();
+    void                                processUpdate(QJsonArray &update, QList<QString> &userIds, QList<QString> &messageIds, QList<QString> &chatIds, QList<QString> &checkMessages, QList<QString> &removed);
+    void                                sendUpdateDataRequest(QList<QString> &userIds, QList<QString> &messageIds, QList<QString> &chatIds, QList<QString> &checkMessages, QList<QString> &removed);
+    QString                             type2string(VKLPEventType::E_VKUPDATE type);
+    void                                updateReadyEvents();
+
 
 signals:
 
 public slots:
     void networkDataReady(QNetworkReply* reply);
-    void updateDataReady();
+    void updateDataReady(VKAbstractHandler* handler);
+    void additionalInformationAboutUsersReady(VKAbstractHandler* handler);
 private:
     QNetworkAccessManager m_manager;
     QString m_key;
@@ -60,25 +117,14 @@ private:
     int m_pts;
     VKStorage* m_storage;
     VK* m_vk;
-    VKHandlerLongPollUpdateData* m_updateData;
 
-    enum {
-        VKUPDATE_MESSAGE_DELETE = 0,
-        VKUPDATE_MESSAGE_FLAGS_CHANGE,
-        VKUPDATE_MESSAGE_FLAGS_SET,
-        VKUPDATE_MESSAGE_FLAGS_RESET,
-        VKUPDATE_MESSAGE_NEW,
-        VKUPDATE_MESSAGE_MARK_READ = 6,
-        VKUPDATE_MESSAGE_MARK_READ2,
-        VKUPDATE_USER_ONLINE,
-        VKUPDATE_USER_OFFLINE,
-        VKUPDATE_CHAT_UPDATED = 51,
-        VKUPDATE_USER_TYPING = 61,
-        VKUPDATE_CHAT_USER_TYPING,
-        VKUPDATE_VIDEOCALL = 70,
-        VKUPDATE_COUNTER_UPDATE = 80,
+    QMap<int, QVector<VKLPAbstract*>> m_cachedEvents;
+    QVector<VKLPAbstract*> m_readyEvents;
 
-    };
+    QVector<VKContainerDialog*> m_updateDialogs;
+    QVector<VKContainerMessage*> m_updateMessages;
+    QVector<VKContainerUser*> m_updateUsers;
+    QMap<int, QVector<QPair<int, int> > > m_longPollData;           //remove
 };
 
 #endif // VKLONGPOLLSERVER_H

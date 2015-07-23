@@ -6,6 +6,10 @@ VKStorage::VKStorage(QObject *parent) :
     QObject(parent)
 {
     m_ourUserId = 0;
+    m_ourUser = NULL;
+    //FOR DEBUG ONLY
+    m_accessToken = "2c1d185c5b1a708a0f619fc1b13828d2e1286d99bf4871d6141baeea4001fa3a50fc7c86959f3110c9c04";
+    m_ourUserId = 16143988;
 }
 
 VKStorage::~VKStorage()
@@ -15,6 +19,7 @@ VKStorage::~VKStorage()
 }
 
 void VKStorage::init() {
+    /*
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("data.db");
     db.setHostName("localhost");
@@ -53,13 +58,19 @@ void VKStorage::init() {
         qDebug()<<"accessToken"<<m_accessToken;
     } else {
         qDebug()<<"no access token";
-    }
+    }*/
 }
 
 
 
 void VKStorage::addUser(VKContainerUser *user) {
-    QSqlQuery query;
+    if (user->id() == ourUserId()) {
+        m_ourUser = new VKContainerUser(this);
+        user->copyTo(m_ourUser);
+        return;
+    }
+    Q_ASSERT(0);
+    /*QSqlQuery query;
     query.prepare("INSERT OR REPLACE INTO users(id, first_name, second_name, photo_50, photo_100, photo_200) VALUES(:id, :fname, :sname, :photo50, :photo100, :photo200)");
     query.bindValue(":id", user->id());
     query.bindValue(":fname", user->firstName());
@@ -68,33 +79,33 @@ void VKStorage::addUser(VKContainerUser *user) {
     query.bindValue(":photo100",user->iconMedium());
     query.bindValue(":photo200",user->iconLarge());
     qDebug()<<user->iconMedium();
-    query.exec();
+    query.exec();*/
 }
 
 VKContainerUser* VKStorage::getUserById(int userId) {
-    //qDebug()<<"VKStorage::getUserById(userId ="<<userId<<")";
-
-    /*QSqlQuery test;
-    test.exec("SELECT * FROM users");
-    while (test.next()) {
-        qDebug()<<test.value("id").toInt()<<test.value("second_name").toString()<<test.value("photo_50").toString();
-    }*/
-
+    if (userId == m_ourUserId) {
+        return m_ourUser;
+    }
+    Q_ASSERT(0);
+/*
     QSqlQuery query;
     query.prepare("SELECT * FROM users WHERE id = :userid");
     query.bindValue(":userid",userId);
     query.exec();
     if (query.next()) {
-        //qDebug()<<query.value(2).toString()<<query.value("first_name").toString()<<query.value("photo_100").toString();
         return VKContainerUser::fromSql(this, query);
     } else {
         Q_ASSERT(0);
         return NULL;
     }
+*/
+    return NULL;
 }
 
 void VKStorage::addMessage(VKContainerMessage *message) {
-    QSqlQuery query;
+    Q_UNUSED(message);
+    Q_ASSERT(0);
+/*    QSqlQuery query;
     query.prepare("INSERT OR REPLACE INTO messages(id, date, incoming, user_id, read_state, body, is_chat, chat_id)"
                   "VALUES(:id, :date, :incoming, :userid, :readstate, :body, :ischat, :chatid)");
     query.bindValue(":id", message->msgId());
@@ -106,9 +117,13 @@ void VKStorage::addMessage(VKContainerMessage *message) {
     query.bindValue(":ischat", message->isChat() ? 1 : 0);
     query.bindValue(":chatid", message->chatId());
     query.exec();
+*/
 }
 
 VKContainerMessage *VKStorage::getMessageById(int messageId) {
+    Q_UNUSED(messageId);
+    Q_ASSERT(0);
+/*
     QSqlQuery query;
     query.prepare("SELECT * FROM messages WHERE id = :msgid");
     query.bindValue("::msgid", messageId);
@@ -119,10 +134,14 @@ VKContainerMessage *VKStorage::getMessageById(int messageId) {
         Q_ASSERT(0);
         return NULL;
     }
+    */
+    return NULL;
 }
 
 void VKStorage::addDialog(VKContainerDialog *dialog) {
-    QSqlQuery query;
+    Q_UNUSED(dialog);
+    Q_ASSERT(0);
+/*    QSqlQuery query;
     query.prepare("INSERT OR REPLACE INTO dialogs(id, unread_count, is_chat, name, icon1, icon2, icon3, icon4)"
                   "VALUES(:id, :unreadcount, :ischat, :name, :icon1, :icon2, :icon3, :icon4)");
     query.bindValue(":id", dialog->chatId());
@@ -136,11 +155,13 @@ void VKStorage::addDialog(VKContainerDialog *dialog) {
     query.bindValue(":icon3",icon->get(2));
     query.bindValue(":icon4",icon->get(3));
 
-    query.exec();
+    query.exec();*/
 }
 
 VKContainerDialog *VKStorage::getDialogById(int dialogId) {
-    QSqlQuery query;
+    Q_UNUSED(dialogId);
+    Q_ASSERT(0);
+/*    QSqlQuery query;
     query.prepare("SELECT * FROM dialogs WHERE id = :dialogid");
     query.bindValue(":dialogid",dialogId);
     query.exec();
@@ -149,44 +170,9 @@ VKContainerDialog *VKStorage::getDialogById(int dialogId) {
     } else {
         Q_ASSERT(0);
         return NULL;
-    }
+    }*/
+    return NULL;
 }
-
-/*QList<VKContainerDialog *> VKStorage::getDialogs(int offset) {
-    qFatal("err");
-    QSqlQuery query;
-    query.prepare(
-                  "SELECT * "
-                  "FROM dialogs D "
-                  "JOIN ("
-                      "SELECT * "
-                      "FROM messages "
-                      "GROUP BY chat_id "
-                      "ORDER BY date "
-                      "LIMIT 20 "
-                      "OFFSET :offset "
-                  ")M "
-                  "ON M.chat_id = D.id "
-                  "JOIN ( "
-                      "SELECT * "
-                      "FROM users "
-                  ")U "
-                  "ON U.id = M.user_id "
-                  "ORDER BY M.date"
-                  );
-    query.bindValue(":offset",offset);
-    query.exec();
-    
-    //dialogs(id INTEGER PRIMARY KEY, unread_count INTEGER, is_chat INTEGER, name TEXT, icon1 TEXT, icon2 TEXT, icon3 TEXT, icon4 TEXT)
-    //message(id INTEGER PRIMARY KEY, date INTEGER, incoming INTEGER, user_id REAL, read_state INTEGER, body TEXT, is_chat INTEGER, chat_id INTEGER)
-    //users(id INTEGER PRIMARY KEY, unread_count INTEGER, is_chat INTEGER, name TEXT, icon1 TEXT, icon2 TEXT, icon3 TEXT, icon4 TEXT)
-    
-    while (query.next()) {
-        VKContainerDialog* dialog = new VKContainerDialog;
-        //dialog->set
-    }
-    
-}*/
 
 bool VKStorage::isAuthorizred() {
     return m_accessToken != "" && m_ourUserId != 0;
@@ -201,28 +187,32 @@ void VKStorage::setAccessToken(QString accessToken) {
     qDebug()<<"aceesTokent set";
     Q_ASSERT(accessToken != "");
     m_accessToken = accessToken;
-    QSqlQuery query;
+    /*QSqlQuery query;
     query.prepare("INSERT OR REPLACE INTO common(param_name, param) VALUES('access_token', :token)");
     query.bindValue(":token",accessToken);
-    query.exec();
+    query.exec();*/
 }
 
 bool VKStorage::userExist(int id) const {
-    QSqlQuery query;
+    Q_UNUSED(id);
+    Q_ASSERT(0);
+   /* QSqlQuery query;
     query.prepare("SELECT * FROM users WHERE id = :userid LIMIT 1");
     query.bindValue(":userid",id);
     query.exec();
-    return query.next();
+    return query.next();*/
+    return NULL;
 }
 
 void VKStorage::getHistory() {
-    QSqlQuery query;
+    Q_ASSERT(0);
+   /* QSqlQuery query;
     query.exec("SELECT * FROM dialogs LIMIT 20");
     QList<VKAbstractContainer*> result;
     while (query.next()) {
         result.push_back(VKContainerDialog::fromSql(this, query));
     }
-    emit passToScript(result);
+    emit passToScript(result);*/
 }
 
 int VKStorage::ourUserId() const {
@@ -234,25 +224,27 @@ void VKStorage::setOurUserId(int ourUserId) {
     qDebug()<<"set user id"<<ourUserId;
     Q_ASSERT(ourUserId);
     m_ourUserId = ourUserId;
-    QSqlQuery query;
+    /*QSqlQuery query;
     query.prepare("INSERT OR REPLACE INTO common(param_name, param) VALUES('user_id', :userid)");
     query.bindValue(":userid",QString::number(ourUserId));
-    query.exec();
+    query.exec();*/
 }
 
 void VKStorage::debugPrint() {
-    QSqlQuery query;
+    Q_ASSERT(0);
+    /*QSqlQuery query;
     query.prepare("SELECT * FROM dialogs");
     query.exec();
     while (query.next()) {
         qDebug()<<query.value("id").toInt()<<query.value("unread_count").toInt()<<query.value("is_chat").toInt()<<query.value("name").toString();
-    }
+    }*/
 }
 
 int VKStorage::getUnread(int idx) {
+    Q_ASSERT(0);
     qDebug()<<"get unread"<<idx;
     Q_ASSERT(idx);
-
+/*
     QSqlQuery query;
     query.prepare("SELECT unread_count FROM dialogs WHERE id = :dialogid");
     query.bindValue(":dialogid",idx);
@@ -262,7 +254,9 @@ int VKStorage::getUnread(int idx) {
     } else {
         qDebug()<<"no data from SELECT, may be new dialog?"<<idx;
         return 0;
-    }
+    }*/
+
+    return 0;
 }
 
 

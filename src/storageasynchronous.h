@@ -2,7 +2,6 @@
 #define STORAGEASYNCHRONOUS_H
 
 #include <QThread>
-#include <QDebug>
 #include <QQueue>
 
 class StorageAsynchronous : public QThread

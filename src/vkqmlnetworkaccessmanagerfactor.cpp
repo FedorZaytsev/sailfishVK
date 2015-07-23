@@ -5,5 +5,6 @@ VKQmlNetworkAccessManagerFactor::VKQmlNetworkAccessManagerFactor()
 }
 
 QNetworkAccessManager *VKQmlNetworkAccessManagerFactor::create(QObject *parent) {
-
+    Q_UNUSED(parent);
+    return NULL;
 }

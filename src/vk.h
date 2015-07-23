@@ -2,14 +2,12 @@
 #define VK_H
 
 #include <QObject>
-#include <QDebug>
 #include <QUrl>
 #include <QUrlQuery>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include "cryptostorage.h"
 #include <QSettings>
 #include <QDir>
 #include <QObject>
@@ -20,11 +18,12 @@
 #include "vkstorage.h"
 #include "vkabstracthandler.h"
 #include "vkhandlerdialogs.h"
+#include "vkhandlermarkasread.h"
 #include "pendingrequest.h"
 #include "vkabstractcontainer.h"
 #include "qmllist.h"
 #include "vklongpollserver.h"
-
+#include "vkhandlersendmessage.h"
 
 #define DEFAULT_TIME_REPEAT 3000        //3 sec
 
@@ -37,11 +36,28 @@ class VK : public QObject
 public:
     explicit VK(QObject *parent = 0);
     ~VK();
+
+    enum ErrorHandlers{
+        ERROR_HANDLER_NOTHING,
+        ERROR_HANDLER_RESTART,
+        ERROR_HANDLER_RELOGIN,
+    };
+
+    Q_ENUMS(ErrorHandlers)
+
+
     Q_INVOKABLE bool updateAccessToken(QString url);
     Q_INVOKABLE void getDialogs(int offset);
-    Q_INVOKABLE void getMessages(QString identification, QString additional, int id, bool isChat, int offset);
-    Q_INVOKABLE void getFriends(QString identification, QString additional, int user_id);
-    Q_INVOKABLE void getUserInformation(QString identification, QString additional, QString ids,QString fields);
+    Q_INVOKABLE void getMessages(int id, bool isChat, int offset);
+    Q_INVOKABLE void markAsRead(QList<int> msgs);
+    Q_INVOKABLE void sendMessage(int userId, bool isChat, QString text, QString forward, QString attachments);
+
+
+    Q_INVOKABLE void getFriends(QString identification, QString additional, int user_id);                               //remove
+    Q_INVOKABLE void getUserInformation(QString identification, QString additional, QString ids,QString fields);        //remove
+    Q_INVOKABLE void dropAuthorization();
+
+
     Q_INVOKABLE bool isOurUserAuthorized();
                 bool initialized() {return true;}                                                                                      //remove
     Q_INVOKABLE void getLongPollHistory(QString identification, QString additional, int ts, int pts, int messageId);
@@ -50,23 +66,24 @@ public:
     Q_INVOKABLE void subscribeLongPollServer(QString identification, QString additional, QString key, QString server, int ts);              //remove
     Q_INVOKABLE void getLongPollMessageInformation(QString identification, QString additional, QString userIds, QString fwdMessagesIds);    //remove
                 void errorHandler(QJsonObject, VKAbstractHandler*);
-                void displayErrorMessage(QString err, int displayType);
+                void displayErrorMessage(QString err, ErrorHandlers displayType);
     Q_INVOKABLE QString getAuthPageUrl();
-    Q_INVOKABLE void downloadImageToCache(QString url);
+    Q_INVOKABLE void downloadImageToCache(QString url);                                                                                         //remove
     Q_INVOKABLE VKStorage* getStorage() {return &storage();}
                 void sendContainersToScript(VKAbstractHandler* handler);
-
 
 signals:
     void replyReady(QString document, QString identificator, QString additional);
     void dataReady(VKAbstractContainer* data);
-    void handlerReady(QString name, QmlList* data);
-    void fileDownloaded(QString name, QString path);
-    void needToUpdate();
+    void handlerReady(QString name, VKAbstractHandler* handler);
+    void fileDownloaded(QString name, QString path);                //remove
+    void displayError(QString reason, ErrorHandlers type);
 public slots:
     void requestFinished(QNetworkReply*);
     void storageError(QString);
     void timerRequest(VKAbstractHandler* handler);
+    void sendHandlertoScript(VKAbstractHandler* handler);
+    void processHandler(VKAbstractHandler* handler);
 private:
     VKStorage& storage() {return m_VKStorage;}
     QNetworkAccessManager *m_manager;
@@ -74,7 +91,7 @@ private:
     QSettings m_settings;                                           //remove
     VKStorage m_VKStorage;
     QMap<QNetworkReply*, VKAbstractHandler*> m_networkReplies;
-    QVector<QImage*> m_images;
+    QVector<QImage*> m_images;                                      //remove
     VKLongPollServer* m_longPoll;
     
 
@@ -112,13 +129,6 @@ private:
         ERROR_HTTPS_SAME = 1113,                        //The same as ERROR_HTTPS_ONLY, may be missunderstanding in documentation?
     };
 
-    enum {
-        ERROR_HANDLER_NOTHING,
-        ERROR_HANDLER_RESTART,
-        ERROR_HANDLER_INFORM,
-        ERROR_HANDLER_RELOGIN,
-        ERROR_HANDLER_RELOGIN_INFORM,
-    };
 };
 
 #endif // VK_H

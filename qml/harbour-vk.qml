@@ -43,13 +43,20 @@ ApplicationWindow
     VK {
         id: vk
         onHandlerReady: {
-            Handlers.ready(name, data)
+            Handlers.ready(name, handler)
         }
+        onDisplayError: {
+            console.log(reason, type)
 
-
+            pageStack.completeAnimation()
+            if (type !== VK.ERROR_HANDLER_NOTHING) {
+                pageStack.clear()
+            }
+            pageStack.push(Qt.resolvedUrl("pages/DebugError.qml"), {msg: reason, type: type})
+        }
     }
 
-    initialPage: Component { Auth { } }
+    initialPage: Component {Auth { }}
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
 }
 

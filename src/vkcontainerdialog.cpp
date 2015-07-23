@@ -8,25 +8,33 @@ VKContainerDialog::VKContainerDialog(QObject *parent) :
 {
     m_message = NULL;
     m_chatIcon = NULL;
-    //qDebug()<<"VKContainerDialog::VKContainerDialog create";
+    m_unreadCount = 0;
+    m_chatId = 0;
+    m_isChat = false;
 }
-
 
 VKContainerDialog::~VKContainerDialog()
 {
-    if (m_message) {
-        delete m_message;
-    }
-    if (m_chatIcon) {
-        delete m_chatIcon;
-    }
-    //qDebug()<<"VKContainerDialog::~VKContainerDialog";
 }
 
-VKContainerDialog* VKContainerDialog::fromJson(VKStorage *storage, QJsonObject obj, const QJsonArray users) {
+VKContainerDialog* VKContainerDialog::fromJson(VKStorage *storage, QJsonObject obj, const QJsonArray users, QVector<int> userIds) {
     VKContainerDialog* dialog = new VKContainerDialog;
-    dialog->setUnreadCount(obj.value("unread").toInt(0));
-    QJsonObject message = obj.value("message").toObject();
+    dialog->setUnreadCount(obj.value("unread").toInt());
+
+    QJsonObject message;
+    if (obj.contains("message")) {
+        message = obj.value("message").toObject();
+    } else if (obj.contains("body") && obj.contains("id")) {
+        message = obj;
+        dialog->setUnreadCount(1);
+    } else {
+        qDebug()<<"unknown object for VKContainerDialog\nKeys:";
+        for (auto it = message.begin();it != message.end(); ++it) {
+            qDebug()<<it.key();
+        }
+        Q_ASSERT(0);
+    }
+
     if (message.contains("chat_id")) {
         dialog->setIsChat(true);
         dialog->setChatId(message.value("chat_id").toInt());
@@ -62,7 +70,7 @@ VKContainerDialog* VKContainerDialog::fromJson(VKStorage *storage, QJsonObject o
     dialog->setChatIcon(chatIcon);
 
 
-    VKContainerMessage* containerMessage = VKContainerMessage::fromJson(storage, obj.value("message").toObject(), users);
+    VKContainerMessage* containerMessage = VKContainerMessage::fromJson(storage, message, users, userIds);
     containerMessage->setParent(dialog);
     dialog->setMessage(containerMessage);
     return dialog;
@@ -80,14 +88,23 @@ VKContainerDialog *VKContainerDialog::fromSql(VKStorage *storage, QSqlQuery quer
         QString iconName = query.value(QString("icon%1").arg(i)).toString();
         if (iconName == "") break;
 
-
     }
 
     return dialog;
 }
 
+void VKContainerDialog::setChatName(QString arg) {
+    m_chatName = arg;
+}
+
+void VKContainerDialog::setChatIcon(VKContainerChatIcon *arg) {
+    m_chatIcon = arg;
+    m_chatIcon->setParent(this);
+}
+
 void VKContainerDialog::setMessage(VKContainerMessage *arg) {
-    m_message = arg; m_message->setParent(this);
+    m_message = arg;
+    m_message->setParent(this);
 }
 
 

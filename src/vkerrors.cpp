@@ -28,7 +28,7 @@ void VK::errorHandler(QJsonObject obj, VKAbstractHandler *handler) {
         displayErrorMessage("VK::ERROR_TOO_MANY_REQUESTS", VK::ERROR_HANDLER_RESTART);
     } break;
     case VK::ERROR_NO_PERMISSION: {
-        displayErrorMessage("VK::ERROR_NO_PERMISSION", VK::ERROR_HANDLER_RELOGIN_INFORM);
+        displayErrorMessage("VK::ERROR_NO_PERMISSION", VK::ERROR_HANDLER_RELOGIN);
     } break;
     case VK::ERROR_WRONG_SYNTAX: {
         displayErrorMessage("VK::ERROR_WRONG_SYNTAX", VK::ERROR_HANDLER_NOTHING);
