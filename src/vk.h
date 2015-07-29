@@ -41,6 +41,7 @@ public:
         ERROR_HANDLER_NOTHING,
         ERROR_HANDLER_RESTART,
         ERROR_HANDLER_RELOGIN,
+        ERROR_HANDLER_INFORM
     };
 
     Q_ENUMS(ErrorHandlers)
@@ -51,32 +52,18 @@ public:
     Q_INVOKABLE void getMessages(int id, bool isChat, int offset);
     Q_INVOKABLE void markAsRead(QList<int> msgs);
     Q_INVOKABLE void sendMessage(int userId, bool isChat, QString text, QString forward, QString attachments);
-
-
-    Q_INVOKABLE void getFriends(QString identification, QString additional, int user_id);                               //remove
-    Q_INVOKABLE void getUserInformation(QString identification, QString additional, QString ids,QString fields);        //remove
     Q_INVOKABLE void dropAuthorization();
-
-
+    Q_INVOKABLE QString getAuthPageUrl();
+    Q_INVOKABLE VKStorage* getStorage() {return &storage();}
     Q_INVOKABLE bool isOurUserAuthorized();
-                bool initialized() {return true;}                                                                                      //remove
-    Q_INVOKABLE void getLongPollHistory(QString identification, QString additional, int ts, int pts, int messageId);
-                void sendRequest(QString method, QList<QPair<QString,QString>> args, QString identificator, QString additional);        //remove
+
                 void sendNetworkRequest(VKAbstractHandler* handler);
-    Q_INVOKABLE void subscribeLongPollServer(QString identification, QString additional, QString key, QString server, int ts);              //remove
-    Q_INVOKABLE void getLongPollMessageInformation(QString identification, QString additional, QString userIds, QString fwdMessagesIds);    //remove
                 void errorHandler(QJsonObject, VKAbstractHandler*);
                 void displayErrorMessage(QString err, ErrorHandlers displayType);
-    Q_INVOKABLE QString getAuthPageUrl();
-    Q_INVOKABLE void downloadImageToCache(QString url);                                                                                         //remove
-    Q_INVOKABLE VKStorage* getStorage() {return &storage();}
                 void sendContainersToScript(VKAbstractHandler* handler);
 
 signals:
-    void replyReady(QString document, QString identificator, QString additional);
-    void dataReady(VKAbstractContainer* data);
     void handlerReady(QString name, VKAbstractHandler* handler);
-    void fileDownloaded(QString name, QString path);                //remove
     void displayError(QString reason, ErrorHandlers type);
 public slots:
     void requestFinished(QNetworkReply*);
@@ -87,11 +74,8 @@ public slots:
 private:
     VKStorage& storage() {return m_VKStorage;}
     QNetworkAccessManager *m_manager;
-    QMap<QNetworkReply*,QPair<QString,QString>> m_replies;          //remove
-    QSettings m_settings;                                           //remove
     VKStorage m_VKStorage;
     QMap<QNetworkReply*, VKAbstractHandler*> m_networkReplies;
-    QVector<QImage*> m_images;                                      //remove
     VKLongPollServer* m_longPoll;
     
 
@@ -104,7 +88,7 @@ private:
         ERROR_TOO_MANY_REQUESTS,
         ERROR_NO_PERMISSION,
         ERROR_WRONG_SYNTAX,
-        ERROR_TOO_MANY_SIMILAR_REQUESTS,           //???
+        ERROR_TOO_MANY_SIMILAR_REQUESTS,
         ERROR_SERVER_ERROR,
         ERROR_TEST_MODE,
         ERROR_CAPTHA = 14,

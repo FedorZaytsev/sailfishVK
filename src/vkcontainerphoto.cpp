@@ -43,12 +43,26 @@ QString VKContainerPhoto::maxSuitablePhoto() {
 
 QSize VKContainerPhoto::maxSuitableSize() {
     if (photo604().length()) {
-        return {604, 604};
+        return calculatePhotoSize({604, 604});
     } else if (photo130().length()) {
-        return {130, 130};
+        return calculatePhotoSize({130, 130});
     } else if (photo75().length()) {
-        return {75, 75};
+        return calculatePhotoSize({75, 75});
     }
     Q_ASSERT(0);
     return QSize();
+}
+
+QSize VKContainerPhoto::calculatePhotoSize(QSize size) {
+    float coefWidth = size.width()/m_width;
+    float coefHeight = size.height()/m_height;
+
+    float max = qMax(coefWidth, coefHeight);
+
+    if (max > 1.0) {
+        return size*max;
+    }
+
+    return size;
+
 }

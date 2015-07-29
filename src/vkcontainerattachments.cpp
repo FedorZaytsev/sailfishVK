@@ -3,6 +3,10 @@
 #include "vkcontainervideo.h"
 #include "vkcontaineraudio.h"
 #include "vkcontainerdocument.h"
+#include "vkcontainerwall.h"
+#include "vkcontainerwallreply.h"
+#include "vkcontainersticker.h"
+#include "vkcontainerlink.h"
 
 VKContainerAttachments::VKContainerAttachments(QObject *parent) :
     VKAbstractContainer(parent)
@@ -16,9 +20,9 @@ VKContainerAttachments *VKContainerAttachments::fromJson(VKStorage *storage, QJs
         auto el = e.toObject();
         auto type = stringToType(el.value("type").toString());
         //HACK UNTIL NOT ALL ATTACHMENTS IMPLEMENTED
-        if (type == AttachmentsType::PHOTO || type == AttachmentsType::VIDEO || type == AttachmentsType::AUDIO || type == AttachmentsType::DOC) {
-            attachments->addAttachment(type, getContainer(type, storage, el.value(el.value("type").toString()).toObject(), users));
-        }
+        //if (type == AttachmentsType::PHOTO || type == AttachmentsType::VIDEO || type == AttachmentsType::AUDIO || type == AttachmentsType::DOC) {
+        attachments->addAttachment(type, getContainer(type, storage, el.value(el.value("type").toString()).toObject(), users));
+        //}
     }
     return attachments;
 }
@@ -31,7 +35,6 @@ VKContainerAttachments *VKContainerAttachments::fromSql(VKStorage *storage, QSql
 }
 
 int VKContainerAttachments::count(AttachmentsType type) {
-    qDebug()<<"type"<<type;
     if (m_data.contains(type)) {
         return m_data[type].length();
     }
@@ -118,16 +121,16 @@ VKAbstractContainer *VKContainerAttachments::getContainer(AttachmentsType type, 
         return VKContainerAudio::fromJson(storage, obj, users);
     } break;
     case AttachmentsType::STICKER: {
-        Q_ASSERT(0);
+        return VKContainerSticker::fromJson(storage, obj, users);
     } break;
     case AttachmentsType::WALL: {
-        Q_ASSERT(0);
+        return VKContainerWall::fromJson(storage, obj, users);
     } break;
     case AttachmentsType::WALL_REPLY: {
-        Q_ASSERT(0);
+        return VKContainerWallReply::fromJson(storage, obj, users);
     } break;
     case AttachmentsType::LINK: {
-        Q_ASSERT(0);
+        return VKContainerLink::fromJson(storage, obj, users);
     } break;
     default:
         Q_ASSERT(0);

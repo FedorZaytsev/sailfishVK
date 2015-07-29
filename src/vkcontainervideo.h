@@ -30,6 +30,8 @@ public:
     Q_INVOKABLE int comments()          { return m_comments; }
     Q_INVOKABLE QString playerUrl()     { return m_playerUrl; }
     Q_INVOKABLE bool isProcessing()     { return m_isProcessing; }
+    Q_INVOKABLE QString accessToken()   { return m_accessToken; }
+    Q_INVOKABLE bool canEdit()          { return m_canEdit; }
 
 
     void setId(int arg)                 { m_id = arg; }
@@ -47,6 +49,8 @@ public:
     void setComments(int arg)           { m_comments = arg; }
     void setPlayerUrl(QString arg)      { m_playerUrl = arg; }
     void setIsProcessing(bool arg)      { m_isProcessing = arg; }
+    void setAccessToken(QString arg)    { m_accessToken = arg; }
+    void setCanEdit(bool arg)           { m_canEdit = arg; }
 
 
 signals:
@@ -68,6 +72,8 @@ private:
     int m_comments;
     QString m_playerUrl;
     bool m_isProcessing;
+    QString m_accessToken;
+    bool m_canEdit;
 };
 
 #endif // VKCONTAINERVIDEO_H

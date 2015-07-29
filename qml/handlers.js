@@ -75,33 +75,66 @@ function findDialogModel() {
 
 function prepareAttachments(e) {
 
-    function parsePhoto(result, el) {
-        var t = {
-                    id: el.id(),
-                    image: el.maxSuitablePhoto(),
-                    imageSize: el.maxSuitableSize()
-        }
-        if (result.photo) {
-            result.photo.push(t)
+    function arrayAdd(t, key, val) {
+        if (t[key]) {
+            t[key].push(val)
         } else {
-            result.photo = [t]
+            t[key] = [val]
         }
+    }
+
+    function parsePhoto(result, el) {
+        arrayAdd(result, "photo", {
+                     id: el.id(),
+                     image: el.maxSuitablePhoto(),
+                     imageSize: el.size()
+         })
     }
     function parseVideo(result, el) {
-        var t = {
-            id: el.id(),
-            name: el.title(),
-            url: el.playerUrl()
-        }
-        if (result.video) {
-            result.video.push(t)
-        } else {
-            result.video = [t]
-        }
+        arrayAdd(result, "video", {
+                     videoId: el.id(),
+                     videoName: el.title(),
+                     videoUrl: el.playerUrl()
+        })
     }
+    function parseAudio(result, el) {
+        arrayAdd(result, "audio", {
+                     audioId: el.id()
+        })
+    }
+    function parseDoc(result, el) {
+        arrayAdd(result, "doc", {
+        })
+    }
+    function parseWall(result, el) {
+        arrayAdd(result, "wall", {
+        })
+    }
+    function parseWallReply(result, el) {
+        arrayAdd(result, "wallReply", {
+        })
+    }
+    function parseSticker(result, el) {
+        arrayAdd(result, "sticker", {
+        })
+    }
+    function parseLink(result, el) {
+        arrayAdd(result, "link", {
+                     linkUrl: el.url(),
+                     linkTitle: el.title(),
+                     linkDescription: el.description()
+        })
+    }
+
     var funcs = {}
     funcs[VKContainerAttachments.PHOTO] = parsePhoto
     funcs[VKContainerAttachments.VIDEO] = parseVideo
+    funcs[VKContainerAttachments.AUDIO] = parseAudio
+    funcs[VKContainerAttachments.DOC] = parseDoc
+    funcs[VKContainerAttachments.WALL] = parseWall
+    funcs[VKContainerAttachments.WALL_REPLY] = parseWallReply
+    funcs[VKContainerAttachments.STICKER] = parseSticker
+    funcs[VKContainerAttachments.LINK] = parseLink
 
     var result = {
         /*photo: [],
@@ -177,16 +210,16 @@ function addDialog(model, dialog, position, additionalUnreadCount) {
     if ((additionalUnreadCount + (message.isIncoming() ? dialog.unreadCount() : 0)) < 0) console.assert(0,"ggg4")
     var t = {
         name: dialog.chatName(),
-        msgText: processMsg(message),
+        msg: processMsg(message),
         isIncoming: message.isIncoming(),
         authorAvatar50: message.user().iconSmall(),
         isChat: dialog.isChat(),
         id: dialog.chatId(),
         msgId: message.msgId(),
-        iconFour1: icon.get(0) || "",
-        iconFour2: icon.get(1) || "",
-        iconFour3: icon.get(2) || "",
-        iconFour4: icon.get(3) || "",
+        icon1: icon.get(0) || "",
+        icon2: icon.get(1) || "",
+        icon3: icon.get(2) || "",
+        icon4: icon.get(3) || "",
         isRead: message.readState(),
         unreadCount: additionalUnreadCount + (message.isIncoming() ? dialog.unreadCount() : 0),
     }
@@ -457,7 +490,7 @@ function processMessageNew(el) {
     var additionalUnreadCount = 0
     var dialogId = findMsgId(dmodel, dialog.chatId())
 
-    console.log("dialogId",dialogId, "chatId", dialog.chatId(), "dmodel.get(dialogId).unreadCount", dmodel.get(dialogId).unreadCount)
+    console.log("dialogId",dialogId, "chatId", dialog.chatId(), "dmodel.get(dialogId).unreadCount", dmodel?dmodel.get(dialogId).unreadCount:"no dmodel")
     if (dialogId !== undefined) {
 
         updateDialog(dmodel, dialog, dialogId)

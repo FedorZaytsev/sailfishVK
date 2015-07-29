@@ -34,12 +34,11 @@ VK::VK(QObject *parent) :
     m_longPoll = new VKLongPollServer(&m_VKStorage, this);
 }
 
-VK::~VK() {
-    m_settings.sync();
-}
+VK::~VK() {}
 
 void VK::storageError(QString msg) {
     qDebug()<<"Storage error"<<msg;
+    Q_ASSERT(0);
 }
 
 void VK::timerRequest(VKAbstractHandler *handler) {
@@ -59,9 +58,6 @@ void VK::processHandler(VKAbstractHandler *handler) {
 }
 
 void VK::displayErrorMessage(QString err, ErrorHandlers displayType) {
-    //Q_UNUSED(displayType);
-    //qDebug()<<"ERROR:"<<err;
-    //qFatal("VK::displayErrorMessage not implemented");
     static bool flag;
     if (!flag) {
         flag = true;
@@ -77,10 +73,6 @@ QString VK::getAuthPageUrl() {
                                 "&display=mobile"
                                 "&v=5.28"
                                 "&response_type=token";
-}
-
-void VK::downloadImageToCache(QString url) {
-    m_manager->get(QNetworkRequest(url));
 }
 
 void VK::sendContainersToScript(VKAbstractHandler* handler) {
@@ -106,10 +98,6 @@ bool VK::updateAccessToken(QString str_url) {
 
 
 void VK::getDialogs(int offset) {
-    //Q_ASSERT(0);
-    qDebug()<<"VK::getDialogs offset"<<offset;
-    Q_ASSERT(initialized());
-
     VKHandlerDialogs* dialogHandler = new VKHandlerDialogs(&storage(), this);
     dialogHandler->setOffset(offset);
     dialogHandler->setLongPoll(!m_longPoll->initilized());
@@ -121,8 +109,6 @@ void VK::getDialogs(int offset) {
 
 
 void VK::getMessages(int id, bool isChat, int offset) {
-    Q_ASSERT(initialized());
-
     VKHandlerMessages* messagesHandler = new VKHandlerMessages(&storage(), this);
     if (isChat) {
         messagesHandler->setChatId(id);
@@ -183,6 +169,11 @@ void VK::dropAuthorization() {
     m_longPoll = new VKLongPollServer(&m_VKStorage, this);
 }
 
+bool VK::isOurUserAuthorized() {
+    return m_VKStorage.isAuthorizred();
+}
+
+
 void VK::requestFinished(QNetworkReply* reply) {
     if (reply->error() == QNetworkReply::NoError) {
 
@@ -225,129 +216,8 @@ void VK::requestFinished(QNetworkReply* reply) {
         }
     } else {
         qCritical()<<"Reply error"<<reply->errorString();
-        Q_ASSERT(0);
+        displayError(reply->errorString(), ERROR_HANDLER_INFORM);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-void VK::subscribeLongPollServer(QString identification, QString additional, QString key, QString server, int ts) {
-    Q_ASSERT(initialized());
-
-    QUrl url(QString("https://%1?act=a_check&key=%2&ts=%3&wait=25&mode=2").arg(server).arg(key).arg(ts));
-
-    qDebug()<<url.toString();
-
-    QNetworkReply* reply = m_manager->get(QNetworkRequest(url));
-
-    m_replies[reply] = QPair<QString,QString>(identification,additional);
-}
-
-void VK::getLongPollMessageInformation(QString identification, QString additional, QString userIds, QString fwdMessagesIds) {
-    Q_ASSERT(initialized());
-    QList<QPair<QString,QString>> args;
-
-    QString execute;
-    if (userIds.length() && !fwdMessagesIds.length()) {
-        execute = QString("\
-return {\"users\":API.users.get({\"user_ids\":\"%1\",\"fields\":\"photo_50\"}),\"fwd\":[]};\
-").arg(userIds);
-    } else if (!userIds.length() && fwdMessagesIds.length()) {
-        execute = QString("\
-return {\"users\":[], \"fwd\":API.messages.getById({\"message_ids\":\"%1\",\"preview_length\":16})};\
-").arg(fwdMessagesIds);
-    } else if (userIds.length() && fwdMessagesIds.length()) {
-        execute = QString("\
-return {\"users\": API.users.get({\"user_ids\":\"%1\",\"fields\":\"photo_50\"}) ,\"fwd\": API.messages.getById({\"message_ids\":\"%2\",\"preview_length\":16})};\
-").arg(userIds).arg(fwdMessagesIds);
-    } else {
-        Q_ASSERT(false);
-    }
-
-    qDebug()<<execute;
-
-    args.push_back({"code", execute.replace("+","%2B")});
-                                  sendRequest("execute", args, identification, additional);
-                              }
-
-
-void VK::getLongPollHistory(QString identification, QString additional, int ts, int pts, int messageId) {
-    Q_ASSERT(initialized());
-    QList<QPair<QString,QString>> args;
-
-    QString execute = QString("\
-return API.messages.getLongPollHistory({\"ts\":%1,\"pts\":%2,\"preview_length\":16,\"max_msg_id\":%3});\
-").arg(ts).arg(pts).arg(messageId);
-
-    qDebug()<<execute;
-
-    args.push_back({"code", execute.replace("+","%2B")});
-    sendRequest("execute", args, identification, additional);
-}
-
-void VK::getUserInformation(QString identificator, QString additional, QString ids, QString fields) {
-    Q_ASSERT(initialized());
-
-    QList<QPair<QString,QString>> args;
-
-    QString execute = QString("\
-return API.users.get({\"user_ids\":\"%1\",\"fields\":\"%2\"});\
-").arg(ids).arg(fields);
-
-    qDebug()<<execute;
-
-    args.push_back({"code", execute.replace("+","%2B")});
-                       sendRequest("execute", args, identificator, additional);
-}
-
-
-void VK::getFriends(QString identificator, QString additional, int user_id) {
-    Q_ASSERT(initialized());
-
-    QList<QPair<QString,QString>> args;
-
-    QString execute = QString("\
-return API.friends.get({\"user_id\":%1,\"order\":\"hints\",\"fields\":\"photo_100\"});\
-").arg(user_id);
-
-    qDebug()<<execute;
-
-    args.push_back({"code", execute.replace("+","%2B")});
-    sendRequest("execute", args, identificator, additional);
-}
-
-bool VK::isOurUserAuthorized() {
-    return m_VKStorage.isAuthorizred();
-}
-
-void VK::sendRequest(QString method, QList<QPair<QString,QString>> args, QString identificator, QString additional) {
-    QUrl url(QString("https://api.vk.com/method/%1").arg(method));
-
-    args.push_back({"access_token","123"});
-
-    QUrlQuery query;
-    args.push_back({"v","5.28"});
-    query.setQueryItems(args);
-    url.setQuery(query);
-
-    qDebug()<<url.toString();
-
-    QNetworkReply* reply = m_manager->get(QNetworkRequest(url));
-
-                                                  m_replies[reply] = QPair<QString,QString>(identificator,additional);
-                                              }
-
-
-
 
 

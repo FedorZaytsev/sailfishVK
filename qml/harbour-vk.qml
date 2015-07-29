@@ -54,7 +54,12 @@ ApplicationWindow
             if (type !== VK.ERROR_HANDLER_NOTHING) {
                 pageStack.clear()
             }
-            pageStack.push(Qt.resolvedUrl("pages/DebugError.qml"), {msg: reason, type: type})
+            if (type === VK.ERROR_HANDLER_INFORM) {
+                //todo!!!!
+                //popup.show(reason)
+            } else {
+                pageStack.push(Qt.resolvedUrl("pages/DebugError.qml"), {msg: reason, type: type})
+            }
         }
     }
 

@@ -18,8 +18,6 @@ CONFIG += sailfishapp c++11
 
 SOURCES += src/harbour-vk.cpp \
     src/vk.cpp \
-    src/cryptostorage.cpp \
-    src/cachestorage.cpp \
     src/vkpixmapprovider.cpp \
     src/vkstorage.cpp \
     src/vkchatinfo.cpp \
@@ -33,7 +31,6 @@ SOURCES += src/harbour-vk.cpp \
     src/vkhandlerusers.cpp \
     src/vkabstracthandler.cpp \
     src/vkabstractcontainer.cpp \
-    src/storageasynchronous.cpp \
     src/vklongpollserver.cpp \
     src/vkcontainerchaticon.cpp \
     src/vkqmlnetworkaccessmanagerfactor.cpp \
@@ -69,7 +66,11 @@ SOURCES += src/harbour-vk.cpp \
     src/vklpvideocall.cpp \
     src/vklpcounterupdate.cpp \
     src/vkusertypinghelper.cpp \
-    src/debug.cpp
+    src/debug.cpp \
+    src/vkcontainerwall.cpp \
+    src/vkcontainerwallreply.cpp \
+    src/vkcontainersticker.cpp \
+    src/vkcontainerlink.cpp
 
 OTHER_FILES += qml/harbour-vk.qml \
     qml/cover/CoverPage.qml \
@@ -99,7 +100,13 @@ OTHER_FILES += qml/harbour-vk.qml \
     qml/pages/ImageViewFullScreen.qml \
     qml/pages/MessageMultiImage.qml \
     qml/pages/MessageVideo.qml \
-    qml/pages/DebugError.qml
+    qml/pages/DebugError.qml \
+    qml/pages/InfoPopup.qml \
+    qml/pages/MessageAudio.qml \
+    qml/pages/MessageWall.qml \
+    qml/pages/MessageWallReply.qml \
+    qml/pages/MessageSticker.qml \
+    qml/pages/MessageLink.qml
 
 # to disable building translations every time, comment out the
 # following CONFIG line
@@ -112,8 +119,6 @@ PRECOMPILED_HEADER += src/debug.h
 
 HEADERS += \
     src/vk.h \
-    src/cryptostorage.h \
-    src/cachestorage.h \
     src/vkpixmapprovider.h \
     src/debug.h \
     src/vkstorage.h \
@@ -127,7 +132,6 @@ HEADERS += \
     src/vkhandlerusers.h \
     src/vkabstracthandler.h \
     src/vkabstractcontainer.h \
-    src/storageasynchronous.h \
     src/vklongpollserver.h \
     src/vkcontainerchaticon.h \
     src/vkqmlnetworkaccessmanagerfactor.h \
@@ -162,7 +166,11 @@ HEADERS += \
     src/vklpchatusertyping.h \
     src/vklpvideocall.h \
     src/vklpcounterupdate.h \
-    src/vkusertypinghelper.h
+    src/vkusertypinghelper.h \
+    src/vkcontainerwall.h \
+    src/vkcontainerwallreply.h \
+    src/vkcontainersticker.h \
+    src/vkcontainerlink.h
 
 RESOURCES +=
 

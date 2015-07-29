@@ -25,8 +25,7 @@ public:
     Q_INVOKABLE QString     photo807()      { return m_photo807; }
     Q_INVOKABLE QString     photo1280()     { return m_photo1280; }
     Q_INVOKABLE QString     photo2560()     { return m_photo2560; }
-    Q_INVOKABLE int         width()         { return m_width; }
-    Q_INVOKABLE int         height()        { return m_height; }
+    Q_INVOKABLE QSize       size()          { return QSize(m_width, m_height); }
     Q_INVOKABLE QDateTime   time()          { return m_date; }
     Q_INVOKABLE QString     text()          { return m_text; }
     Q_INVOKABLE QString     maxSuitablePhoto();
@@ -46,7 +45,8 @@ public:
     void setHeight(int height) { m_height = height; }
     void setDate(QDateTime date) { m_date = date; }
     void setText(QString text) { m_text = text; }
-
+private:
+    QSize calculatePhotoSize(QSize size);
 signals:
 
 public slots:

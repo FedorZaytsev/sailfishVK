@@ -24,6 +24,8 @@ VKContainerVideo *VKContainerVideo::fromJson(VKStorage *storage, QJsonObject obj
     video->setPlayerUrl(obj.value("player").toString());
     video->setTitle(obj.value("title").toString());
     video->setViews(obj.value("views").toInt());
+    video->setAccessToken(obj.value("access_toke").toString());
+    video->setCanEdit(obj.value("can_edit").toInt() == 1);
 
     QDateTime date;
     date.setTime_t(obj.value("date").toInt());
