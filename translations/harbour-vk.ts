@@ -9,6 +9,13 @@
     </message>
 </context>
 <context>
+    <name>DebugError</name>
+    <message>
+        <source>Send bug report</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FirstPage</name>
     <message>
         <source>Show Page 2</source>

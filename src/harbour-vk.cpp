@@ -60,7 +60,6 @@ void createLogFile() {
     qInstallMessageHandler(myMessageOutput);
 
     qWarning()<<"Application version"<<VK_MAJOR_VERSION<<VK_MINOR_VERSION<<VK_DEVELOP_STATE;
-
 }
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
@@ -102,16 +101,19 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
     stderrStream<<logString;
 
     __logFile.flush();
+    if (getVK()) {
+        getVK()->addDebugLogLine(logString);
+    }
 }
 
 
 int main(int argc, char *argv[]) {
 
+    createLogFile();
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
     QScopedPointer<QQuickView> view(SailfishApp::createView());
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
-    createLogFile();
 
     qmlRegisterType<VK>("harbour.vk.VK", 1, 0, "VK");
     qmlRegisterType<VKLongPollServer>();

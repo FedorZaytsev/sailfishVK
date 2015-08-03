@@ -18,6 +18,7 @@ VK::VK(QObject *parent) :
     } else {
         __vk_object = this;
     }
+    m_debugLogBuffer = new DebugLogBuffer(this);
 
     m_manager = new QNetworkAccessManager(this);
     QObject::connect(m_manager, &QNetworkAccessManager::finished, this, &VK::requestFinished);
@@ -32,6 +33,7 @@ VK::VK(QObject *parent) :
     QObject::connect(&m_VKStorage, &VKStorage::error, this, &VK::storageError);
 
     m_longPoll = new VKLongPollServer(&m_VKStorage, this);
+    m_isOnline = true;
 }
 
 VK::~VK() {}
@@ -78,6 +80,20 @@ QString VK::getAuthPageUrl() {
 void VK::sendContainersToScript(VKAbstractHandler* handler) {
     qDebug()<<"sendContainersToScript";
     emit handlerReady(handler->name(),  handler);
+}
+
+void VK::addDebugLogLine(const QString &line) {
+    m_debugLogBuffer->add(line);
+}
+
+QString VK::generateBugReport() {
+    QString test = QString("-----------ATTENTION!---------\n"
+            "Logs can contains some personal information, "
+            "such as messages and account details. "
+            "Logs do not contains your login/password.\n\n\n"+
+            m_debugLogBuffer->generate()).toHtmlEscaped();
+    qDebug()<<test;
+    return test;
 }
 
 bool VK::updateAccessToken(QString str_url) {
@@ -177,8 +193,9 @@ bool VK::isOurUserAuthorized() {
 void VK::requestFinished(QNetworkReply* reply) {
     if (reply->error() == QNetworkReply::NoError) {
 
+        m_isOnline = true;
         auto element = m_networkReplies.find(reply);
-        if (element != m_networkReplies.end()) {                            //handler
+        if (element != m_networkReplies.end()) {
             QString data = reply->readAll();
             qDebug()<<"VK::requestFinished:\n"<<data;
             VKAbstractHandler* handler = element.value();
@@ -187,6 +204,7 @@ void VK::requestFinished(QNetworkReply* reply) {
             QJsonDocument document = QJsonDocument::fromJson(data.toUtf8(), &err);
             if (err.error != QJsonParseError::NoError) {
                 qFatal("%s",err.errorString().toUtf8().data());
+                Q_ASSERT(0);
             }
             QJsonObject object = document.object();
             if (object.value("error").type() != QJsonValue::Undefined) {
@@ -209,14 +227,27 @@ void VK::requestFinished(QNetworkReply* reply) {
 
                 } else {
                     qCritical()<<"no response";
+                    Q_ASSERT(0);
                 }
             }
         } else {
             qCritical()<<"error";
+            Q_ASSERT(0);
         }
     } else {
         qCritical()<<"Reply error"<<reply->errorString();
-        displayError(reply->errorString(), ERROR_HANDLER_INFORM);
+        if (m_isOnline) {
+            displayError("Connection error", ERROR_HANDLER_INFORM);
+        }
+        auto element = m_networkReplies.find(reply);
+        if (element != m_networkReplies.end()) {
+            qDebug()<<"Network error, trying to reconnect";
+
+            m_networkReplies.remove(reply);
+            sendNetworkRequest(element.value());
+
+        }
+        m_isOnline = false;
     }
 }
 

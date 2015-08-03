@@ -39,6 +39,11 @@ import "handlers.js" as Handlers
 ApplicationWindow
 {
     id: applicationWindow
+    property var infoPopupComponent
+
+    InfoPopup {
+        id: infoPopup
+    }
 
     VK {
         id: vk
@@ -51,12 +56,11 @@ ApplicationWindow
 
             pageStack.completeAnimation()
 
-            if (type !== VK.ERROR_HANDLER_NOTHING) {
+            if (type !== VK.ERROR_HANDLER_NOTHING && type !== VK.ERROR_HANDLER_INFORM) {
                 pageStack.clear()
             }
             if (type === VK.ERROR_HANDLER_INFORM) {
-                //todo!!!!
-                //popup.show(reason)
+                infoPopup.show("Information", reason, 3000, true)
             } else {
                 pageStack.push(Qt.resolvedUrl("pages/DebugError.qml"), {msg: reason, type: type})
             }

@@ -3,6 +3,9 @@
 
 #include <QDebug>
 
+class VK;
+VK* getVK();
+
 /*#ifdef QT_NO_DEBUG
     #define X_ASSERT(cond) ((!(cond)) ? qDebug()<<"ERROR:\n"<<"File:"<<__FILE__<<"\nLine"<<__LINE__<<"\nDescription"<<(#cond) : qt_noop())
 #else

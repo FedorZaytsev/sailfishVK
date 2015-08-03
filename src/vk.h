@@ -24,6 +24,7 @@
 #include "qmllist.h"
 #include "vklongpollserver.h"
 #include "vkhandlersendmessage.h"
+#include "debuglogbuffer.h"
 
 #define DEFAULT_TIME_REPEAT 3000        //3 sec
 
@@ -62,6 +63,12 @@ public:
                 void displayErrorMessage(QString err, ErrorHandlers displayType);
                 void sendContainersToScript(VKAbstractHandler* handler);
 
+                //debug
+                void addDebugLogLine(const QString &line);
+    Q_INVOKABLE QString generateBugReport();
+    Q_INVOKABLE void assert0() {Q_ASSERT(0);}
+    Q_INVOKABLE void inform() {emit displayError("test infrom message",ERROR_HANDLER_INFORM);}
+
 signals:
     void handlerReady(QString name, VKAbstractHandler* handler);
     void displayError(QString reason, ErrorHandlers type);
@@ -77,7 +84,8 @@ private:
     VKStorage m_VKStorage;
     QMap<QNetworkReply*, VKAbstractHandler*> m_networkReplies;
     VKLongPollServer* m_longPoll;
-    
+    DebugLogBuffer* m_debugLogBuffer;
+    bool m_isOnline;
 
     enum {
         ERROR_UNKNOWN = 1,

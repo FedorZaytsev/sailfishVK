@@ -70,7 +70,8 @@ SOURCES += src/harbour-vk.cpp \
     src/vkcontainerwall.cpp \
     src/vkcontainerwallreply.cpp \
     src/vkcontainersticker.cpp \
-    src/vkcontainerlink.cpp
+    src/vkcontainerlink.cpp \
+    src/debuglogbuffer.cpp
 
 OTHER_FILES += qml/harbour-vk.qml \
     qml/cover/CoverPage.qml \
@@ -170,7 +171,8 @@ HEADERS += \
     src/vkcontainerwall.h \
     src/vkcontainerwallreply.h \
     src/vkcontainersticker.h \
-    src/vkcontainerlink.h
+    src/vkcontainerlink.h \
+    src/debuglogbuffer.h
 
 RESOURCES +=
 
