@@ -294,6 +294,9 @@ function handlerMessages(data) {
         return
     }
 
+    var mpage = findMessagesPage()
+    mpage.ready = true
+
     for (var i=data.count()-1;i>=0;i--) {
         var element = data.get(i)
 
@@ -588,6 +591,7 @@ function handlerDialogs(data) {
     if (!mod) return
 
     pageStack.currentPage.offset += 20
+    pageStack.currentPage.ready = true
     for (var i=0;i<data.count();i++) {
         var dialog = data.at(i)
 
