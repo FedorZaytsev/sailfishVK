@@ -54,8 +54,6 @@ void VKLongPollServer::clean() {
     m_readyEvents.clear();
 }
 
-
-
 void VKLongPollServer::request() {
     //mode 66 = 64+2 = return user device + attachments
     QUrl url(QString("https://%1?act=a_check&key=%2&ts=%3&wait=25&mode=66").arg(server()).arg(key()).arg(ts()));

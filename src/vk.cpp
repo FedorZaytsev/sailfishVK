@@ -119,6 +119,9 @@ void VK::getDialogs(int offset) {
     dialogHandler->setLongPoll(!m_longPoll->initilized());
     QObject::connect(dialogHandler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
     QObject::connect(dialogHandler, &VKAbstractHandler::sendRequest, this, &VK::processHandler);
+    QObject::connect(dialogHandler, &VKHandlerDialogs::unreadCountChanged, [this](int count) {
+        emit this->unreadCountChanged(count);
+    });
 
     sendNetworkRequest(dialogHandler);
 }

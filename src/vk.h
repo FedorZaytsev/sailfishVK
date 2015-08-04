@@ -72,6 +72,7 @@ public:
 signals:
     void handlerReady(QString name, VKAbstractHandler* handler);
     void displayError(QString reason, ErrorHandlers type);
+    void unreadCountChanged(int count);
 public slots:
     void requestFinished(QNetworkReply*);
     void storageError(QString);

@@ -300,12 +300,30 @@ function handlerMessages(data) {
     var mpage = findMessagesPage()
     mpage.ready = true
 
-    for (var i=data.count()-1;i>=0;i--) {
+    var isEmpty = mpage.messagesList.model.count === 0
+
+    var prevHeight = mpage.messagesList.contentHeight
+    console.log(mpage.messagesList.contentHeight)
+
+    for (var i=0;i<data.count();i++) {
         var element = data.get(i)
 
-        addMessage(model, element)
+        addMessage(model, element, undefined, undefined, 0)
     }
-    pageStack.currentPage.messagesList.positionViewAtEnd()
+    if (mpage.messagesList.visibleArea.yPosition > 0.95 || isEmpty) {
+        mpage.messagesList.positionViewAtEnd()
+    }
+    //mpage.messagesList.forceLayout()
+    prevHeight = mpage.messagesList.contentHeight - prevHeight
+    console.log("prevHeight",prevHeight, mpage.messagesList.contentHeight)
+    /*if (!isEmpty) {
+        mpage.messagesList.contentY = prevHeight;
+    }*/
+
+
+
+    mpage.offset += 20
+
 }
 
 
@@ -532,7 +550,8 @@ function processChatUpdated(el) {
 }
 
 function processCounterUpdate(el) {
-    console.log("nothing done for CounterUpdate event")
+    console.log(typeof vk.onUnreadCountChanged)
+    vk.onUnreadCountChanged(el.count())
 }
 
 function processTyping(el) {

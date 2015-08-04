@@ -32,7 +32,7 @@ const QNetworkRequest VKHandlerDialogs::processRequest() {
     "result.push({\"item\":dialog,\"users\":users});"
     "i = i+1;"
 "}"
-"return {\"user\":API.users.get({\"user_ids\":%4,\"fields\":\"photo_50,photo_100\"})[0],\"dialogs\":result%5};"
+"return {\"user\":API.users.get({\"user_ids\":%4,\"fields\":\"photo_50,photo_100\"})[0],\"unreadCount\":dialogs.unread_dialogs,\"dialogs\":result%5};"
 ).arg(m_offset).arg(m_previewLength).arg(m_count).arg(m_storage->ourUserId())
 .arg(m_longPollRequested ? ",\"longPoll\":API.messages.getLongPollServer({\"use_ssl\":1,\"need_pts\":1})" : "");
     QList<QPair<QString,QString>> args;
@@ -58,6 +58,8 @@ void VKHandlerDialogs::processReply(QJsonValue *reply) {
         m_dialogs.push_back(dialog);
     }
 
+    setUnread(reply->toObject().value("unreadCount").toInt());
+
     emit ready(this);
 }
 
@@ -78,8 +80,8 @@ void VKHandlerDialogs::setPreviewLength(int previewLength) {
 }
 
 void VKHandlerDialogs::setUnread(int unread) {
-    Q_ASSERT_X(0,"setUnread","setUnread function is not working properly");
     m_unread = unread;
+    emit unreadCountChanged(unread);
 }
 
 void VKHandlerDialogs::setLongPoll(bool b) {

@@ -35,7 +35,7 @@ public:
     Q_INVOKABLE int count();
 
 signals:
-
+    void unreadCountChanged(int count);
 public slots:
 
 private:

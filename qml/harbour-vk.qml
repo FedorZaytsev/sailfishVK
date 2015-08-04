@@ -31,6 +31,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.vk.VK 1.0
+import "cover"
 import "pages"
 import "debug.js" as Debug
 import "main.js" as Main
@@ -65,10 +66,17 @@ ApplicationWindow
                 pageStack.push(Qt.resolvedUrl("pages/DebugError.qml"), {msg: reason, type: type})
             }
         }
+        onUnreadCountChanged: {
+            console.log("count",count,typeof coverId, typeof unreadLabel, typeof cover, typeof cover.unreadLabel)
+            /*for (var prop in cover) {
+                console.log("prop",prop)
+            }*/
+            cover.unreadLabel = "" + count
+        }
     }
 
     initialPage: Component {Auth { }}
-    cover: Qt.resolvedUrl("cover/CoverPage.qml")
+    cover: CoverPage { }//Qt.resolvedUrl("cover/CoverPage.qml")
 }
 
 
