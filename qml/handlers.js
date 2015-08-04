@@ -2,6 +2,7 @@ var handlers = {
     "dialogs" : handlerDialogs,
     "longPollServer" : handlerLongPoll,
     "messages" : handlerMessages,
+    "sendMessage" : handlerSendMessage
 }
 
 
@@ -237,15 +238,17 @@ function updateDialog(model, dialog, pos) {
     var message = dialog.message()
 
     console.log("unreadCount",message.msgId(), model.get(0).unreadCount, model.get(0).unreadCount + (message.isIncoming() ? 1 : 0))
+    console.log("updating dialog with msg", pos, processMsg(message))
 
     model.move(pos, 0, 1)
     model.setProperty(0, "name", dialog.chatName())
-    model.setProperty(0, "msgText", processMsg(message))
+    model.setProperty(0, "msg", processMsg(message))
     model.setProperty(0, "isIncoming", message.isIncoming())
     model.setProperty(0, "authorAvatar50", message.user().iconSmall())
     model.setProperty(0, "msgId", message.msgId())
     model.setProperty(0, "isRead", message.readState())
     model.setProperty(0, "unreadCount", model.get(0).unreadCount + (message.isIncoming() ? 1 : 0))
+
 
 }
 
@@ -555,6 +558,10 @@ function processTyping(el) {
 
 function processVideocall(el) {
     console.log("nothing done for Videocall event")
+}
+
+function handlerSendMessage(data) {
+    console.log("nothing done in sendMessage handler")
 }
 
 function handlerLongPoll(data) {

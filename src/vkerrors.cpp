@@ -97,6 +97,12 @@ void VK::errorHandler(QJsonObject obj, VKAbstractHandler *handler) {
     case VK::ERROR_ADVERTISEMENT_ERROR: {
         displayErrorMessage("VK::ERROR_ADVERTISEMENT_ERROR", VK::ERROR_HANDLER_NOTHING);
     } break;
+    case VK::ERROR_CANNOT_COMPILE_CODE: {
+        displayErrorMessage("VK::ERROR_CANNOT_COMPILE_CODE", VK::ERROR_HANDLER_RESTART);
+    } break;
+    case VK::ERROR_CANNOT_EXECUTE_CODE: {
+        displayErrorMessage("VK::ERROR_CANNOT_EXECUTE_CODE", VK::ERROR_HANDLER_RESTART);
+    } break;
     default: {
         qCritical()<<"Unknown error got from server, error_id ="<<error_code<<"handler"<<handler->name();
         QJsonValue errorMsg = obj.value("error_msg");
