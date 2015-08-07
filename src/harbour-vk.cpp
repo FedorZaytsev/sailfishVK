@@ -1,6 +1,6 @@
 #define VK_MAJOR_VERSION 1
 #define VK_MINOR_VERSION 0
-#define VK_DEVELOP_STATE "Alpha"
+#define VK_DEVELOP_STATE "Beta"
 
 #ifdef QT_QML_DEBUG
 #include <QtQuick>
@@ -38,7 +38,8 @@
 #include "vklpmessagenew.h"
 #include "vkusertypinghelper.h"
 
-QFile __logFile;
+QFile global__logFile;
+QString global__appVersion = QString("Sailfish %1.%2 %3").arg(VK_MAJOR_VERSION).arg(VK_MINOR_VERSION).arg(VK_DEVELOP_STATE);
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
 void createLogFile() {
@@ -50,16 +51,16 @@ void createLogFile() {
         dir.mkpath(".");
     }
 
-    QString fpath = QString("%1/%2.log").arg(path).arg(QDateTime::currentDateTime().toString("d_M_yy_h_m_s"));
+    QString fpath = QString("%1/sailVK_%2.log").arg(path).arg(QDateTime::currentDateTime().toString("d_M_yy_h_m_s"));
 
-    __logFile.setFileName(fpath);
-    if(!__logFile.open(QIODevice::WriteOnly)) {
+    global__logFile.setFileName(fpath);
+    if(!global__logFile.open(QIODevice::WriteOnly)) {
         qDebug()<<"cannot open file"<<fpath;
     }
 
     qInstallMessageHandler(myMessageOutput);
 
-    qWarning()<<"Application version"<<VK_MAJOR_VERSION<<VK_MINOR_VERSION<<VK_DEVELOP_STATE;
+    qWarning()<<"Application version"<<VK_MAJOR_VERSION<<VK_MINOR_VERSION<<VK_DEVELOP_STATE<<"log path"<<fpath;
 }
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
@@ -91,8 +92,8 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
             .arg(context.line)
             .arg(msg);
 
-    if (__logFile.isOpen()) {
-        QTextStream stream(&__logFile);
+    if (global__logFile.isOpen()) {
+        QTextStream stream(&global__logFile);
         stream << logString;
     }
 
@@ -100,7 +101,7 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 
     stderrStream<<logString;
 
-    __logFile.flush();
+    global__logFile.flush();
     if (getVK()) {
         getVK()->addDebugLogLine(logString);
     }

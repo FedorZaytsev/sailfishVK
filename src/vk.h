@@ -6,10 +6,12 @@
 #include <QUrlQuery>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
+#include "vknetworkmanager.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSettings>
 #include <QDir>
+#include <QFileInfo>
 #include <QObject>
 #include <QtQuick>
 #include <QMap>
@@ -19,6 +21,7 @@
 #include "vkabstracthandler.h"
 #include "vkhandlerdialogs.h"
 #include "vkhandlermarkasread.h"
+#include "vkhandlerlongpollserverkey.h"
 #include "pendingrequest.h"
 #include "vkabstractcontainer.h"
 #include "qmllist.h"
@@ -50,6 +53,7 @@ public:
 
     Q_INVOKABLE bool updateAccessToken(QString url);
     Q_INVOKABLE void getDialogs(int offset);
+    Q_INVOKABLE void startLongPollServer(bool updateTs);
     Q_INVOKABLE void getMessages(int id, bool isChat, int offset);
     Q_INVOKABLE void markAsRead(QList<int> msgs);
     Q_INVOKABLE void sendMessage(int userId, bool isChat, QString text, QString forward, QString attachments);
@@ -65,7 +69,10 @@ public:
 
                 //debug
                 void addDebugLogLine(const QString &line);
-    Q_INVOKABLE QString generateBugReport();
+                VKLongPollServer* longPoll() { return m_longPoll; }
+    Q_INVOKABLE QString appVersion();
+    Q_INVOKABLE QString getLogPath();
+    Q_INVOKABLE QString getLogName();
     Q_INVOKABLE void assert0() {Q_ASSERT(0);}
     Q_INVOKABLE void inform() {emit displayError("test infrom message",ERROR_HANDLER_INFORM);}
 
@@ -73,6 +80,7 @@ signals:
     void handlerReady(QString name, VKAbstractHandler* handler);
     void displayError(QString reason, ErrorHandlers type);
     void unreadCountChanged(int count);
+    void updatePages();
 public slots:
     void requestFinished(QNetworkReply*);
     void storageError(QString);
@@ -81,9 +89,8 @@ public slots:
     void processHandler(VKAbstractHandler* handler);
 private:
     VKStorage& storage() {return m_VKStorage;}
-    QNetworkAccessManager *m_manager;
     VKStorage m_VKStorage;
-    QMap<QNetworkReply*, VKAbstractHandler*> m_networkReplies;
+    VKNetworkManager m_manager;
     VKLongPollServer* m_longPoll;
     DebugLogBuffer* m_debugLogBuffer;
     bool m_isOnline;

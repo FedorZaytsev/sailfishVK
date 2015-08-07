@@ -4,6 +4,7 @@
 #include "vklongpollupdateparser.h"
 
 VK* __vk_object = NULL;
+extern QString global__appVersion;
 
 //todo https://vk.com/dev/api_nohttps
 //todo VK::ERROR_CAPTHA
@@ -20,8 +21,6 @@ VK::VK(QObject *parent) :
     }
     m_debugLogBuffer = new DebugLogBuffer(this);
 
-    m_manager = new QNetworkAccessManager(this);
-    QObject::connect(m_manager, &QNetworkAccessManager::finished, this, &VK::requestFinished);
     QDir dir = QDir(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)).filePath(QCoreApplication::applicationName());
 
     if (!dir.exists()) {
@@ -31,12 +30,18 @@ VK::VK(QObject *parent) :
 
     m_VKStorage.init();
     QObject::connect(&m_VKStorage, &VKStorage::error, this, &VK::storageError);
+    QObject::connect(&m_manager, &VKNetworkManager::finished, this, &VK::requestFinished);
+    QObject::connect(m_longPoll, &VKLongPollServer::updatePages, [this]() {
+        emit this->updatePages();
+    });
 
     m_longPoll = new VKLongPollServer(&m_VKStorage, this);
     m_isOnline = true;
 }
 
-VK::~VK() {}
+VK::~VK() {
+    qDebug()<<"vk desc";
+}
 
 void VK::storageError(QString msg) {
     qDebug()<<"Storage error"<<msg;
@@ -86,7 +91,7 @@ void VK::addDebugLogLine(const QString &line) {
     m_debugLogBuffer->add(line);
 }
 
-QString VK::generateBugReport() {
+/*QString VK::generateBugReport() {
     QString test = QString("-----------ATTENTION!---------\n"
             "Logs can contains some personal information, "
             "such as messages and account details. "
@@ -94,6 +99,20 @@ QString VK::generateBugReport() {
             m_debugLogBuffer->generate()).toHtmlEscaped();
     qDebug()<<test;
     return test;
+}*/
+
+QString VK::appVersion() {
+    return global__appVersion;
+}
+
+extern QFile global__logFile;
+QString VK::getLogPath() {
+    return global__logFile.fileName();
+}
+
+QString VK::getLogName() {
+    QFileInfo info(global__logFile);
+    return info.fileName();
 }
 
 bool VK::updateAccessToken(QString str_url) {
@@ -124,6 +143,15 @@ void VK::getDialogs(int offset) {
     });
 
     sendNetworkRequest(dialogHandler);
+}
+
+void VK::startLongPollServer(bool updateTs) {
+    VKHandlerLongPollServerKey* handler = new VKHandlerLongPollServerKey(this, &storage(), this);
+    handler->setUpdateTs(updateTs);
+    QObject::connect(handler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
+    QObject::connect(handler, &VKAbstractHandler::sendRequest, this, &VK::processHandler);
+
+    sendNetworkRequest(handler);
 }
 
 
@@ -174,11 +202,7 @@ void VK::sendMessage(int userId, bool isChat, QString text, QString forward, QSt
 void VK::sendNetworkRequest(VKAbstractHandler *handler) {
     Q_ASSERT(handler);
 
-    QNetworkRequest request = handler->processRequest();
-    qDebug()<<request.url().toString();
-    QNetworkReply *reply = m_manager->get(request);
-
-    m_networkReplies[reply] = handler;
+    m_manager.sendRequest(handler);
 }
 
 void VK::dropAuthorization() {
@@ -197,11 +221,10 @@ void VK::requestFinished(QNetworkReply* reply) {
     if (reply->error() == QNetworkReply::NoError) {
 
         m_isOnline = true;
-        auto element = m_networkReplies.find(reply);
-        if (element != m_networkReplies.end()) {
+        auto handler = m_manager.getHandlerByReply(reply);
+        if (handler) {
             QString data = reply->readAll();
             qDebug()<<"VK::requestFinished:\n"<<data;
-            VKAbstractHandler* handler = element.value();
 
             QJsonParseError err;
             QJsonDocument document = QJsonDocument::fromJson(data.toUtf8(), &err);
@@ -215,16 +238,6 @@ void VK::requestFinished(QNetworkReply* reply) {
             } else {
                 if (object.contains("response")) {
                     QJsonValue response = object.value("response");
-                    QJsonObject responseObject = response.toObject();
-                    
-                    QJsonObject longPoll = responseObject.value("longPoll").toObject();
-                    if (responseObject.value("longPoll").isObject()) {
-                        m_longPoll->init(this, &m_VKStorage,
-                                        longPoll.value("key").toString(),
-                                        longPoll.value("server").toString(), 
-                                        longPoll.value("ts").toInt(),
-                                        longPoll.value("pts").toInt());
-                    }
                     
                     handler->processReply(&response);
 
@@ -242,12 +255,12 @@ void VK::requestFinished(QNetworkReply* reply) {
         if (m_isOnline) {
             displayError("Connection error", ERROR_HANDLER_INFORM);
         }
-        auto element = m_networkReplies.find(reply);
-        if (element != m_networkReplies.end()) {
+        auto handler = m_manager.getHandlerByReply(reply);
+        if (handler) {
             qDebug()<<"Network error, trying to reconnect";
 
-            m_networkReplies.remove(reply);
-            sendNetworkRequest(element.value());
+            m_manager.remove(reply);
+            sendNetworkRequest(handler);
 
         }
         m_isOnline = false;

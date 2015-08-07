@@ -9,6 +9,7 @@ VKLongPollServer::VKLongPollServer(VKStorage* storage, QObject *parent) :
     VKAbstractHandler(storage, parent)
 {
     m_vk = NULL;
+    m_initialized = false;
     setStorage(0);
     setVK(0);
     setTs(0);
@@ -30,15 +31,12 @@ VKLongPollServer::VKLongPollServer(VKStorage* storage, QObject *parent) :
     m_longPollData[VKLPEventType::VIDEOCALL] = {};
 }
 
-void VKLongPollServer::init(VK* vk, VKStorage* storage, QString key, QString server, int ts, int pts) {
-    setKey(key);
-    setServer(server);
-    setTs(ts);
-    setPts(pts);
+void VKLongPollServer::init(VK* vk, VKStorage* storage) {
     setStorage(storage);
     setVK(vk);
 
     request();
+    m_initialized = true;
     qDebug()<<"initialized";
 }
 
@@ -374,9 +372,28 @@ void VKLongPollServer::networkDataReady(QNetworkReply *reply) {
         } else {
             qDebug()<<"no update field";
         }
-        if (object.value("ts").isDouble()) {
+        if (object.contains("ts")) {
             setTs(object.value("ts").toInt());
             request();
+        }
+        if (object.contains("failed")) {
+            int val = object.value("failed").toInt();
+            switch (val) {
+            case VKLP_REFRESH_HISTORY: {
+                emit updatePages();
+                setTs(object.value("ts").toInt());
+                qDebug()<<"VKLP_REFRESH_HISTORY";
+            } break;
+            case VKLP_REFRESH_KEY: {
+                vk()->startLongPollServer(false);
+                qDebug()<<"VKLP_REFRESH_KEY";
+            } break;
+            case VKLP_REFRESH_KEY_AND_HISTORY: {
+                emit updatePages();
+                vk()->startLongPollServer(true);
+                qDebug()<<"VKLP_REFRESH_KEY_AND_HISTORY";
+            } break;
+            }
         }
     } else {
         qCritical()<<"Reply error"<<reply->errorString();

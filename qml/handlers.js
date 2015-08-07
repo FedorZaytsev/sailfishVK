@@ -2,7 +2,8 @@ var handlers = {
     "dialogs" : handlerDialogs,
     "longPollServer" : handlerLongPoll,
     "messages" : handlerMessages,
-    "sendMessage" : handlerSendMessage
+    "sendMessage" : handlerSendMessage,
+    "longPollServerKey" : handlerLongPollKey
 }
 
 
@@ -137,15 +138,7 @@ function prepareAttachments(e) {
     funcs[VKContainerAttachments.STICKER] = parseSticker
     funcs[VKContainerAttachments.LINK] = parseLink
 
-    var result = {
-        /*photo: [],
-        audio: [],
-        video: [],
-        wall: [],
-        wall_reply: [],
-        sticker: [],
-        doc: [],*/
-    }
+    var result = {}
     if (e) {
         for (var type in funcs) {
             for (var i=0;i<e.count(type);i++) {
@@ -167,6 +160,9 @@ function addMessage(model, element, offset, incoming, position) {
         incoming = element.isIncoming()
     }
 
+    for (var i=element.countFwd()-1;i>=0;i--) {
+        addMessage(model, element.getFwd(i), offset + 1, incoming, position !== undefined? position + 1 : position)
+    }
 
     var t = {
         id: element.msgId(),
@@ -187,9 +183,6 @@ function addMessage(model, element, offset, incoming, position) {
         model.insert(position, t)
     }
 
-    for (var i=0;i<element.countFwd();i++) {
-        addMessage(model, element.getFwd(i), offset + 1, incoming, position !== undefined? position + 1 : position)
-    }
 }
 
 function processMsg(msg) {
@@ -208,7 +201,6 @@ function addDialog(model, dialog, position, additionalUnreadCount) {
     var message = dialog.message()
     var icon = dialog.chatIcon()
 
-    if ((additionalUnreadCount + (message.isIncoming() ? dialog.unreadCount() : 0)) < 0) console.assert(0,"ggg4")
     var t = {
         name: dialog.chatName(),
         msg: processMsg(message),
@@ -262,7 +254,7 @@ function normalizeTime(param) {
 }
 
 function convertDate(unixtime) {
-    var date = new Date(unixtime * 1000);
+    var date = new Date(unixtime);
     var hours = ""+date.getHours()
     var minutes = normalizeTime(date.getMinutes())
     var day = normalizeTime(date.getDate())
@@ -302,30 +294,20 @@ function handlerMessages(data) {
 
     var isEmpty = mpage.messagesList.model.count === 0
 
-    var prevHeight = mpage.messagesList.contentHeight
-    console.log(mpage.messagesList.contentHeight)
-
     for (var i=0;i<data.count();i++) {
         var element = data.get(i)
 
-        addMessage(model, element, undefined, undefined, 0)
+        addMessage(model, element)
     }
-    if (mpage.messagesList.visibleArea.yPosition > 0.95 || isEmpty) {
+    if (mpage.messagesList.visibleArea.yPosition > 0.99) {
         mpage.messagesList.positionViewAtEnd()
     }
-    //mpage.messagesList.forceLayout()
-    prevHeight = mpage.messagesList.contentHeight - prevHeight
-    console.log("prevHeight",prevHeight, mpage.messagesList.contentHeight)
-    /*if (!isEmpty) {
-        mpage.messagesList.contentY = prevHeight;
-    }*/
-
-
 
     mpage.offset += 20
-
 }
 
+function handlerLongPollKey(data) {
+}
 
 function findMsgId(model, id) {
     if (model) {
@@ -525,7 +507,7 @@ function processMessageNew(el) {
 
     console.log("adding element", dialog.message().readState(), additionalUnreadCount)
     if (mpage && dialog.chatId() === mpage.id) {
-        addMessage(mmodel, dialog.message())
+        addMessage(mmodel, dialog.message(), undefined, undefined, 0)
     }
 }
 
@@ -602,13 +584,13 @@ function handlerLongPoll(data) {
 
     data.clean()
 
-    if (mmodel) {
+    /*if (mmodel) {
         var list = mpage.messagesList
         console.log("log",list.visibleArea.yPosition, list.visibleArea.heightRatio)
         if (1.0 - (list.visibleArea.yPosition + list.visibleArea.heightRatio) < 0.001) {
             list.positionViewAtEnd()
         }
-    }
+    }*/
     console.log("handlerPoll end")
 }
 

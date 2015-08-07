@@ -72,7 +72,9 @@ SOURCES += src/harbour-vk.cpp \
     src/vkcontainersticker.cpp \
     src/vkcontainerlink.cpp \
     src/debuglogbuffer.cpp \
-    src/vklpunreadcount.cpp
+    src/vklpunreadcount.cpp \
+    src/vknetworkmanager.cpp \
+    src/vkhandlerlongpollserverkey.cpp
 
 OTHER_FILES += qml/harbour-vk.qml \
     qml/cover/CoverPage.qml \
@@ -174,7 +176,9 @@ HEADERS += \
     src/vkcontainersticker.h \
     src/vkcontainerlink.h \
     src/debuglogbuffer.h \
-    src/vklpunreadcount.h
+    src/vklpunreadcount.h \
+    src/vknetworkmanager.h \
+    src/vkhandlerlongpollserverkey.h
 
 RESOURCES +=
 

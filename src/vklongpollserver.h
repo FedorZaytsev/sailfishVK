@@ -53,8 +53,8 @@ class VKLongPollServer : public VKAbstractHandler
     Q_OBJECT
 public:
     explicit VKLongPollServer(VKStorage *storage, QObject *parent = 0);
-    void                                init(VK* vk, VKStorage* storage, QString key, QString server, int ts, int pts);
-    bool                                initilized() {return key() != "" && ts() != 0;}
+    void                                init(VK* vk, VKStorage* storage);
+    bool                                initilized() {return key() != "" && ts() != 0 && m_initialized;}
 
     virtual QString                     name() {return "longPollServer";}
     virtual const QNetworkRequest       processRequest() {qCritical("never called"); return QNetworkRequest();}
@@ -64,15 +64,23 @@ public:
     Q_INVOKABLE VKLPAbstract*           at(int idx);
     Q_INVOKABLE void                    clean();
 
+
+    void                                setKey(const QString &key)          {m_key = key;}
+    void                                setServer(const QString &server)    {m_server = server;}
+    void                                setTs(int ts)                       {m_ts = ts;}
+    void                                setPts(int pts)                     {m_pts = pts;}
+
+    enum Enum {
+        VKLP_REFRESH_HISTORY,
+        VKLP_REFRESH_KEY,
+        VKLP_REFRESH_KEY_AND_HISTORY
+    };
+
 private:
     QString                             key() const                         {return m_key;}
-    void                                setKey(const QString &key)          {m_key = key;}
     QString                             server() const                      {return m_server;}
-    void                                setServer(const QString &server)    {m_server = server;}
     int                                 ts() const                          {return m_ts;}
-    void                                setTs(int ts)                       {m_ts = ts;}
     int                                 pts() const                         {return m_pts;}
-    void                                setPts(int pts)                     {m_pts = pts;}
     VKStorage*                          storage() const                     {return m_storage;}
     void                                setStorage(VKStorage *storage)      {m_storage = storage;}
     QNetworkAccessManager&              manager()                           {return m_manager;}
@@ -86,7 +94,7 @@ private:
 
 
 signals:
-
+    void updatePages();
 public slots:
     void networkDataReady(QNetworkReply* reply);
     void updateDataReady(VKAbstractHandler* handler);
@@ -99,6 +107,7 @@ private:
     int m_pts;
     VKStorage* m_storage;
     VK* m_vk;
+    bool m_initialized;
 
     QMap<int, QVector<VKLPAbstract*>> m_cachedEvents;
     QVector<VKLPAbstract*> m_readyEvents;

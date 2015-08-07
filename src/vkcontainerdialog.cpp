@@ -50,7 +50,7 @@ VKContainerDialog* VKContainerDialog::fromJson(VKStorage *storage, QJsonObject o
         for (auto e : users) {
             auto el = e.toObject();
             if (el.value("id").toInt() == user_id) {
-                dialog->setChatName(QString("%1 %2") .arg(el.value("first_name").toString()) .arg(el.value("las_name").toString()));
+                dialog->setChatName(QString("%1 %2") .arg(el.value("first_name").toString()) .arg(el.value("last_name").toString()));
                 break;
             }
         }

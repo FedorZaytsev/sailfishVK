@@ -19,14 +19,14 @@ Idea														Version					Done
 4. Implement debug system									1.0						+-
 5. Use short requests for server							-						
 6. Implement smiles											1.0						
-7. Fix TO_MANY_REQUESTS error								-						
+7. Fix TO_MANY_REQUESTS error								-						+
 	//May be just make timeout? ~1/3 sec before requests
 8. CAPTCHA													1.1
 9. Implement busy indicator in pages						1.0						+
 10. Implement status line									-
 11. Exit button												1.0						+
 12. Sad picture in DebugError.qml							-
-13. Cover													1.0						
+13. Cover													1.0						+-
 14. No Internet connection label							1.0						+
 15. Reduce request count									1.1 					
-16. Allow to get earlier messages							1.0						
+16. Allow to get earlier messages							1.0						+

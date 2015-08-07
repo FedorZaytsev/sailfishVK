@@ -73,6 +73,9 @@ ApplicationWindow
             }*/
             cover.unreadLabel = "" + count
         }
+        Component.onCompleted: {
+            vk.startLongPollServer(true)
+        }
     }
 
     initialPage: Component {Auth { }}

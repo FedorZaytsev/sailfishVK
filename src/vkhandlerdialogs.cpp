@@ -32,9 +32,8 @@ const QNetworkRequest VKHandlerDialogs::processRequest() {
     "result.push({\"item\":dialog,\"users\":users});"
     "i = i+1;"
 "}"
-"return {\"user\":API.users.get({\"user_ids\":%4,\"fields\":\"photo_50,photo_100\"})[0],\"unreadCount\":dialogs.unread_dialogs,\"dialogs\":result%5};"
-).arg(m_offset).arg(m_previewLength).arg(m_count).arg(m_storage->ourUserId())
-.arg(m_longPollRequested ? ",\"longPoll\":API.messages.getLongPollServer({\"use_ssl\":1,\"need_pts\":1})" : "");
+"return {\"user\":API.users.get({\"user_ids\":%4,\"fields\":\"photo_50,photo_100\"})[0],\"unreadCount\":dialogs.unread_dialogs,\"dialogs\":result};"
+).arg(m_offset).arg(m_previewLength).arg(m_count).arg(m_storage->ourUserId());
     QList<QPair<QString,QString>> args;
     args.push_back({"code",exec});
     return generateRequest("execute", args);

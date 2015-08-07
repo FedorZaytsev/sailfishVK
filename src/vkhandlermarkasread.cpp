@@ -14,7 +14,7 @@ const QNetworkRequest VKHandlerMarkAsRead::processRequest() {
 
 
     QString exec = QString(
-"return API.messages.markAsRead({\"message_ids\":%1});"
+"return API.messages.markAsRead({\"message_ids\":\"%1\"});"
 ).arg(lst.join(","));
 
     QList<QPair<QString,QString>> args;
