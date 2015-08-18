@@ -18,6 +18,7 @@ public:
     void        setText(QString arg)            { m_text = arg; }
     void        setForward(QString arg)         { m_forward = arg; }
     void        setAttachments(QString arg)     { m_attachments = arg; }
+    void        setGuid(int arg)                { m_guid = arg; }
 
     Q_INVOKABLE int get() { return m_messageId; }
 
@@ -27,10 +28,10 @@ public slots:
 private:
     int m_userId;
     bool m_isChat;
+    int m_guid;
     QString m_text;
     QString m_forward;
     QString m_attachments;
-
     int m_messageId;
 };
 

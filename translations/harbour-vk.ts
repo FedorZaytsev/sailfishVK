@@ -45,4 +45,11 @@
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>handlers</name>
+    <message>
+        <source>Messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

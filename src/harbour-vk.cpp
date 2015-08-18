@@ -2,10 +2,6 @@
 #define VK_MINOR_VERSION 0
 #define VK_DEVELOP_STATE "Beta"
 
-#ifdef QT_QML_DEBUG
-#include <QtQuick>
-#endif
-
 #include <sailfishapp.h>
 #include "vk.h"
 
@@ -14,6 +10,8 @@
 #include <QDateTime>
 #include <QFile>
 #include <QDir>
+#include <execinfo.h>
+#include <signal.h>
 #include "vkpixmapprovider.h"
 #include "vkabstractcontainer.h"
 #include "vkcontainerdialog.h"
@@ -36,6 +34,8 @@
 #include "vklpmessageflagsset.h"
 #include "vklpmessagemarkincoming.h"
 #include "vklpmessagenew.h"
+#include "vklpuseroffline.h"
+#include "vklpuseronline.h"
 #include "vkusertypinghelper.h"
 
 QFile global__logFile;
@@ -51,7 +51,7 @@ void createLogFile() {
         dir.mkpath(".");
     }
 
-    QString fpath = QString("%1/sailVK_%2.log").arg(path).arg(QDateTime::currentDateTime().toString("d_M_yy_h_m_s"));
+    QString fpath = QString("%1/sailVK_%2.log").arg(path).arg(QDateTime::currentDateTime().toString("yy_M_d_h_m_s"));
 
     global__logFile.setFileName(fpath);
     if(!global__logFile.open(QIODevice::WriteOnly)) {
@@ -107,10 +107,25 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
     }
 }
 
+void handler(int sig) {
+    void *array[10];
+    size_t size;
+
+    // get void*'s for all entries on the stack
+    size = backtrace(array, 10);
+
+    // print out all the frames to stderr
+    qDebug()<<"Error: signal"<<sig;
+    backtrace_symbols_fd(array, size, global__logFile.handle());
+    exit(sig);
+}
 
 int main(int argc, char *argv[]) {
 
+    QCoreApplication::setApplicationName("harbour-vk");
+
     createLogFile();
+    signal(SIGSEGV, handler);
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
     QScopedPointer<QQuickView> view(SailfishApp::createView());
 
@@ -137,6 +152,8 @@ int main(int argc, char *argv[]) {
     qmlRegisterType<VKLPMessageFlagsSet>();
     qmlRegisterType<VKLPMessageMarkIncoming>();
     qmlRegisterType<VKLPMessageNew>();
+    qmlRegisterType<VKLPUserOffline>();
+    qmlRegisterType<VKLPUserOnline>();
     qmlRegisterType<VKUserTypingHelper>("harbour.vk.VK", 1, 0, "UserTypingHelper");
     qmlRegisterUncreatableType<VKLPFlags>("harbour.vk.VK", 1, 0, "VKLPFlags","Cannot create VKLPFlags class");
     qmlRegisterUncreatableType<VKLPEventType>("harbour.vk.VK", 1, 0, "VKLPEventType","Cannot create VKLPEventType class");
@@ -147,6 +164,8 @@ int main(int argc, char *argv[]) {
 
     view->setSource(SailfishApp::pathTo("qml/harbour-vk.qml"));
     view->show();
+
+    qDebug()<<"exec";
 
     int result = app->exec();
 

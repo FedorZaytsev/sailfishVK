@@ -186,10 +186,15 @@ function addMessage(model, element, offset, incoming, position) {
 }
 
 function processMsg(msg) {
-    if (msg.body() === "" && msg.attachments()) {
-        var desc = msg.attachments().description()
-        if (desc.length > 0) {
-            return desc.charAt(0).toUpperCase() + desc.slice(1)
+    if (msg.body() === "") {
+        if (msg.attachments()) {
+            var desc = msg.attachments().description()
+            if (desc.length > 0) {
+                return desc.charAt(0).toUpperCase() + desc.slice(1)
+            }
+        }
+        if (msg.countFwd() > 0) {
+            return "["+qsTr("Messages")+"]"
         }
     }
     return msg.body()
@@ -206,7 +211,9 @@ function addDialog(model, dialog, position, additionalUnreadCount) {
         msg: processMsg(message),
         isIncoming: message.isIncoming(),
         authorAvatar50: message.user().iconSmall(),
+        userId: message.user().id(),
         isChat: dialog.isChat(),
+        online: message.user().isOnline(),
         id: dialog.chatId(),
         msgId: message.msgId(),
         icon1: icon.get(0) || "",
@@ -229,8 +236,7 @@ function updateDialog(model, dialog, pos) {
 
     var message = dialog.message()
 
-    console.log("unreadCount",message.msgId(), model.get(0).unreadCount, model.get(0).unreadCount + (message.isIncoming() ? 1 : 0))
-    console.log("updating dialog with msg", pos, processMsg(message))
+    console.log("label:","unreadCount", model.get(0).unreadCount, model.get(0).unreadCount + (message.isIncoming() ? 1 : 0), processMsg(message))
 
     model.move(pos, 0, 1)
     model.setProperty(0, "name", dialog.chatName())
@@ -242,6 +248,22 @@ function updateDialog(model, dialog, pos) {
     model.setProperty(0, "unreadCount", model.get(0).unreadCount + (message.isIncoming() ? 1 : 0))
 
 
+}
+
+function showFakeMessage(text, forward, attachments) {
+    var t = {
+        id: 0,
+        msg: text,
+        date: convertDate(element.date()),
+        userName: element.user().firstName() + " " + element.user().lastName(),
+        icon: element.user().iconSmall(),
+        incoming: incoming,
+        offset: offset,
+        highlight: false,
+        isRead: element.readState(),
+        attachments: prepareAttachments(element.attachments()),
+        chatId: element.chatId(),
+    }
 }
 
 function normalizeTime(param) {
@@ -307,6 +329,7 @@ function handlerMessages(data) {
 }
 
 function handlerLongPollKey(data) {
+
 }
 
 function findMsgId(model, id) {
@@ -331,7 +354,7 @@ function deleteMessage(msgId, chatId, prev) {
     var countUpdated = false;
     if (msgIdMessages !== undefined) {
         if (!mmodel.get(msgIdMessages).isRead && msgIdDialogs !== undefined) {
-            if (dmodel.get(msgIdDialogs).unreadCount <= 0) console.assert(0,"ggg1")
+            //if (dmodel.get(msgIdDialogs).unreadCount <= 0) console.assert(0,"ggg1")
             dmodel.setProperty(msgIdDialogs, "unreadCount", dmodel.get(msgIdDialogs).unreadCount - 1)
             countUpdated = true;
         }
@@ -350,7 +373,7 @@ function deleteMessage(msgId, chatId, prev) {
 
     //updating unread count
     if (msgIdMessages === undefined && msgIdDialogs !== undefined && !dmodel.get(msgIdDialogs).isRead && !countUpdated) {
-        if (dmodel.get(msgIdDialogs).unreadCount <= 0) console.assert(0,"ggg2")
+        //if (dmodel.get(msgIdDialogs).unreadCount <= 0) console.assert(0,"ggg2")
         dmodel.setProperty(msgIdDialogs, "unreadCount", dmodel.get(msgIdDialogs).unreadCount - 1)
     }
 
@@ -449,6 +472,7 @@ function processMessageFlagsSet(el) {
             mmodel.setProperty(msgIdMessages, "isRead", flags.isSet(VKLPFlags.UNREAD))
         }
         if (msgIdDialogs !== undefined) {
+            console.log("label:",dmodel.get(msgIdDialogs).msgText, dmodel.get(msgIdDialogs).unreadCount, "plus")
             dmodel.setProperty(msgIdDialogs, "unreadCount", dmodel.get(msgIdDialogs).unreadCount + 1)
         }
     }
@@ -475,8 +499,7 @@ function processMessageFlagsReset(el) {
             mmodel.setProperty(msgIdMessages, "isRead", !flags.isSet(VKLPFlags.UNREAD))
         }
         if (msgIdDialogs !== undefined) {
-            console.log("descrease count",el.id(), el.userId(), dmodel.get(msgIdDialogs).unreadCount)
-            if (dmodel.get(msgIdDialogs).unreadCount <= 0) console.log("ggggg")
+            console.log("label:",dmodel.get(msgIdDialogs).msgText, dmodel.get(msgIdDialogs).unreadCount, "minus")
             dmodel.setProperty(msgIdDialogs, "unreadCount", dmodel.get(msgIdDialogs).unreadCount - 1)
         }
     }
@@ -496,7 +519,7 @@ function processMessageNew(el) {
     var additionalUnreadCount = 0
     var dialogId = findMsgId(dmodel, dialog.chatId())
 
-    console.log("dialogId",dialogId, "chatId", dialog.chatId(), "dmodel.get(dialogId).unreadCount", dmodel?dmodel.get(dialogId).unreadCount:"no dmodel")
+    console.log("label:","dialogId",dialogId, "chatId", dialog.chatId(), "dmodel.get(dialogId).unreadCount", dmodel?dmodel.get(dialogId).unreadCount:"no dmodel")
     if (dialogId !== undefined) {
 
         updateDialog(dmodel, dialog, dialogId)
@@ -511,19 +534,42 @@ function processMessageNew(el) {
     }
 }
 
+function findDialogByUserId(model,id) {
+    if (model) {
+        for (var i=0;i<model.count;i++) {
+            var e = model.get(i)
+            if (e.userId === id) {
+                return i
+            }
+        }
+    }
+}
+
 function processUserOnline(el) {
-    console.log("nothing done for UserOnline event")
+    var model = findMessagesModel()
+    var idx = findDialogByUserId(model, el.userId())
+    if (idx !== undefined) {
+        model.setProperty(idx, "online", true)
+    }
 }
 
 function processUserOffline(el) {
-    console.log("nothing done for UserOffline event")
+    var model = findMessagesModel()
+    var idx = findDialogByUserId(model, el.userId())
+    if (idx !== undefined) {
+        model.setProperty(idx, "online", false)
+    }
 }
 
 function processMessageMarkReadIncoming(el) {
+
+    //we dont need to implement this function because instead of this event VK server send flag change event
     console.log("nothing done for MarkReadIncoming event")
 }
 
 function processMessageMarkReadOutcoming(el) {
+
+    //we dont need to implement this function because instead of this event VK server send flag change event
     console.log("nothing done for MarkReadOutcoming event")
 }
 
@@ -537,15 +583,13 @@ function processCounterUpdate(el) {
 }
 
 function processTyping(el) {
-    //console.log("nothing done for Typing event")
-
     console.log("processTyping ",el.userName())
 
     var mpage = findMessagesPage()
     var dmodel = findDialogModel()
     var dpage = findDialogPage()
     if (mpage && mpage.id === el.chatId()) {
-        mpage.messagesList.footerItem.addUser(el.userName())
+        mpage.messagesList.headerItem.addUser(el.userName())
     }
 
 
@@ -584,13 +628,6 @@ function handlerLongPoll(data) {
 
     data.clean()
 
-    /*if (mmodel) {
-        var list = mpage.messagesList
-        console.log("log",list.visibleArea.yPosition, list.visibleArea.heightRatio)
-        if (1.0 - (list.visibleArea.yPosition + list.visibleArea.heightRatio) < 0.001) {
-            list.positionViewAtEnd()
-        }
-    }*/
     console.log("handlerPoll end")
 }
 

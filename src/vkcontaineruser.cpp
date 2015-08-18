@@ -4,6 +4,7 @@ VKContainerUser::VKContainerUser(QObject *parent) :
     VKAbstractContainer(parent)
 {
     valid(true);
+    setIsOnline(false);
 }
 
 VKContainerUser *VKContainerUser::fromJson(VKStorage *storage, const QJsonObject &obj) {
@@ -15,6 +16,7 @@ VKContainerUser *VKContainerUser::fromJson(VKStorage *storage, const QJsonObject
     user->setIconSmall(obj.value("photo_50").toString());
     user->setIconMedium(obj.value("photo_100").toString());
     user->setIconLarge(obj.value("photo_200").toString());
+    user->setIsOnline(obj.value("online").toInt() == 1 || obj.value("online_mobile").toInt() == 1);
     return user;
 }
 

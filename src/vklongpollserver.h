@@ -69,6 +69,7 @@ public:
     void                                setServer(const QString &server)    {m_server = server;}
     void                                setTs(int ts)                       {m_ts = ts;}
     void                                setPts(int pts)                     {m_pts = pts;}
+    void                                forceRequest();
 
     enum Enum {
         VKLP_REFRESH_HISTORY,
@@ -86,7 +87,6 @@ private:
     QNetworkAccessManager&              manager()                           {return m_manager;}
     void                                setVK(VK *vk)                       {m_vk = vk;}
     VK*                                 vk()                                {return m_vk;}
-    void                                request();
     void                                processUpdate(QJsonArray &update, QList<QString> &userIds, QList<QString> &messageIds, QList<QString> &chatIds, QList<QString> &checkMessages, QList<QString> &removed);
     void                                sendUpdateDataRequest(QList<QString> &userIds, QList<QString> &messageIds, QList<QString> &chatIds, QList<QString> &checkMessages, QList<QString> &removed);
     QString                             type2string(VKLPEventType::E_VKUPDATE type);

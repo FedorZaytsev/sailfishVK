@@ -6,11 +6,11 @@ VKHandlerSendMessage::VKHandlerSendMessage(VKStorage *storage, QObject *parent) 
     m_messageId = 0;
     m_isChat = false;
     m_userId = 0;
+    m_guid = 1;
 }
 
 const QNetworkRequest VKHandlerSendMessage::processRequest() {
-    static int guid;
-    qDebug()<<m_userId<<m_text<<"guid"<<guid<<"m_attachments"<<m_attachments<<"m_forward"<<m_forward;
+    qDebug()<<m_userId<<m_text<<"guid"<<m_guid<<"m_attachments"<<m_attachments<<"m_forward"<<m_forward;
 
     QString attachments;
     if (m_attachments.length()) {
@@ -23,8 +23,13 @@ const QNetworkRequest VKHandlerSendMessage::processRequest() {
     }
 
     QString exec = QString(
-"return API.messages.send({\"%1_id\":%2,\"message\":\"%3\",\"guid\":%4%5%6});"
-).arg(m_isChat ? "chat" : "user").arg(m_userId).arg(m_text).arg(guid++).arg(attachments).arg(forward);
+"return {\"id\":API.messages.send({\"%1_id\":%2,\"message\":\"%3\",\"guid\":%4%5%6}),\"guid\":%4")
+            .arg(m_isChat ? "chat" : "user")
+            .arg(m_userId)
+            .arg(m_text)
+            .arg(m_guid)
+            .arg(attachments)
+            .arg(forward);
 
 
     QList<QPair<QString,QString>> args;

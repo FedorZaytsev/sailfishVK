@@ -5,15 +5,14 @@
 #include <QUrl>
 #include <QUrlQuery>
 #include <QNetworkReply>
+#include <QCoreApplication>
 #include <QNetworkAccessManager>
-#include "vknetworkmanager.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSettings>
 #include <QDir>
 #include <QFileInfo>
 #include <QObject>
-#include <QtQuick>
 #include <QMap>
 #include <QVector>
 #include <QQmlListProperty>
@@ -28,6 +27,7 @@
 #include "vklongpollserver.h"
 #include "vkhandlersendmessage.h"
 #include "debuglogbuffer.h"
+#include "vknetworkmanager.h"
 
 #define DEFAULT_TIME_REPEAT 3000        //3 sec
 
@@ -56,7 +56,7 @@ public:
     Q_INVOKABLE void startLongPollServer(bool updateTs);
     Q_INVOKABLE void getMessages(int id, bool isChat, int offset);
     Q_INVOKABLE void markAsRead(QList<int> msgs);
-    Q_INVOKABLE void sendMessage(int userId, bool isChat, QString text, QString forward, QString attachments);
+    Q_INVOKABLE void sendMessage(int guid, int userId, bool isChat, QString text, QString forward, QString attachments);
     Q_INVOKABLE void dropAuthorization();
     Q_INVOKABLE QString getAuthPageUrl();
     Q_INVOKABLE VKStorage* getStorage() {return &storage();}
@@ -65,7 +65,6 @@ public:
                 void sendNetworkRequest(VKAbstractHandler* handler);
                 void errorHandler(QJsonObject, VKAbstractHandler*);
                 void displayErrorMessage(QString err, ErrorHandlers displayType);
-                void sendContainersToScript(VKAbstractHandler* handler);
 
                 //debug
                 void addDebugLogLine(const QString &line);
@@ -75,6 +74,7 @@ public:
     Q_INVOKABLE QString getLogName();
     Q_INVOKABLE void assert0() {Q_ASSERT(0);}
     Q_INVOKABLE void inform() {emit displayError("test infrom message",ERROR_HANDLER_INFORM);}
+    Q_INVOKABLE void emitUpdatePages() {emit updatePages();}
 
 signals:
     void handlerReady(QString name, VKAbstractHandler* handler);

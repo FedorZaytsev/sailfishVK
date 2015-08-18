@@ -8,7 +8,6 @@
 #include <QtSql/QSqlQueryModel>
 #include <QVariant>
 #include <QDebug>
-#include <QQuickItem>
 #include "vkcontaineruser.h"
 #include "vkcontainermessage.h"
 #include "vkcontainerdialog.h"

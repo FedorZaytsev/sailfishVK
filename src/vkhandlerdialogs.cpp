@@ -28,7 +28,7 @@ const QNetworkRequest VKHandlerDialogs::processRequest() {
     "var dialog = dialogs.items[i];"
     "var chat_act = dialog.message.chat_active;"
     "var ids = [chat_act[0],chat_act[1],chat_act[2],chat_act[3]];"
-    "var users = API.users.get({\"user_ids\":(ids+\",\"+dialog.message.user_id), \"fields\":\"photo_50,photo_100\"});"
+    "var users = API.users.get({\"user_ids\":(ids+\",\"+dialog.message.user_id), \"fields\":\"photo_50,photo_100,online,online_mobile\"});"
     "result.push({\"item\":dialog,\"users\":users});"
     "i = i+1;"
 "}"

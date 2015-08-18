@@ -84,8 +84,6 @@ OTHER_FILES += qml/harbour-vk.qml \
     rpm/harbour-vk.yaml \
     translations/*.ts \
     harbour-vk.desktop \
-    qml/debug.js \
-    qml/main.js \
     qml/pages/Dialogs.qml \
     qml/pages/DialogComponent.qml \
     qml/pages/DialogElement.qml \
@@ -94,7 +92,6 @@ OTHER_FILES += qml/harbour-vk.qml \
     qml/pages/DialogIconHolder.qml \
     qml/pages/FriendComponent.qml \
     qml/handlers.js \
-    qml/cache.js \
     qml/pages/MessageData.qml \
     qml/pages/MessageComponent.qml \
     qml/pages/DebugHello.qml \
@@ -110,7 +107,9 @@ OTHER_FILES += qml/harbour-vk.qml \
     qml/pages/MessageWall.qml \
     qml/pages/MessageWallReply.qml \
     qml/pages/MessageSticker.qml \
-    qml/pages/MessageLink.qml
+    qml/pages/MessageLink.qml \
+    qml/pages/MessageDocument.qml \
+    qml/pages/LoadingFooter.qml
 
 # to disable building translations every time, comment out the
 # following CONFIG line
@@ -118,6 +117,7 @@ CONFIG += sailfishapp_i18n
 TRANSLATIONS += translations/harbour-vk-de.ts
 CONFIG += precompile_header
 PRECOMPILED_HEADER += src/debug.h
+#DEFINES += "Q_DECL_CONST_FUNCTION"
 #DEFINES += "VK_DEBUG"
 
 

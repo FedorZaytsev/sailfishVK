@@ -3,7 +3,8 @@
 #include "vklongpollserver.h"
 #include "vklongpollupdateparser.h"
 
-VK* __vk_object = NULL;
+volatile VK* __vk_object;
+
 extern QString global__appVersion;
 
 //todo https://vk.com/dev/api_nohttps
@@ -19,14 +20,16 @@ VK::VK(QObject *parent) :
     } else {
         __vk_object = this;
     }
+
     m_debugLogBuffer = new DebugLogBuffer(this);
+    m_longPoll = new VKLongPollServer(&m_VKStorage, this);
 
-    QDir dir = QDir(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)).filePath(QCoreApplication::applicationName());
-
+    QDir dir = QDir(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation));
     if (!dir.exists()) {
         dir.mkpath(".");
     }
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, dir.path());
+
 
     m_VKStorage.init();
     QObject::connect(&m_VKStorage, &VKStorage::error, this, &VK::storageError);
@@ -35,8 +38,8 @@ VK::VK(QObject *parent) :
         emit this->updatePages();
     });
 
-    m_longPoll = new VKLongPollServer(&m_VKStorage, this);
     m_isOnline = true;
+
 }
 
 VK::~VK() {
@@ -57,7 +60,9 @@ void VK::timerRequest(VKAbstractHandler *handler) {
 }
 
 void VK::sendHandlertoScript(VKAbstractHandler *handler) {
-    sendContainersToScript(handler);
+    handler->setParent(nullptr);
+    QQmlEngine::setObjectOwnership(handler, QQmlEngine::JavaScriptOwnership);
+    emit handlerReady(handler->name(),  handler);
 }
 
 void VK::processHandler(VKAbstractHandler *handler) {
@@ -82,24 +87,9 @@ QString VK::getAuthPageUrl() {
                                 "&response_type=token";
 }
 
-void VK::sendContainersToScript(VKAbstractHandler* handler) {
-    qDebug()<<"sendContainersToScript";
-    emit handlerReady(handler->name(),  handler);
-}
-
 void VK::addDebugLogLine(const QString &line) {
     m_debugLogBuffer->add(line);
 }
-
-/*QString VK::generateBugReport() {
-    QString test = QString("-----------ATTENTION!---------\n"
-            "Logs can contains some personal information, "
-            "such as messages and account details. "
-            "Logs do not contains your login/password.\n\n\n"+
-            m_debugLogBuffer->generate()).toHtmlEscaped();
-    qDebug()<<test;
-    return test;
-}*/
 
 QString VK::appVersion() {
     return global__appVersion;
@@ -136,6 +126,7 @@ void VK::getDialogs(int offset) {
     VKHandlerDialogs* dialogHandler = new VKHandlerDialogs(&storage(), this);
     dialogHandler->setOffset(offset);
     dialogHandler->setLongPoll(!m_longPoll->initilized());
+    dialogHandler->setPreviewLength(60);
     QObject::connect(dialogHandler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
     QObject::connect(dialogHandler, &VKAbstractHandler::sendRequest, this, &VK::processHandler);
     QObject::connect(dialogHandler, &VKHandlerDialogs::unreadCountChanged, [this](int count) {
@@ -184,9 +175,10 @@ void VK::markAsRead(QList<int> msgs) {
 
 }
 
-void VK::sendMessage(int userId, bool isChat, QString text, QString forward, QString attachments) {
+void VK::sendMessage(int guid, int userId, bool isChat, QString text, QString forward, QString attachments) {
     auto handler = new VKHandlerSendMessage(&storage(), this);
 
+    handler->setGuid(guid);
     handler->setAttachments(attachments);
     handler->setForward(forward);
     handler->setIsChat(isChat);

@@ -56,7 +56,6 @@ VKContainerDialog* VKContainerDialog::fromJson(VKStorage *storage, QJsonObject o
         }
     }
 
-    //must be list, because if there is no icon in chat, 4 avators are requested
 
     VKContainerChatIcon* chatIcon = new VKContainerChatIcon;
     if (message.value("photo_100").isString()) {

@@ -9,7 +9,7 @@
 #include <QNetworkAccessManager>
 #include "vkabstracthandler.h"
 
-#define WAIT_TIME_MS 400
+#define WAIT_TIME_MS 500
 
 class VKNetworkManager : public QObject
 {

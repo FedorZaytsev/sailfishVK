@@ -25,6 +25,7 @@ public:
     Q_INVOKABLE QString iconSmall() const   { return m_iconSmall; }
     Q_INVOKABLE QString iconMedium() const  { return m_iconMedium; }
     Q_INVOKABLE QString iconLarge() const   { return m_iconLarge; }
+    Q_INVOKABLE bool isOnline() const       { return m_online; }
     Q_INVOKABLE bool isValid() const        { return m_valid; }
 
     void setId(int arg)                     { m_id = arg; }
@@ -33,6 +34,7 @@ public:
     void setIconSmall(QString arg)          { m_iconSmall = arg; }
     void setIconMedium(QString arg)         { m_iconMedium = arg; }
     void setIconLarge(QString arg)          { m_iconLarge = arg; }
+    void setIsOnline(bool arg)              { m_online = arg; }
     void valid(bool b)                      { m_valid = b; }
 private:
     int m_id;
@@ -41,6 +43,7 @@ private:
     QString m_iconSmall;
     QString m_iconMedium;
     QString m_iconLarge;
+    bool m_online;
     bool m_valid;
 };
 

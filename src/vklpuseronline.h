@@ -21,6 +21,8 @@ public:
         WEB
     };
 
+    Q_INVOKABLE int userId() { return m_userId; }
+
 signals:
 
 public slots:

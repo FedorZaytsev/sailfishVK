@@ -35,7 +35,7 @@ void VKLongPollServer::init(VK* vk, VKStorage* storage) {
     setStorage(storage);
     setVK(vk);
 
-    request();
+    forceRequest();
     m_initialized = true;
     qDebug()<<"initialized";
 }
@@ -52,7 +52,7 @@ void VKLongPollServer::clean() {
     m_readyEvents.clear();
 }
 
-void VKLongPollServer::request() {
+void VKLongPollServer::forceRequest() {
     //mode 66 = 64+2 = return user device + attachments
     QUrl url(QString("https://%1?act=a_check&key=%2&ts=%3&wait=25&mode=66").arg(server()).arg(key()).arg(ts()));
 
@@ -320,7 +320,7 @@ void VKLongPollServer::updateReadyEvents() {
 
 
     for (auto k : m_cachedEvents.keys()) {
-        qDebug()<<"log test"<< m_cachedEvents[k].count();
+        qDebug()<<"m_cachedEvents.count()"<< m_cachedEvents[k].count();
         auto &v = m_cachedEvents[k];
         for (int i=v.size()-1;i>=0;i--) {
             auto e = v[i];
@@ -331,7 +331,7 @@ void VKLongPollServer::updateReadyEvents() {
                 qDebug()<<"deleting this element";
             }
         }
-        qDebug()<<"log test end"<< m_cachedEvents[k].count();
+        qDebug()<<"m_cachedEvents.count() end"<< m_cachedEvents[k].count();
     }
     m_updateDialogs.clear();
     m_updateMessages.clear();
@@ -339,7 +339,7 @@ void VKLongPollServer::updateReadyEvents() {
 
 
     qDebug()<<"emit ready";
-    vk()->sendContainersToScript(this);
+    vk()->sendHandlertoScript(this);
 }
 
 void VKLongPollServer::networkDataReady(QNetworkReply *reply) {
@@ -366,7 +366,7 @@ void VKLongPollServer::networkDataReady(QNetworkReply *reply) {
                 sendUpdateDataRequest(userIds, messageIds, chatIds, checkMessages, removed);
             }
             if (m_readyEvents.length()) {
-                vk()->sendContainersToScript(this);
+                vk()->sendHandlertoScript(this);
             }
             qDebug()<<"sent request";
         } else {
@@ -374,7 +374,7 @@ void VKLongPollServer::networkDataReady(QNetworkReply *reply) {
         }
         if (object.contains("ts")) {
             setTs(object.value("ts").toInt());
-            request();
+            forceRequest();
         }
         if (object.contains("failed")) {
             int val = object.value("failed").toInt();
@@ -394,9 +394,10 @@ void VKLongPollServer::networkDataReady(QNetworkReply *reply) {
                 qDebug()<<"VKLP_REFRESH_KEY_AND_HISTORY";
             } break;
             }
+            m_vk->displayErrorMessage("Restarting long poll server", VK::ERROR_HANDLER_INFORM);
         }
     } else {
         qCritical()<<"Reply error"<<reply->errorString();
-        Q_ASSERT(0);
+        forceRequest();
     }
 }

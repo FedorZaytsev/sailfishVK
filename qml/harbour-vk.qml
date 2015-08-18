@@ -33,8 +33,6 @@ import Sailfish.Silica 1.0
 import harbour.vk.VK 1.0
 import "cover"
 import "pages"
-import "debug.js" as Debug
-import "main.js" as Main
 import "handlers.js" as Handlers
 
 ApplicationWindow
@@ -48,6 +46,8 @@ ApplicationWindow
 
     VK {
         id: vk
+
+        property int guid : 1
         onHandlerReady: {
             Handlers.ready(name, handler)
         }
@@ -67,19 +67,23 @@ ApplicationWindow
             }
         }
         onUnreadCountChanged: {
-            console.log("count",count,typeof coverId, typeof unreadLabel, typeof cover, typeof cover.unreadLabel)
-            /*for (var prop in cover) {
-                console.log("prop",prop)
-            }*/
             cover.unreadLabel = "" + count
         }
         Component.onCompleted: {
             vk.startLongPollServer(true)
         }
+        onUpdatePages: {
+            pageStack.find(function(page) {
+                if (page.updatePage !== undefined) {
+                    page.updatePage()
+                }
+            })
+        }
     }
 
-    initialPage: Component {Auth { }}
-    cover: CoverPage { }//Qt.resolvedUrl("cover/CoverPage.qml")
+
+    initialPage: vk.isOurUserAuthorized() ? Qt.resolvedUrl("pages/Dialogs.qml") : Qt.resolvedUrl("pages/Auth.qml")//Component {Auth { }}
+    cover: CoverPage { }
 }
 
 
