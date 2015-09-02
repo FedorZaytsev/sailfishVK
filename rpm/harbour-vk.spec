@@ -6,6 +6,7 @@
 Name:       harbour-vk
 
 # >> macros
+%define debug_package %{nil}
 # << macros
 
 %{!?qtc_qmake:%define qtc_qmake %qmake}

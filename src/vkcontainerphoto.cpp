@@ -5,7 +5,7 @@ VKContainerPhoto::VKContainerPhoto(QObject *parent) :
 {
 }
 
-VKContainerPhoto *VKContainerPhoto::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
+QSharedPointer<VKContainerPhoto> VKContainerPhoto::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
     Q_UNUSED(storage);
     Q_UNUSED(users);
     Q_UNUSED(userIds);
@@ -26,7 +26,7 @@ VKContainerPhoto *VKContainerPhoto::fromJson(VKStorage *storage, QJsonObject obj
 
     QDateTime date;
     date.setTime_t(obj.value("date").toInt());
-    return photo;
+    return QSharedPointer<VKContainerPhoto>(photo);
 }
 
 QString VKContainerPhoto::maxSuitablePhoto() {

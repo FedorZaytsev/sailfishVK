@@ -4,6 +4,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QSqlQuery>
+#include <QSharedPointer>
 #include "vkabstractcontainer.h"
 
 class VKStorage;
@@ -28,29 +29,26 @@ public:
     Q_ENUMS(AttachmentsType)
 
     explicit VKContainerAttachments(QObject *parent = 0);
-    static VKContainerAttachments*           fromJson(VKStorage *storage, QJsonArray obj, const QJsonArray users = QJsonArray());
-    static VKContainerAttachments*           fromSql(VKStorage *storage, QSqlQuery query);
-
-    //Q_INVOKABLE int countPhoto();
-    //Q_INVOKABLE VKContainerPhoto* getPhoto(int i);
-    //Q_INVOKABLE int countVideo();
-    //Q_INVOKABLE VKContainerVideo* getVideo(int i);
+    static QSharedPointer<VKContainerAttachments> fromJson(VKStorage *storage, QJsonArray obj, const QJsonArray users = QJsonArray());
 
     Q_INVOKABLE int count(AttachmentsType type);
-    Q_INVOKABLE VKAbstractContainer* get(AttachmentsType type, int i);
+    Q_INVOKABLE VKAbstractContainer* getPtr(AttachmentsType type, int i);
     Q_INVOKABLE QString description();
 
-    void addAttachment(AttachmentsType type, VKAbstractContainer* container);
+
+    QSharedPointer<VKAbstractContainer> get(AttachmentsType type, int i);
+
+    void addAttachment(AttachmentsType type, QSharedPointer<VKAbstractContainer> container);
 
 private:
     static VKContainerAttachments::AttachmentsType stringToType(QString type);
     static QString typeToString(AttachmentsType type);
-    static VKAbstractContainer* getContainer(AttachmentsType type, VKStorage *storage, QJsonObject obj, QJsonArray users);
+    static QSharedPointer<VKAbstractContainer> getContainer(AttachmentsType type, VKStorage *storage, QJsonObject obj, QJsonArray users);
 signals:
 
 public slots:
 private:
-    QMap<AttachmentsType, QVector<VKAbstractContainer*>> m_data;
+    QMap<AttachmentsType, QVector<QSharedPointer<VKAbstractContainer>>> m_data;
 };
 
 #endif // VKCONTAINERATTACHMENTS_H

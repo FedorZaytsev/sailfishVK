@@ -12,6 +12,7 @@
 #include <QDir>
 #include <execinfo.h>
 #include <signal.h>
+#include <exception>
 #include "vkpixmapprovider.h"
 #include "vkabstractcontainer.h"
 #include "vkcontainerdialog.h"
@@ -39,7 +40,7 @@
 #include "vkusertypinghelper.h"
 
 QFile global__logFile;
-QString global__appVersion = QString("Sailfish %1.%2 %3").arg(VK_MAJOR_VERSION).arg(VK_MINOR_VERSION).arg(VK_DEVELOP_STATE);
+bool global__isApplicationExec;
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
 void createLogFile() {
@@ -60,7 +61,7 @@ void createLogFile() {
 
     qInstallMessageHandler(myMessageOutput);
 
-    qWarning()<<"Application version"<<VK_MAJOR_VERSION<<VK_MINOR_VERSION<<VK_DEVELOP_STATE<<"log path"<<fpath;
+    qWarning()<<QCoreApplication::applicationName()<<QCoreApplication::applicationVersion()<<"log path"<<fpath;
 }
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
@@ -107,6 +108,26 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
     }
 }
 
+#include <sys/types.h>
+#include <sys/wait.h>
+void print_trace() {
+    char pid_buf[30];
+    sprintf(pid_buf, "%d", getpid());
+    char name_buf[512];
+    name_buf[readlink("/proc/self/exe", name_buf, 511)]=0;
+    int child_pid = fork();
+    if (!child_pid) {
+        qDebug()<<"!child_pid";
+        dup2(2,1); // redirect output to stderr
+        fprintf(stdout,"stack trace for %s pid=%s\n",name_buf,pid_buf);
+        execlp("gdb", "gdb", "--batch", "-n", "-ex", "thread", "-ex", "bt", name_buf, pid_buf, NULL);
+        abort(); /* If gdb failed to start */
+    } else {
+        qDebug()<<"waitpid";
+        waitpid(child_pid,NULL,0);
+    }
+}
+
 void handler(int sig) {
     void *array[10];
     size_t size;
@@ -116,26 +137,39 @@ void handler(int sig) {
 
     // print out all the frames to stderr
     qDebug()<<"Error: signal"<<sig;
+    print_trace();
+    backtrace_symbols_fd(array, size, STDERR_FILENO);
     backtrace_symbols_fd(array, size, global__logFile.handle());
     exit(sig);
+}
+
+void myterminate() {
+    print_trace();
 }
 
 int main(int argc, char *argv[]) {
 
     QCoreApplication::setApplicationName("harbour-vk");
+    QCoreApplication::setApplicationVersion(QString("%1.%2 %3").arg(VK_MAJOR_VERSION).arg(VK_MINOR_VERSION).arg(VK_DEVELOP_STATE));
 
     createLogFile();
     signal(SIGSEGV, handler);
+    signal(SIGINT, handler);
+    signal(SIGABRT, handler);
+
+    std::set_terminate (myterminate);
+
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
     QScopedPointer<QQuickView> view(SailfishApp::createView());
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 
+
     qmlRegisterType<VK>("harbour.vk.VK", 1, 0, "VK");
     qmlRegisterType<VKLongPollServer>();
     qmlRegisterType<VKContainerDialog>();
     qmlRegisterType<VKContainerMessage>();
-    qmlRegisterType<VKContainerMessageAction>();
+    qmlRegisterUncreatableType<VKContainerMessageAction>("harbour.vk.VK", 1, 0, "VKContainerMessageAction","Cannot create VKContainerMessageAction class");
     qmlRegisterType<VKContainerUser>();
     qmlRegisterType<VKAbstractContainer>();
     qmlRegisterType<VKContainerChatIcon>();
@@ -165,7 +199,7 @@ int main(int argc, char *argv[]) {
     view->setSource(SailfishApp::pathTo("qml/harbour-vk.qml"));
     view->show();
 
-    qDebug()<<"exec";
+    global__isApplicationExec = true;
 
     int result = app->exec();
 

@@ -4,11 +4,17 @@ VKAbstractHandler::VKAbstractHandler(VKStorage* storage,QObject *parent) :
     QObject(parent)
 {
     m_storage = storage;
+    m_additionalDataHandler = nullptr;
     Q_ASSERT(parent);
 }
 
-QJsonValue VKAbstractHandler::data()
-{
+void VKAbstractHandler::requestAdditionInfo(VKAbstractHandler *h) {
+    m_additionalDataHandler = h;
+    QObject::connect(m_additionalDataHandler, &VKAbstractHandler::ready, this, &VKAbstractHandler::additionDataReady);
+    sendRequest(m_additionalDataHandler);
+}
+
+QJsonValue VKAbstractHandler::data() {
     return m_data;
 }
 
@@ -31,4 +37,10 @@ const QNetworkRequest VKAbstractHandler::generateRequest(QString method, QList<Q
     url.setQuery(query);
 
     return QNetworkRequest(url);
+}
+
+void VKAbstractHandler::additionDataReady(VKAbstractHandler *h) {
+    Q_UNUSED(h);
+    Q_ASSERT(0);
+
 }

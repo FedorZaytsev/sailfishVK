@@ -5,7 +5,7 @@ VKContainerVideo::VKContainerVideo(QObject *parent) :
 {
 }
 
-VKContainerVideo *VKContainerVideo::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
+QSharedPointer<VKContainerVideo> VKContainerVideo::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
     Q_UNUSED(storage);
     Q_UNUSED(users);
     Q_UNUSED(userIds);
@@ -34,7 +34,7 @@ VKContainerVideo *VKContainerVideo::fromJson(VKStorage *storage, QJsonObject obj
     addingDate.setTime_t(obj.value("adding_date").toInt());
     video->setAddingDate(addingDate);
 
-    return video;
+    return QSharedPointer<VKContainerVideo>(video);
 }
 
 

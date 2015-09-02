@@ -4,11 +4,11 @@
 VKContainerMessageAction::VKContainerMessageAction(QObject *parent) :
     VKAbstractContainer(parent)
 {
-    m_actionId = ACTION_INVALID;
+    setType(ACTION_INVALID);
     m_actionMid = 0;
 }
 
-VKContainerMessageAction *VKContainerMessageAction::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
+QSharedPointer<VKContainerMessageAction> VKContainerMessageAction::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> &userIds) {
     Q_UNUSED(storage);
     Q_UNUSED(users);
 
@@ -16,32 +16,47 @@ VKContainerMessageAction *VKContainerMessageAction::fromJson(VKStorage *storage,
 
     auto act = obj.value("action").toString();
     if (act == "") {
-        action->setId( ACTION_INVALID );
+        action->setType( ACTION_INVALID );
     } else if (act == "chat_photo_update") {
-        action->setId( ACTION_PHOTO_UPDATED );
+        //todo
+        action->setType( ACTION_PHOTO_UPDATED );
     } else if (act == "chat_photo_remove") {
-        action->setId( ACTION_PHOTO_REMOVED );
+        //todo
+        action->setType( ACTION_PHOTO_REMOVED );
     } else if (act == "chat_create") {
-        action->setId( ACTION_CHAT_CREATE );
+        action->setType( ACTION_CHAT_CREATE );
         action->setText(obj.value("action_text").toString());
     } else if (act == "chat_title_update") {
-        action->setId( ACTION_TITLE_UPDATED );
+        action->setType( ACTION_TITLE_UPDATED );
+        qDebug()<<"title updated";
         action->setText(obj.value("action_text").toString());
     } else if (act == "chat_invite_user") {
-        action->setId( ACTION_INVITE_USER );
-        int userId = obj.value("action_mid").toInt();
+        action->setType( ACTION_INVITE_USER );
+        int userId = 0;
+        if (obj.value("action_mid").isString()) {
+            userId = obj.value("action_mid").toString().toInt();
+        } else {
+            userId = obj.value("action_mid").toInt();
+        }
         if (userId < 0) {
             action->setText(obj.value("action_email").toString());
         } else {
+            qDebug()<<"adding"<<userId;
             userIds.append(userId);
             action->setUserId(userId);
         }
     } else if (act == "chat_kick_user") {
-        action->setId( ACTION_KICK_USER );
-        int userId = obj.value("action_mid").toInt();
+        action->setType( ACTION_KICK_USER );
+        int userId = 0;
+        if (obj.value("action_mid").isString()) {
+            userId = obj.value("action_mid").toString().toInt();
+        } else {
+            userId = obj.value("action_mid").toInt();
+        }
         if (userId < 0) {
             action->setText(obj.value("action_email").toString());
         } else {
+            qDebug()<<"adding"<<userId;
             userIds.append(userId);
             action->setUserId(userId);
         }
@@ -50,14 +65,20 @@ VKContainerMessageAction *VKContainerMessageAction::fromJson(VKStorage *storage,
         Q_ASSERT(0);
     }
 
-    return action;
+    return QSharedPointer<VKContainerMessageAction>(action);
 }
 
-void VKContainerMessageAction::complete(VKHandlerUsers *users) {
-    for (int i=0;i<users->count();i++) {
-        auto el = users->get(i);
-        if (userId() == el->id()) {
-            setText(el->firstName() + " " + el->lastName());
+void VKContainerMessageAction::complete(VKAbstractHandler *_h) {
+    auto users = dynamic_cast<VKHandlerUsers*>(_h);
+
+    if (users) {
+        for (int i=0;i<users->count();i++) {
+            auto el = users->get(i);
+            if (userId() == el->id()) {
+                setText(el->firstName() + " " + el->lastName());
+                qDebug()<<"Message action with type"<<type()<<"completed with user id"<<el->id();
+                return;
+            }
         }
     }
 }

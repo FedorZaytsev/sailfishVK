@@ -5,7 +5,7 @@ VKContainerLink::VKContainerLink(QObject *parent) :
 {
 }
 
-VKContainerLink *VKContainerLink::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
+QSharedPointer<VKContainerLink> VKContainerLink::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
     Q_UNUSED(storage);
     Q_UNUSED(users);
     Q_UNUSED(userIds);
@@ -15,5 +15,5 @@ VKContainerLink *VKContainerLink::fromJson(VKStorage *storage, QJsonObject obj, 
     link->setTitle(obj.value("title").toString());
     link->setUrl(obj.value("url").toString());
 
-    return link;
+    return QSharedPointer<VKContainerLink>(link);
 }

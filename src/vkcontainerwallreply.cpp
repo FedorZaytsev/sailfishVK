@@ -5,7 +5,7 @@ VKContainerWallReply::VKContainerWallReply(QObject *parent) :
 {
 }
 
-VKContainerWallReply *VKContainerWallReply::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
+QSharedPointer<VKContainerWallReply> VKContainerWallReply::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
     Q_UNUSED(storage);
     Q_UNUSED(obj);
     Q_UNUSED(users);
@@ -13,6 +13,6 @@ VKContainerWallReply *VKContainerWallReply::fromJson(VKStorage *storage, QJsonOb
 
     auto wallReply = new VKContainerWallReply;
 
-    return wallReply;
+    return QSharedPointer<VKContainerWallReply>(wallReply);
 }
 

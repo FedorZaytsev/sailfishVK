@@ -62,7 +62,9 @@ Page {
                 id: pageHeader
                 title: listHeader
             }
-            LoadingFooter {}
+            LoadingFooter {
+                showBusy: messagesList.model.count > 10
+            }
         }
         header: MessageFooter {
             usrId: id
@@ -76,7 +78,14 @@ Page {
                 vk.getMessages(id,isChat,offset)
             }
         }
-        delegate: MessageComponent{}
+        delegate: Component {
+            Loader {
+                source: actionMessages === "" ?
+                            "MessageComponent.qml" :
+                            "MessageComponentAction.qml"
+            }
+        }
+
         verticalLayoutDirection: ListView.BottomToTop
         VerticalScrollDecorator {}
     }

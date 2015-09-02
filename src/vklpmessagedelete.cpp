@@ -6,7 +6,6 @@ VKLPMessageDelete::VKLPMessageDelete(QObject *parent) :
     m_id = 0;
     m_userId = 0;
     m_isChat = false;
-    m_message = NULL;
     m_type = VKLPEventType::MESSAGE_DELETE;
 }
 
@@ -19,7 +18,9 @@ void VKLPMessageDelete::fromLP(const QJsonArray &data, QList<QString> &l) {
     m_valid = false;
 }
 
-void VKLPMessageDelete::complete(QVector<VKContainerDialog*> , QVector<VKContainerMessage*> messages, QVector<VKContainerUser *> ) {
+void VKLPMessageDelete::complete(QVector<QSharedPointer<VKContainerDialog>> dialogs, QVector<QSharedPointer<VKContainerMessage>> messages, QVector<QSharedPointer<VKContainerUser>> users) {
+    Q_UNUSED(dialogs);
+    Q_UNUSED(users);
     qDebug()<<"requesting"<<id();
     for (auto e : messages) {
         if (e->msgId() == id()) {

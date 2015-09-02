@@ -12,7 +12,7 @@ class VKLPAbstract : public QObject
     Q_OBJECT
 public:
     explicit VKLPAbstract(QObject *parent = 0);
-    virtual void complete(QVector<VKContainerDialog*> dialogs, QVector<VKContainerMessage*> messages, QVector<VKContainerUser*> users);
+    virtual void complete(QVector<QSharedPointer<VKContainerDialog>> dialogs, QVector<QSharedPointer<VKContainerMessage>> messages, QVector<QSharedPointer<VKContainerUser>> users);
     bool isValid() { return m_valid; }
     Q_INVOKABLE int type() { return m_type; }
 signals:

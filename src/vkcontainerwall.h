@@ -9,7 +9,7 @@ class VKContainerWall : public VKAbstractContainer
     Q_OBJECT
 public:
     explicit VKContainerWall(QObject *parent = 0);
-    static VKContainerWall *fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users, QVector<int> userIds = QVector<int>());
+    static QSharedPointer<VKContainerWall> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users, QVector<int> userIds = QVector<int>());
 
 signals:
 

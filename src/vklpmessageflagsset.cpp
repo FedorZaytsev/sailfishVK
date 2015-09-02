@@ -4,7 +4,6 @@ VKLPMessageFlagsSet::VKLPMessageFlagsSet(QObject *parent) :
     VKLPMessageFlagsChange(parent)
 {
     m_type = VKLPEventType::MESSAGE_FLAGS_SET;
-    m_message = NULL;
 }
 
 void VKLPMessageFlagsSet::fromLP(const QJsonArray &data, QList<QString> &l) {
@@ -17,7 +16,11 @@ void VKLPMessageFlagsSet::fromLP(const QJsonArray &data, QList<QString> &l) {
     m_valid = !flags()->isSet(VKLPFlags::DELETED);
 }
 
-void VKLPMessageFlagsSet::complete(QVector<VKContainerDialog*>, QVector<VKContainerMessage*> messages, QVector<VKContainerUser*>) {
+void VKLPMessageFlagsSet::complete(QVector<QSharedPointer<VKContainerDialog>> dialogs,
+                                   QVector<QSharedPointer<VKContainerMessage>> messages,
+                                   QVector<QSharedPointer<VKContainerUser>> users) {
+    Q_UNUSED(dialogs);
+    Q_UNUSED(users);
     qDebug()<<"requesting"<<id();
     for (auto e : messages) {
         if (e->msgId() == id()) {

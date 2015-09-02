@@ -3,6 +3,7 @@
 VKHandlerUsers::VKHandlerUsers(VKStorage* storage, QObject *parent) :
     VKAbstractHandler(storage, parent)
 {
+    setFields("photo_50,photo_100");
 }
 
 const QNetworkRequest VKHandlerUsers::processRequest() {
@@ -17,7 +18,7 @@ const QNetworkRequest VKHandlerUsers::processRequest() {
     }
 
     QString exec = QString(
-"return API.users.get({\"user_ids\":%1,\"fields\":%2}});"
+"return API.users.get({\"user_ids\":\"%1\",\"fields\":\"%2\"});"
 ).arg(lst.join(",")).arg(m_fields);
 
     QList<QPair<QString,QString>> args;
@@ -30,7 +31,6 @@ void VKHandlerUsers::processReply(QJsonValue *reply) {
 
     for (auto e: users) {
         auto user = VKContainerUser::fromJson(storage(), e.toObject());
-        user->setParent(this);
         m_users.append(user);
     }
 
@@ -55,6 +55,10 @@ int VKHandlerUsers::count() {
     return m_users.count();
 }
 
-VKContainerUser *VKHandlerUsers::get(int i) {
+VKContainerUser *VKHandlerUsers::getPtr(int i) {
+    return m_users.at(i).data();
+}
+
+QSharedPointer<VKContainerUser> VKHandlerUsers::get(int i) {
     return m_users.at(i);
 }

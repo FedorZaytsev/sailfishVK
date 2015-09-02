@@ -5,8 +5,6 @@
 
 volatile VK* __vk_object;
 
-extern QString global__appVersion;
-
 //todo https://vk.com/dev/api_nohttps
 //todo VK::ERROR_CAPTHA
 //todo VK::ERROR_HTTPS_SAME
@@ -60,6 +58,10 @@ void VK::timerRequest(VKAbstractHandler *handler) {
 }
 
 void VK::sendHandlertoScript(VKAbstractHandler *handler) {
+
+    //Care, I need to change all raw pointers in Handlers to QSharedPointer to prevent deletion shared containers
+
+    qDebug()<<"sendHandlertoScript";
     handler->setParent(nullptr);
     QQmlEngine::setObjectOwnership(handler, QQmlEngine::JavaScriptOwnership);
     emit handlerReady(handler->name(),  handler);
@@ -92,7 +94,7 @@ void VK::addDebugLogLine(const QString &line) {
 }
 
 QString VK::appVersion() {
-    return global__appVersion;
+    return QCoreApplication::applicationName()+" "+QCoreApplication::applicationVersion();
 }
 
 extern QFile global__logFile;
@@ -230,7 +232,7 @@ void VK::requestFinished(QNetworkReply* reply) {
             } else {
                 if (object.contains("response")) {
                     QJsonValue response = object.value("response");
-                    
+
                     handler->processReply(&response);
 
                 } else {

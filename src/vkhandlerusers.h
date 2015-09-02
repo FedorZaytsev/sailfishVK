@@ -18,14 +18,16 @@ public:
     void setFields(QString fields);
 
     Q_INVOKABLE int count();
-    Q_INVOKABLE VKContainerUser* get(int i);
+    Q_INVOKABLE VKContainerUser* getPtr(int i);
+
+    QSharedPointer<VKContainerUser> get(int i);
 signals:
 
 public slots:
 private:
     QVector<int> m_userIds;
     QString m_fields;
-    QVector<VKContainerUser*> m_users;
+    QVector<QSharedPointer<VKContainerUser>> m_users;
 };
 
 #endif // VKHANDLERUSERS_H

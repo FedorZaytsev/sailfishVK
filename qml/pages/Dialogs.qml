@@ -41,6 +41,18 @@ Page {
                     vk.emitUpdatePages()
                 }
             }
+            MenuItem {
+                text: "gc"
+                onClicked: {
+                    gc()
+                }
+            }
+            MenuItem {
+                text: "test"
+                onClicked: {
+                    vk.test()
+                }
+            }
         }
 
 
@@ -50,9 +62,11 @@ Page {
         spacing: Theme.paddingLarge
         header: PageHeader {
             id: pageHeader
-            title: "Messanges"
+            title: "Conversations"
         }
-        footer: LoadingFooter {}
+        footer: LoadingFooter {
+            showBusy: dialogsList.model.count > 10
+        }
 
         delegate: DialogComponent{}
         onMovementEnded: {

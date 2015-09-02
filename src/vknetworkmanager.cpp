@@ -15,6 +15,7 @@ VKAbstractHandler *VKNetworkManager::getHandlerByReply(QNetworkReply *reply) {
     return NULL;
 }
 
+extern bool global__isApplicationExec;
 void VKNetworkManager::sendRequest(VKAbstractHandler *handler) {
 
     qDebug()<<"adding handler in network manager";
@@ -24,6 +25,7 @@ void VKNetworkManager::sendRequest(VKAbstractHandler *handler) {
         send(handler);
         m_time = time.addMSecs(WAIT_TIME_MS);                              //400ms
     } else {
+        qDebug()<<"global__isApplicationExec"<<global__isApplicationExec;
         if (m_data.isEmpty()) {
             qDebug()<<"m_data is empty, setting timer for time"<<(m_time.toMSecsSinceEpoch() - time.toMSecsSinceEpoch());
             QTimer::singleShot(m_time.toMSecsSinceEpoch() - time.toMSecsSinceEpoch(), this, SLOT(timeout()));

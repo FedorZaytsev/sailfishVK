@@ -8,7 +8,6 @@ VKHandlerMessages::VKHandlerMessages(VKStorage* storage, QObject *parent) :
     setUserId(0);
     setStartMessageId(0);
     setReverse(0);
-    m_usersHandler = NULL;
 }
 
 const QNetworkRequest VKHandlerMessages::processRequest() {
@@ -18,7 +17,6 @@ const QNetworkRequest VKHandlerMessages::processRequest() {
 "var messages = API.messages.getHistory({\"offset\":%1,\"count\":%2,\"%3_id\":%4});"
 "var i = 0;"
 "var users = [];"
-//"return messages.items.length;"
 "while (i < messages.items.length) {"
     "var message = messages.items[i];"
     "users.push(message.user_id);"
@@ -42,22 +40,18 @@ void VKHandlerMessages::processReply(QJsonValue *reply) {
     for (auto e: messages) {
         auto message = e.toObject();
 
-        VKContainerMessage* msg = VKContainerMessage::fromJson(storage(), message, users, unknownUsers);
-        msg->setParent(this);
+        auto msg = VKContainerMessage::fromJson(storage(), message, users, unknownUsers);
         m_messages.push_back(msg);
     }
 
-    QStringList lst;
-    for (auto e: unknownUsers) {
-        lst.append(QString::number(e));
-    }
-
     //Additional request for case when we don't have info about users in fwd messages
-    if (lst.length()) {
-        qDebug()<<"We need additional users info about"<<lst.join(",");
-        m_usersHandler = new VKHandlerUsers(storage(), this);
-        QObject::connect(m_usersHandler, &VKHandlerUsers::ready, this, &VKHandlerMessages::usersUpdateData);
+    if (unknownUsers.length()) {
+        qDebug()<<"We need additional users info about"<<unknownUsers;
+        auto usersHandler = new VKHandlerUsers(storage(), this);
+        usersHandler->setUsers(unknownUsers);
+        requestAdditionInfo(usersHandler);
     } else {
+        qDebug()<<"ready";
         emit ready(this);
     }
 }
@@ -96,24 +90,23 @@ int VKHandlerMessages::count() {
     return m_messages.count();
 }
 
-VKContainerMessage *VKHandlerMessages::get(int i) {
+QSharedPointer<VKContainerMessage> VKHandlerMessages::get(int i) {
     return m_messages.at(i);
 }
 
-void VKHandlerMessages::usersUpdateData(){
+VKContainerMessage *VKHandlerMessages::getPtr(int i) {
+    return m_messages.at(i).data();
+}
+
+void VKHandlerMessages::additionDataReady(VKAbstractHandler *h) {
+    auto handler = dynamic_cast<VKHandlerUsers*>(h);
+    Q_ASSERT(handler != nullptr);
+
     qDebug()<<"additional info ready, updating";
     for (auto e: m_messages) {
-        e->complete(m_usersHandler);
+        e->complete(handler);
     }
-    /*for (auto e: m_messages) {
-        for (int i=0;i<m_usersHandler->count();i++) {
-            auto el = m_usersHandler->get(i);
-            if (e->user()->id() == el->id()) {
-                delete e->user();
-                e->setUser(el);
-            }
-        }
-    }*/
 
     emit ready(this);
+
 }

@@ -23,14 +23,13 @@ const QNetworkRequest VKHandlerSendMessage::processRequest() {
     }
 
     QString exec = QString(
-"return {\"id\":API.messages.send({\"%1_id\":%2,\"message\":\"%3\",\"guid\":%4%5%6}),\"guid\":%4")
+"return {\"id\":API.messages.send({\"%1_id\":%2,\"message\":\"%3\",\"guid\":%4%5%6}),\"guid\":%4};")
             .arg(m_isChat ? "chat" : "user")
             .arg(m_userId)
             .arg(m_text)
             .arg(m_guid)
             .arg(attachments)
             .arg(forward);
-
 
     QList<QPair<QString,QString>> args;
     args.push_back({"code",exec});

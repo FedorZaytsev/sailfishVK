@@ -12,6 +12,7 @@
 #include <QJsonArray>
 #include <QObject>
 #include <QPair>
+#include <QTimer>
 #include "vkabstracthandler.h"
 #include "vklpeventtype.h"
 #include "vklpabstract.h"
@@ -31,19 +32,9 @@
 #include "vklpcounterupdate.h"
 
 #define MAX_USER_ID 2000000000
+#define TIMEOUT_REQUEST (2*60*1000)
 //Long Poll server
 //Have his own parser, network manager and so on
-
-/*
-class E_VKUPDATE : public QObject
-{
-    Q_OBJECT
-public:
-    E_VKUPDATE(QObject *parent = 0) : QObject(parent) {}
-
-
-};*/
-
 
 class VKStorage;
 class VK;
@@ -61,8 +52,10 @@ public:
     virtual void                        processReply(QJsonValue*) {qCritical("never called");}
 
     Q_INVOKABLE int                     count();
-    Q_INVOKABLE VKLPAbstract*           at(int idx);
+    Q_INVOKABLE VKLPAbstract*           atPtr(int idx);
     Q_INVOKABLE void                    clean();
+
+    QSharedPointer<VKLPAbstract>        at(int idx);
 
 
     void                                setKey(const QString &key)          {m_key = key;}
@@ -99,6 +92,7 @@ public slots:
     void networkDataReady(QNetworkReply* reply);
     void updateDataReady(VKAbstractHandler* handler);
     void additionalInformationAboutUsersReady(VKAbstractHandler* handler);
+    void watchdogTimer();
 private:
     QNetworkAccessManager m_manager;
     QString m_key;
@@ -109,13 +103,14 @@ private:
     VK* m_vk;
     bool m_initialized;
 
-    QMap<int, QVector<VKLPAbstract*>> m_cachedEvents;
-    QVector<VKLPAbstract*> m_readyEvents;
+    QMap<int, QVector<QSharedPointer<VKLPAbstract>>> m_cachedEvents;
+    QVector<QSharedPointer<VKLPAbstract>> m_readyEvents;
 
-    QVector<VKContainerDialog*> m_updateDialogs;
-    QVector<VKContainerMessage*> m_updateMessages;
-    QVector<VKContainerUser*> m_updateUsers;
-    QMap<int, QVector<QPair<int, int> > > m_longPollData;           //remove
+    QVector<QSharedPointer<VKContainerDialog>> m_updateDialogs;
+    QVector<QSharedPointer<VKContainerMessage>> m_updateMessages;
+    QVector<QSharedPointer<VKContainerUser>> m_updateUsers;
+    QTimer m_timer;
+    QDateTime m_lastTime;
 };
 
 #endif // VKLONGPOLLSERVER_H

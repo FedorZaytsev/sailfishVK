@@ -14,10 +14,9 @@ class VKContainerUser : public VKAbstractContainer
     Q_OBJECT
 public:
     explicit VKContainerUser(QObject *parent = 0);
+    ~VKContainerUser();
 
-    static VKContainerUser* fromJson(VKStorage *storage, const QJsonObject &obj);
-    static VKContainerUser* fromSql(VKStorage *storage, QSqlQuery &query);
-    void copyTo(VKContainerUser* user);
+    static QSharedPointer<VKContainerUser> fromJson(VKStorage *storage, const QJsonObject &obj);
 
     Q_INVOKABLE int id() const              { return m_id; }
     Q_INVOKABLE QString firstName() const   { return m_firstName; }

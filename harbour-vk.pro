@@ -12,7 +12,7 @@
 # The name of your application
 TARGET = harbour-vk
 QT += sql
-QMAKE_CXXFLAGS += -Werror
+QMAKE_CXXFLAGS += -Werror -std=c++0x -g -rdynamic -DQT_SHAREDPOINTER_TRACK_POINTERS
 
 CONFIG += sailfishapp c++11
 
@@ -109,7 +109,8 @@ OTHER_FILES += qml/harbour-vk.qml \
     qml/pages/MessageSticker.qml \
     qml/pages/MessageLink.qml \
     qml/pages/MessageDocument.qml \
-    qml/pages/LoadingFooter.qml
+    qml/pages/LoadingFooter.qml \
+    qml/pages/MessageComponentAction.qml
 
 # to disable building translations every time, comment out the
 # following CONFIG line

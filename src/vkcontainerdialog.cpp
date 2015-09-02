@@ -6,8 +6,6 @@
 VKContainerDialog::VKContainerDialog(QObject *parent) :
     VKAbstractContainer(parent)
 {
-    m_message = NULL;
-    m_chatIcon = NULL;
     m_unreadCount = 0;
     m_chatId = 0;
     m_isChat = false;
@@ -17,7 +15,7 @@ VKContainerDialog::~VKContainerDialog()
 {
 }
 
-VKContainerDialog* VKContainerDialog::fromJson(VKStorage *storage, QJsonObject obj, const QJsonArray users, QVector<int> userIds) {
+QSharedPointer<VKContainerDialog> VKContainerDialog::fromJson(VKStorage *storage, QJsonObject obj, const QJsonArray users, QVector<int> &userIds) {
     VKContainerDialog* dialog = new VKContainerDialog;
     dialog->setUnreadCount(obj.value("unread").toInt());
 
@@ -57,7 +55,7 @@ VKContainerDialog* VKContainerDialog::fromJson(VKStorage *storage, QJsonObject o
     }
 
 
-    VKContainerChatIcon* chatIcon = new VKContainerChatIcon;
+    auto chatIcon = QSharedPointer<VKContainerChatIcon>(new VKContainerChatIcon);
     if (message.value("photo_100").isString()) {
         chatIcon->add(message.value("photo_100").toString());
     } else {
@@ -69,41 +67,26 @@ VKContainerDialog* VKContainerDialog::fromJson(VKStorage *storage, QJsonObject o
     dialog->setChatIcon(chatIcon);
 
 
-    VKContainerMessage* containerMessage = VKContainerMessage::fromJson(storage, message, users, userIds);
-    containerMessage->setParent(dialog);
+    auto containerMessage = VKContainerMessage::fromJson(storage, message, users, userIds);
     dialog->setMessage(containerMessage);
-    return dialog;
+    return QSharedPointer<VKContainerDialog>(dialog);
 }
 
-VKContainerDialog *VKContainerDialog::fromSql(VKStorage *storage, QSqlQuery query) {
-    VKContainerDialog* dialog = new VKContainerDialog;
-    dialog->setChatId(query.value("id").toInt());
-    dialog->setMessage(storage->getMessageById(query.value("last_message_id").toInt()));
-    dialog->setUnreadCount(query.value("unread_count").toInt());
-    dialog->setIsChat(query.value("is_chat").toInt() == 1);
-    dialog->setChatName(query.value("name").toString());
-
-    for (int i=0;i<4;i++) {
-        QString iconName = query.value(QString("icon%1").arg(i)).toString();
-        if (iconName == "") break;
-
-    }
-
-    return dialog;
+void VKContainerDialog::complete(VKAbstractHandler *users) {
+    m_message->complete(users);
+    m_chatIcon->complete(users);
 }
 
 void VKContainerDialog::setChatName(QString arg) {
     m_chatName = arg;
 }
 
-void VKContainerDialog::setChatIcon(VKContainerChatIcon *arg) {
+void VKContainerDialog::setChatIcon(QSharedPointer<VKContainerChatIcon> arg) {
     m_chatIcon = arg;
-    m_chatIcon->setParent(this);
 }
 
-void VKContainerDialog::setMessage(VKContainerMessage *arg) {
+void VKContainerDialog::setMessage(QSharedPointer<VKContainerMessage> arg) {
     m_message = arg;
-    m_message->setParent(this);
 }
 
 

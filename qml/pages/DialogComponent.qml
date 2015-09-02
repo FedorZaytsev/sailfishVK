@@ -9,7 +9,7 @@ BackgroundItem {
     property alias dialogElementAlias : dialogElement
 
     Loader {
-        sourceComponent: unreadCount > 0? unreadCountLabel : undefined
+        sourceComponent: unreadCount > 0 || true? unreadCountLabel : undefined
     }
     Component {
         id: unreadCountLabel

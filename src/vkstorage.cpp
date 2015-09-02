@@ -6,7 +6,6 @@ VKStorage::VKStorage(QObject *parent) :
     QObject(parent)
 {
     m_ourUserId = 0;
-    m_ourUser = NULL;
     //FOR DEBUG ONLY
     m_accessToken = "2c1d185c5b1a708a0f619fc1b13828d2e1286d99bf4871d6141baeea4001fa3a50fc7c86959f3110c9c04";
     m_ourUserId = 16143988;
@@ -63,10 +62,9 @@ void VKStorage::init() {
 
 
 
-void VKStorage::addUser(VKContainerUser *user) {
-    if (user->id() == ourUserId()) {
-        m_ourUser = new VKContainerUser(this);
-        user->copyTo(m_ourUser);
+void VKStorage::addUser(QSharedPointer<VKContainerUser> user) {
+    if (user->id() == ourUserId() && m_ourUser.isNull()) {
+        m_ourUser = user;
         return;
     }
     Q_ASSERT(0);
@@ -82,7 +80,7 @@ void VKStorage::addUser(VKContainerUser *user) {
     query.exec();*/
 }
 
-VKContainerUser* VKStorage::getUserById(int userId) {
+QSharedPointer<VKContainerUser> VKStorage::getUserById(int userId) {
     if (userId == m_ourUserId) {
         return m_ourUser;
     }
@@ -99,10 +97,10 @@ VKContainerUser* VKStorage::getUserById(int userId) {
         return NULL;
     }
 */
-    return NULL;
+    return QSharedPointer<VKContainerUser>();
 }
 
-void VKStorage::addMessage(VKContainerMessage *message) {
+void VKStorage::addMessage(QSharedPointer<VKContainerMessage> message) {
     Q_UNUSED(message);
     Q_ASSERT(0);
 /*    QSqlQuery query;
@@ -120,7 +118,7 @@ void VKStorage::addMessage(VKContainerMessage *message) {
 */
 }
 
-VKContainerMessage *VKStorage::getMessageById(int messageId) {
+QSharedPointer<VKContainerMessage> VKStorage::getMessageById(int messageId) {
     Q_UNUSED(messageId);
     Q_ASSERT(0);
 /*
@@ -135,10 +133,10 @@ VKContainerMessage *VKStorage::getMessageById(int messageId) {
         return NULL;
     }
     */
-    return NULL;
+    return QSharedPointer<VKContainerMessage>();
 }
 
-void VKStorage::addDialog(VKContainerDialog *dialog) {
+void VKStorage::addDialog(QSharedPointer<VKContainerDialog> dialog) {
     Q_UNUSED(dialog);
     Q_ASSERT(0);
 /*    QSqlQuery query;
@@ -158,7 +156,7 @@ void VKStorage::addDialog(VKContainerDialog *dialog) {
     query.exec();*/
 }
 
-VKContainerDialog *VKStorage::getDialogById(int dialogId) {
+QSharedPointer<VKContainerDialog> VKStorage::getDialogById(int dialogId) {
     Q_UNUSED(dialogId);
     Q_ASSERT(0);
 /*    QSqlQuery query;
@@ -171,7 +169,7 @@ VKContainerDialog *VKStorage::getDialogById(int dialogId) {
         Q_ASSERT(0);
         return NULL;
     }*/
-    return NULL;
+    return QSharedPointer<VKContainerDialog>();
 }
 
 bool VKStorage::isAuthorizred() {

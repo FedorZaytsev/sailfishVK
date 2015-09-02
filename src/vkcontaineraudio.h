@@ -10,7 +10,7 @@ class VKContainerAudio : public VKAbstractContainer
     Q_OBJECT
 public:
     explicit VKContainerAudio(QObject *parent = 0);
-    static VKContainerAudio *fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users, QVector<int> userIds = QVector<int>());
+    static QSharedPointer<VKContainerAudio> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users);
 
     Q_INVOKABLE int         id()            { return m_id; }
     Q_INVOKABLE int         ownerId()       { return m_ownerId; }

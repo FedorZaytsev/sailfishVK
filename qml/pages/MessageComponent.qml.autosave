@@ -12,7 +12,7 @@ BackgroundItem {
     property real maxWidth: Screen.width - itemOffset*2
     property int  idx: index
     height: textHeight + avatarImage.height + 2*padding + messageData.height +
-            ((index === messagesList.model.count || messagesList.model.get(index+1).offset === 0) ? padding*3: 0)
+            ((index === messagesList.model.count || messagesList.model.get(index+1).offset === 0) ? padding : 0)
 
     Component.onCompleted: {
         if (!isRead && id !== 0) {

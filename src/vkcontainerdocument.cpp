@@ -5,7 +5,7 @@ VKContainerDocument::VKContainerDocument(QObject *parent) :
 {
 }
 
-VKContainerDocument *VKContainerDocument::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
+QSharedPointer<VKContainerDocument> VKContainerDocument::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
     Q_UNUSED(storage);
     Q_UNUSED(users);
     Q_UNUSED(userIds);
@@ -20,5 +20,5 @@ VKContainerDocument *VKContainerDocument::fromJson(VKStorage *storage, QJsonObje
     doc->setTitle(obj.value("title").toString());
     doc->setUrl(obj.value("url").toString());
 
-    return doc;
+    return QSharedPointer<VKContainerDocument>(doc);
 }

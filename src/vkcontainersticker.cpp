@@ -5,7 +5,7 @@ VKContainerSticker::VKContainerSticker(QObject *parent) :
 {
 }
 
-VKContainerSticker *VKContainerSticker::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
+QSharedPointer<VKContainerSticker> VKContainerSticker::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
     Q_UNUSED(storage);
     Q_UNUSED(obj);
     Q_UNUSED(users);
@@ -14,5 +14,5 @@ VKContainerSticker *VKContainerSticker::fromJson(VKStorage *storage, QJsonObject
     auto sticker = new VKContainerSticker;
 
 
-    return sticker;
+    return QSharedPointer<VKContainerSticker>(sticker);
 }

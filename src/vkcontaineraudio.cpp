@@ -5,10 +5,9 @@ VKContainerAudio::VKContainerAudio(QObject *parent) :
 {
 }
 
-VKContainerAudio *VKContainerAudio::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
+QSharedPointer<VKContainerAudio> VKContainerAudio::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users) {
     Q_UNUSED(storage);
     Q_UNUSED(users);
-    Q_UNUSED(userIds);
     auto audio = new VKContainerAudio;
 
     audio->setAlbum(obj.value("album").toInt());
@@ -21,5 +20,5 @@ VKContainerAudio *VKContainerAudio::fromJson(VKStorage *storage, QJsonObject obj
     audio->setTitle(obj.value("title").toString());
     audio->setUrl(obj.value("url").toString());
 
-    return audio;
+    return QSharedPointer<VKContainerAudio>(audio);
 }

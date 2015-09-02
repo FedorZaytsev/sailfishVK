@@ -13,13 +13,11 @@ VKHandlerDialogs::VKHandlerDialogs(VKStorage *storage, QObject *parent) :
     m_previewLength = DEFAULT_PREVIEW_LENGTH;
 }
 
-VKHandlerDialogs::~VKHandlerDialogs()
-{
-    qDebug()<<"VKHandlerDialogs::~VKHandlerDialogs";
+VKHandlerDialogs::~VKHandlerDialogs() {
 }
 
 const QNetworkRequest VKHandlerDialogs::processRequest() {
-    Q_ASSERT(m_count >= 20 && m_count <= 200);
+    Q_ASSERT(m_count >= 1 && m_count <= 200);
     QString exec = QString(
 "var dialogs = API.messages.getDialogs({\"offset\":\"%1\",\"preview_length\":%2,\"count\":%3});"
 "var i = 0;"
@@ -42,24 +40,32 @@ const QNetworkRequest VKHandlerDialogs::processRequest() {
 void VKHandlerDialogs::processReply(QJsonValue *reply) {
     QJsonObject ourUser = reply->toObject().value("user").toObject();
 
-    VKContainerUser* ourUserParsed = VKContainerUser::fromJson(storage(), ourUser);
+    auto ourUserParsed = VKContainerUser::fromJson(storage(), ourUser);
+
     storage()->addUser(ourUserParsed);
-    delete ourUserParsed;
 
     QJsonArray dialogs = reply->toObject().value("dialogs").toArray();
 
+    QVector<int> unknownUsers;
     for (auto e : dialogs) {
         auto el = e.toObject();
         Q_ASSERT(el.value("item").isObject());
         Q_ASSERT(el.value("users").isArray());
-        VKContainerDialog* dialog = VKContainerDialog::fromJson(storage(), el.value("item").toObject(), el.value("users").toArray());
-        dialog->setParent(this);
+        auto dialog = VKContainerDialog::fromJson(storage(), el.value("item").toObject(), el.value("users").toArray(), unknownUsers);
         m_dialogs.push_back(dialog);
     }
 
     setUnread(reply->toObject().value("unreadCount").toInt());
 
-    emit ready(this);
+    //Additional request for case when we don't have info about users in fwd messages
+    if (unknownUsers.length()) {
+        qDebug()<<"We need additional users info about"<<unknownUsers;
+        auto usersHandler = new VKHandlerUsers(storage(), this);
+        usersHandler->setUsers(unknownUsers);
+        requestAdditionInfo(usersHandler);
+    } else {
+        emit ready(this);
+    }
 }
 
 QString VKHandlerDialogs::name() {
@@ -87,19 +93,28 @@ void VKHandlerDialogs::setLongPoll(bool b) {
     m_longPollRequested = b;
 }
 
-QList<VKAbstractContainer *> &VKHandlerDialogs::dialogs()
-{
-    return m_dialogs;
+VKAbstractContainer* VKHandlerDialogs::atPtr(int idx) {
+    return m_dialogs[idx].data();
 }
 
-VKAbstractContainer* VKHandlerDialogs::at(int idx)
-{
+int VKHandlerDialogs::count() {
+    return m_dialogs.count();
+}
+
+QSharedPointer<VKAbstractContainer> VKHandlerDialogs::at(int idx) {
     return m_dialogs[idx];
 }
 
-int VKHandlerDialogs::count()
-{
-    return m_dialogs.count();
+void VKHandlerDialogs::additionDataReady(VKAbstractHandler *h) {
+    auto handler = dynamic_cast<VKHandlerUsers*>(h);
+    Q_ASSERT(handler != nullptr);
+
+    qDebug()<<"additional info ready, updating";
+    for (auto e: m_dialogs) {
+        e->complete(handler);
+    }
+
+    emit ready(this);
 }
 
 

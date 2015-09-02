@@ -5,8 +5,6 @@
 VKContainerMessage::VKContainerMessage(QObject *parent) :
     VKAbstractContainer(parent)
 {
-    m_user = NULL;
-    m_attachments = NULL;
     setReadState(false);
 }
 
@@ -14,8 +12,8 @@ VKContainerMessage::~VKContainerMessage()
 {
 }
 
-VKContainerMessage *VKContainerMessage::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
-    VKContainerMessage* message = new VKContainerMessage;
+QSharedPointer<VKContainerMessage> VKContainerMessage::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> &userIds) {
+    auto message = QSharedPointer<VKContainerMessage>(new VKContainerMessage);
 
     QDateTime date;
     date.setTime_t(obj.value("date").toInt());
@@ -26,6 +24,7 @@ VKContainerMessage *VKContainerMessage::fromJson(VKStorage *storage, QJsonObject
     if (message->isIncoming()) {
         bool userFound = false;
         int id = obj.value("user_id").toInt();
+
         for (const auto &e : users) {
             auto el = e.toObject();
             if (el.value("id").toInt() == id) {
@@ -36,7 +35,7 @@ VKContainerMessage *VKContainerMessage::fromJson(VKStorage *storage, QJsonObject
             }
         }
         if (!userFound) {
-            message->setUser(new VKContainerUser);
+            message->setUser(QSharedPointer<VKContainerUser>(new VKContainerUser));
             message->user()->valid(false);
             message->user()->setId(id);
             userIds.append(id);
@@ -63,61 +62,43 @@ VKContainerMessage *VKContainerMessage::fromJson(VKStorage *storage, QJsonObject
         userIds += unknownUsers;
     }
 
-    if (obj.contains("attachments")) {
-        message->setAttachments( VKContainerAttachments::fromJson(storage, obj.value("attachments").toArray()) );
-    }
+    message->setAttachments( VKContainerAttachments::fromJson(storage, obj.value("attachments").toArray()));
 
     message->setAction(VKContainerMessageAction::fromJson(storage, obj, users, userIds));
 
     return message;
 }
 
-VKContainerMessage *VKContainerMessage::fromSql(VKStorage* storage, QSqlQuery &query) {
-    VKContainerMessage* message = new VKContainerMessage;
-    message->setMsgId(query.value("id").toInt());
-    QDateTime date;
-    date.setTime_t(query.value("date").toInt());
-    message->setDate(date);
-    message->setIsIncoming(query.value("incoming").toInt());
-    message->setUser(storage->getUserById(query.value("user_id").toInt()));
-    message->setReadState(query.value("read_state").toInt() == 1);
-    message->setBody(query.value("body").toString());
-    message->setIsChat(query.value("is_chat").toInt() == 1);
-    message->setChatId(query.value("chat_id").toInt());
-
-    return message;
-}
-
-void VKContainerMessage::complete(VKHandlerUsers *users) {
-    for (int i=0;i<users->count();i++) {
-        auto el = users->get(i);
+void VKContainerMessage::complete(VKAbstractHandler *_h) {
+    auto h = dynamic_cast<VKHandlerUsers*>(_h);
+    for (int i=0;i<h->count() && h;i++) {
+        auto el = h->get(i);
         if (user()->id() == el->id()) {
-            delete user();
+            qDebug()<<"Message with id"<<msgId()<<"completed with user id"<<el->id();
             setUser(el);
+            break;
         }
     }
-    m_action->complete(users);
+    m_action->complete(h);
+    m_user->complete(h);
+    m_attachments->complete(h);
 }
 
 
-void VKContainerMessage::setUser(VKContainerUser *arg) {
+void VKContainerMessage::setUser(QSharedPointer<VKContainerUser> arg) {
     m_user = arg;
-    m_user->setParent(this);
 }
 
-void VKContainerMessage::addFwdMsg(VKContainerMessage *arg) {
+void VKContainerMessage::addFwdMsg(QSharedPointer<VKContainerMessage> arg) {
     m_fwd.append(arg);
-    arg->setParent(this);
 }
 
-void VKContainerMessage::setAttachments(VKContainerAttachments *attachments) {
+void VKContainerMessage::setAttachments(QSharedPointer<VKContainerAttachments> attachments) {
     m_attachments = attachments;
-    attachments->setParent(this);
 }
 
-void VKContainerMessage::setAction(VKContainerMessageAction *action) {
+void VKContainerMessage::setAction(QSharedPointer<VKContainerMessageAction> action) {
     m_action = action;
-    action->setParent(this);
 }
 
 bool VKContainerMessage::isValid() {
@@ -128,7 +109,11 @@ int VKContainerMessage::countFwd() {
     return m_fwd.count();
 }
 
-VKContainerMessage *VKContainerMessage::getFwd(int i) {
+VKContainerMessage* VKContainerMessage::getFwdPtr(int i) const {
+    return m_fwd.at(i).data();
+}
+
+QSharedPointer<VKContainerMessage> VKContainerMessage::getFwd(int i) const {
     return m_fwd.at(i);
 }
 

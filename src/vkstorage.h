@@ -2,6 +2,7 @@
 #define VKSTORAGE_H
 
 #include <QObject>
+#include <QSharedPointer>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
@@ -24,15 +25,15 @@ public:
              ~VKStorage();
     void init();
 
-    void addUser(VKContainerUser* user);
-    VKContainerUser *getUserById(int userId);
+    void addUser(QSharedPointer<VKContainerUser> user);
+    QSharedPointer<VKContainerUser> getUserById(int userId);
 
-    void addMessage(VKContainerMessage* message);
-    VKContainerMessage* getMessageById(int messageId);
+    void addMessage(QSharedPointer<VKContainerMessage> message);
+    QSharedPointer<VKContainerMessage> getMessageById(int messageId);
 
-    void addDialog(VKContainerDialog* dialog);
-    VKContainerDialog* getDialogById(int dialogId);
-    QList<VKContainerDialog*> getDialogs(int offset);
+    void addDialog(QSharedPointer<VKContainerDialog> dialog);
+    QSharedPointer<VKContainerDialog> getDialogById(int dialogId);
+    QList<QSharedPointer<VKContainerDialog>> getDialogs(int offset);
 
     QString accessToken() const;
     void setAccessToken(const QString accessToken);
@@ -53,9 +54,8 @@ signals:
     void passToScript(QList<VKAbstractContainer*>);
 public slots:
 private:
-    QMap<QString, QVector<QSqlQueryModel*>> m_models;
     QString     m_accessToken;
-    VKContainerUser* m_ourUser;
+    QSharedPointer<VKContainerUser> m_ourUser;
     int         m_ourUserId;
 };
 

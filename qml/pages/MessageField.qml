@@ -5,7 +5,7 @@ import "../handlers.js" as Handlers
 TextField {
     id: messageField
     property var forward : []
-    property var attachmnets : []
+    property var attachments : []
     property int userId
     property bool chat
 
@@ -32,7 +32,7 @@ TextField {
         var fwd = getForward()
         var attch = getAttachments()
         vk.sendMessage(vk.guid, userId, chat, text, fwd, attch)
-        Handlers.showFakeMessage(text, forward, attachments)
+        //Handlers.showFakeMessage(text, forward, attachments)
         vk.guid = vk.guid + 1
         text = ""
     }

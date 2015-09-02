@@ -13,25 +13,15 @@ VKContainerAttachments::VKContainerAttachments(QObject *parent) :
 {
 }
 
-VKContainerAttachments *VKContainerAttachments::fromJson(VKStorage *storage, QJsonArray obj, QJsonArray users) {
-    auto attachments = new VKContainerAttachments;
+QSharedPointer<VKContainerAttachments> VKContainerAttachments::fromJson(VKStorage *storage, QJsonArray obj, QJsonArray users) {
+    auto attachments = QSharedPointer<VKContainerAttachments>(new VKContainerAttachments);
 
     for (auto e: obj) {
         auto el = e.toObject();
         auto type = stringToType(el.value("type").toString());
-        //HACK UNTIL NOT ALL ATTACHMENTS IMPLEMENTED
-        //if (type == AttachmentsType::PHOTO || type == AttachmentsType::VIDEO || type == AttachmentsType::AUDIO || type == AttachmentsType::DOC) {
         attachments->addAttachment(type, getContainer(type, storage, el.value(el.value("type").toString()).toObject(), users));
-        //}
     }
     return attachments;
-}
-
-VKContainerAttachments *VKContainerAttachments::fromSql(VKStorage *storage, QSqlQuery query) {
-    Q_UNUSED(storage);
-    Q_UNUSED(query);
-    Q_ASSERT(0);
-    return NULL;
 }
 
 int VKContainerAttachments::count(AttachmentsType type) {
@@ -41,10 +31,14 @@ int VKContainerAttachments::count(AttachmentsType type) {
     return 0;
 }
 
-VKAbstractContainer *VKContainerAttachments::get(AttachmentsType type, int i) {
-    return m_data[type].at(i);
+VKAbstractContainer* VKContainerAttachments::getPtr(AttachmentsType type, int i) {
+    return m_data[type].at(i).data();
 }
 
+
+QSharedPointer<VKAbstractContainer> VKContainerAttachments::get(VKContainerAttachments::AttachmentsType type, int i) {
+    return m_data[type].at(i);
+}
 
 QString VKContainerAttachments::description() {
     if (m_data.size()) {
@@ -53,7 +47,7 @@ QString VKContainerAttachments::description() {
     return "";
 }
 
-void VKContainerAttachments::addAttachment(AttachmentsType type, VKAbstractContainer *container) {
+void VKContainerAttachments::addAttachment(AttachmentsType type, QSharedPointer<VKAbstractContainer> container) {
     m_data[type].append(container);
 }
 
@@ -105,7 +99,7 @@ QString VKContainerAttachments::typeToString(AttachmentsType type) {
     return "unknown";
 }
 
-VKAbstractContainer *VKContainerAttachments::getContainer(AttachmentsType type, VKStorage* storage, QJsonObject obj, QJsonArray users) {
+QSharedPointer<VKAbstractContainer> VKContainerAttachments::getContainer(AttachmentsType type, VKStorage* storage, QJsonObject obj, QJsonArray users) {
 
     switch(type) {
     case AttachmentsType::PHOTO: {
@@ -134,7 +128,7 @@ VKAbstractContainer *VKContainerAttachments::getContainer(AttachmentsType type, 
     } break;
     default:
         Q_ASSERT(0);
-        return NULL;
+        return QSharedPointer<VKAbstractContainer>();
     }
-    return NULL;
+    return QSharedPointer<VKAbstractContainer>();
 }

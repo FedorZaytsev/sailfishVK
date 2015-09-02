@@ -5,7 +5,7 @@ VKContainerWall::VKContainerWall(QObject *parent) :
 {
 }
 
-VKContainerWall *VKContainerWall::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
+QSharedPointer<VKContainerWall> VKContainerWall::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
     Q_UNUSED(storage);
     Q_UNUSED(obj);
     Q_UNUSED(users);
@@ -13,5 +13,5 @@ VKContainerWall *VKContainerWall::fromJson(VKStorage *storage, QJsonObject obj, 
 
     auto wall = new VKContainerWall;
 
-    return wall;
+    return QSharedPointer<VKContainerWall>(wall);
 }

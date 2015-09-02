@@ -13,14 +13,16 @@ class VKLPMessageFlagsSet : public VKLPMessageFlagsChange
 public:
     explicit VKLPMessageFlagsSet(QObject *parent = 0);
     void fromLP(const QJsonArray &data, QList<QString> &l);
-    virtual void complete(QVector<VKContainerDialog*> dialogs, QVector<VKContainerMessage*> messages, QVector<VKContainerUser*> users);
-    Q_INVOKABLE VKContainerMessage* message()           { return m_message; }
+    virtual void complete(QVector<QSharedPointer<VKContainerDialog>> dialogs, QVector<QSharedPointer<VKContainerMessage>> messages, QVector<QSharedPointer<VKContainerUser>> users);
+    Q_INVOKABLE VKContainerMessage* messagePtr()           { return m_message.data(); }
+
+    QSharedPointer<VKContainerMessage> message()            { return m_message; }
 
 signals:
 
 public slots:
 protected:
-    VKContainerMessage* m_message;
+    QSharedPointer<VKContainerMessage> m_message;
 };
 
 #endif // VKLPMESSAGEFLAGSSET_H

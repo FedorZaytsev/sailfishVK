@@ -30,13 +30,15 @@ public:
     void setUnread(int unread);
     void setLongPoll(bool b);
 
-    QList<VKAbstractContainer*> &dialogs();
-    Q_INVOKABLE VKAbstractContainer* at(int idx);
+    Q_INVOKABLE VKAbstractContainer* atPtr(int idx);
     Q_INVOKABLE int count();
+
+    QSharedPointer<VKAbstractContainer> at(int idx);
 
 signals:
     void unreadCountChanged(int count);
 public slots:
+    virtual void additionDataReady(VKAbstractHandler* h);
 
 private:
     u_int32_t m_offset;
@@ -44,7 +46,7 @@ private:
     u_int32_t m_previewLength;
     u_int32_t m_unread;
     bool m_longPollRequested;
-    QList<VKAbstractContainer*> m_dialogs;
+    QList<QSharedPointer<VKAbstractContainer>> m_dialogs;
 };
 
 #endif // VKHEADERDIALOGS_H

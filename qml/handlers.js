@@ -142,12 +142,33 @@ function prepareAttachments(e) {
     if (e) {
         for (var type in funcs) {
             for (var i=0;i<e.count(type);i++) {
-                var el = e.get(type, i)
+                var el = e.getPtr(type, i)
                 funcs[type](result, el)
             }
         }
     }
     return result
+}
+
+function processAction(el) {
+    var action = el.actionPtr()
+    var userName = el.userPtr().firstName() + " " + el.userPtr().lastName()
+    switch(el.actionPtr().type()) {
+    case VKContainerMessageAction.ACTION_PHOTO_UPDATED:
+        return "Photo updated by " + userName;
+    case VKContainerMessageAction.ACTION_PHOTO_REMOVED:
+        return "Photo removed by " + userName;
+    case VKContainerMessageAction.ACTION_CHAT_CREATE:
+        return "Chat created by " + userName;
+    case VKContainerMessageAction.ACTION_TITLE_UPDATED:
+        return userName+" updated title to "+action.text()
+    case VKContainerMessageAction.ACTION_INVITE_USER:
+        return userName+" invited "+action.text()
+    case VKContainerMessageAction.ACTION_KICK_USER:
+        return userName+" kicked "+action.text()
+    default:
+        return ""
+    }
 }
 
 function addMessage(model, element, offset, incoming, position) {
@@ -161,21 +182,22 @@ function addMessage(model, element, offset, incoming, position) {
     }
 
     for (var i=element.countFwd()-1;i>=0;i--) {
-        addMessage(model, element.getFwd(i), offset + 1, incoming, position !== undefined? position + 1 : position)
+        addMessage(model, element.getFwdPtr(i), offset + 1, incoming, position !== undefined? position + 1 : position)
     }
 
     var t = {
         id: element.msgId(),
         msg: element.body(),
         date: convertDate(element.date()),
-        userName: element.user().firstName() + " " + element.user().lastName(),
-        icon: element.user().iconSmall(),
+        userName: element.userPtr().firstName() + " " + element.userPtr().lastName(),
+        icon: element.userPtr().iconSmall(),
         incoming: incoming,
         offset: offset,
         highlight: false,
         isRead: element.readState(),
-        attachments: prepareAttachments(element.attachments()),
+        attachments: prepareAttachments(element.attachmentsPtr()),
         chatId: element.chatId(),
+        actionMessages: processAction(element)
     }
     if (position === undefined) {
         model.append(t)
@@ -187,8 +209,8 @@ function addMessage(model, element, offset, incoming, position) {
 
 function processMsg(msg) {
     if (msg.body() === "") {
-        if (msg.attachments()) {
-            var desc = msg.attachments().description()
+        if (msg.attachmentsPtr()) {
+            var desc = msg.attachmentsPtr().description()
             if (desc.length > 0) {
                 return desc.charAt(0).toUpperCase() + desc.slice(1)
             }
@@ -203,17 +225,18 @@ function processMsg(msg) {
 function addDialog(model, dialog, position, additionalUnreadCount) {
     if (!model) return
 
-    var message = dialog.message()
-    var icon = dialog.chatIcon()
+    var message = dialog.messagePtr()
+    var icon = dialog.chatIconPtr()
+    var user = message.userPtr()
 
     var t = {
         name: dialog.chatName(),
         msg: processMsg(message),
         isIncoming: message.isIncoming(),
-        authorAvatar50: message.user().iconSmall(),
-        userId: message.user().id(),
+        authorAvatar50: user.iconSmall(),
+        userId: user.id(),
         isChat: dialog.isChat(),
-        online: message.user().isOnline(),
+        online: user.isOnline(),
         id: dialog.chatId(),
         msgId: message.msgId(),
         icon1: icon.get(0) || "",
@@ -235,6 +258,7 @@ function updateDialog(model, dialog, pos) {
     if (!model) return
 
     var message = dialog.message()
+    var user = message.user()
 
     console.log("label:","unreadCount", model.get(0).unreadCount, model.get(0).unreadCount + (message.isIncoming() ? 1 : 0), processMsg(message))
 
@@ -242,7 +266,7 @@ function updateDialog(model, dialog, pos) {
     model.setProperty(0, "name", dialog.chatName())
     model.setProperty(0, "msg", processMsg(message))
     model.setProperty(0, "isIncoming", message.isIncoming())
-    model.setProperty(0, "authorAvatar50", message.user().iconSmall())
+    model.setProperty(0, "authorAvatar50", user.iconSmall())
     model.setProperty(0, "msgId", message.msgId())
     model.setProperty(0, "isRead", message.readState())
     model.setProperty(0, "unreadCount", model.get(0).unreadCount + (message.isIncoming() ? 1 : 0))
@@ -288,13 +312,13 @@ function convertDate(unixtime) {
 function getFwd(data) {
     var result = []
     for (var i=0;i<data.countFwd();i++) {
-        var el = data.getFwd(i)
+        var el = data.getFwdPtr(i)
         var fwd = getFwd(el)
         result.push({
-                        userName: el.user().firstName() + " " + el.user().lastName(),
+                        userName: el.userPtr().firstName() + " " + el.userPtr().lastName(),
                         date: convertDate(el.date()),
                         msg: el.body(),
-                        icon: el.user().iconSmall(),
+                        icon: el.userPtr().iconSmall(),
                         user_id: 0,
                         fwdMessages: fwd,
                         attachments: {photo: []},
@@ -317,7 +341,7 @@ function handlerMessages(data) {
     var isEmpty = mpage.messagesList.model.count === 0
 
     for (var i=0;i<data.count();i++) {
-        var element = data.get(i)
+        var element = data.getPtr(i)
 
         addMessage(model, element)
     }
@@ -398,7 +422,7 @@ function restoreMessage(msg) {
         dmodel.setProperty(id, "isRead", el.readState())
         dmodel.setProperty(id, "msgId", el.msgId())
         dmodel.setProperty(id, "isIncoming", el.isIncoming())
-        dmodel.setProperty(id, "authorAvatar50", el.user().iconSmall())
+        dmodel.setProperty(id, "authorAvatar50", el.userPtr().iconSmall())
     }
 
     var messages = findMessagesPage()
@@ -451,7 +475,7 @@ function processMessageFlagsChange(el) {
 }
 
 function processMessageFlagsSet(el) {
-    var flags = el.flags()
+    var flags = el.flagsPtr()
     var id = el.id()
     var chatId = el.userId()
     var msg = el.message()
@@ -480,7 +504,7 @@ function processMessageFlagsSet(el) {
 }
 
 function processMessageFlagsReset(el) {
-    var flags = el.flags()
+    var flags = el.flagsPtr()
     console.log("processMessageFlagsReset")
     flags.print()
 
@@ -508,14 +532,14 @@ function processMessageFlagsReset(el) {
 function processMessageDelete(el) {
     console.log("processMessageDelete id =",id)
 
-    deleteMessage(el.id(), el.userId(), el.message())
+    deleteMessage(el.id(), el.userId(), el.messagePtr())
 }
 
 function processMessageNew(el) {
     var dmodel = findDialogModel()
     var mmodel = findMessagesModel()
     var mpage = findMessagesPage()
-    var dialog = el.dialog()
+    var dialog = el.dialogPtr()
     var additionalUnreadCount = 0
     var dialogId = findMsgId(dmodel, dialog.chatId())
 
@@ -530,7 +554,7 @@ function processMessageNew(el) {
 
     console.log("adding element", dialog.message().readState(), additionalUnreadCount)
     if (mpage && dialog.chatId() === mpage.id) {
-        addMessage(mmodel, dialog.message(), undefined, undefined, 0)
+        addMessage(mmodel, dialog.messagePtr(), undefined, undefined, 0)
     }
 }
 
@@ -617,7 +641,7 @@ function handlerLongPoll(data) {
     var mpage = findMessagesPage()
 
     for (var i=0;i<data.count();i++) {
-        var el = data.at(i)
+        var el = data.atPtr(i)
         if (longPollHandlers[el.type()]) {
             console.log("processing event with type",el.type())
             longPollHandlers[el.type()](el)
@@ -638,7 +662,7 @@ function handlerDialogs(data) {
     pageStack.currentPage.offset += 20
     pageStack.currentPage.ready = true
     for (var i=0;i<data.count();i++) {
-        var dialog = data.at(i)
+        var dialog = data.atPtr(i)
 
         addDialog(mod, dialog, undefined, 0)
 

@@ -13,19 +13,21 @@ public:
     void fromLP(const QJsonArray &data);
 
     Q_INVOKABLE int             id()                            { return m_id; }
-    Q_INVOKABLE VKLPFlags*      flags()                         { return m_flags; }
+    Q_INVOKABLE VKLPFlags*      flagsPtr()                      { return m_flags.data(); }
     Q_INVOKABLE int             userId()                        { return m_userId; }
     Q_INVOKABLE bool            isChat()                        { return m_isChat; }
+
+    QSharedPointer<VKLPFlags>   flags()                         { return m_flags; }
 signals:
 
 public slots:
 protected:
                 void            setUserId(int id);
-                void            setFlags(VKLPFlags* flags);
+                void            setFlags(QSharedPointer<VKLPFlags> flags);
                 void            setId(int arg)                  { m_id = arg; }
 private:
     int m_id;
-    VKLPFlags* m_flags;
+    QSharedPointer<VKLPFlags> m_flags;
     int m_userId;
     bool m_isChat;
 };
