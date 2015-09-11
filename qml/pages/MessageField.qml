@@ -32,7 +32,7 @@ TextField {
         var fwd = getForward()
         var attch = getAttachments()
         vk.sendMessage(vk.guid, userId, chat, text, fwd, attch)
-        //Handlers.showFakeMessage(text, forward, attachments)
+        Handlers.showFakeMessage(id, vk.guid, text, forward, attachments)
         vk.guid = vk.guid + 1
         text = ""
     }

@@ -34,7 +34,7 @@ BackgroundItem {
         BusyIndicator {
             id: busy
             anchors.centerIn: parent
-            running: false//id === 0
+            running: id === -1
         }
     }
 

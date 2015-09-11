@@ -34,7 +34,9 @@ Page {
         interval: 1000
         onTriggered: {
             console.log("timer triger",markAsReadArray)
-            vk.markAsRead(markAsReadArray)
+            if (markAsReadArray.length  > 0) {
+                vk.markAsRead(markAsReadArray)
+            }
             markAsReadArray = []
         }
     }

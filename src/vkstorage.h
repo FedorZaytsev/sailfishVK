@@ -27,6 +27,7 @@ public:
 
     void addUser(QSharedPointer<VKContainerUser> user);
     QSharedPointer<VKContainerUser> getUserById(int userId);
+    Q_INVOKABLE VKContainerUser* getUserByIdPtr(int userId);
 
     void addMessage(QSharedPointer<VKContainerMessage> message);
     QSharedPointer<VKContainerMessage> getMessageById(int messageId);
@@ -42,7 +43,7 @@ public:
 
     Q_INVOKABLE void getHistory();
 
-    int ourUserId() const;
+    Q_INVOKABLE int ourUserId() const;
     void setOurUserId(int ourUserId);
     int getUnread(int idx);
 

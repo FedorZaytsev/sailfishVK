@@ -37,7 +37,8 @@ const QNetworkRequest VKHandlerSendMessage::processRequest() {
 }
 
 void VKHandlerSendMessage::processReply(QJsonValue *reply) {
-    m_messageId = reply->toInt();
+    m_messageId = reply->toObject().value("id").toInt();
+    m_guid = reply->toObject().value("guid").toInt();
 
     emit ready(this);
 }

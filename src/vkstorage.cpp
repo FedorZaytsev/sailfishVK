@@ -100,6 +100,10 @@ QSharedPointer<VKContainerUser> VKStorage::getUserById(int userId) {
     return QSharedPointer<VKContainerUser>();
 }
 
+VKContainerUser *VKStorage::getUserByIdPtr(int userId) {
+    return getUserById(userId).data();
+}
+
 void VKStorage::addMessage(QSharedPointer<VKContainerMessage> message) {
     Q_UNUSED(message);
     Q_ASSERT(0);

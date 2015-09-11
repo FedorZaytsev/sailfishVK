@@ -197,6 +197,7 @@ function addMessage(model, element, offset, incoming, position) {
         isRead: element.readState(),
         attachments: prepareAttachments(element.attachmentsPtr()),
         chatId: element.chatId(),
+        guid: 0,
         actionMessages: processAction(element)
     }
     if (position === undefined) {
@@ -206,6 +207,26 @@ function addMessage(model, element, offset, incoming, position) {
     }
 
 }
+
+function normalizeTime(param) {
+    console.assert(param>=0)
+    if (param > 9) {
+        return ""+param
+    } else {
+        return "0"+param
+    }
+}
+
+function convertDate(unixtime) {
+    var date = new Date(unixtime);
+    var hours = ""+date.getHours()
+    var minutes = normalizeTime(date.getMinutes())
+    var day = normalizeTime(date.getDate())
+    var month = normalizeTime(date.getMonth()+1)
+    var year = normalizeTime(date.getFullYear())
+    return hours+":"+minutes+", "+day+"."+month+"."+year
+}
+
 
 function processMsg(msg) {
     if (msg.body() === "") {
@@ -274,39 +295,47 @@ function updateDialog(model, dialog, pos) {
 
 }
 
-function showFakeMessage(text, forward, attachments) {
+function showFakeMessage(chtId, guid, text, forward, attachments) {
+
+    console.log(text)
+    var usr = vk.getStorage().getUserByIdPtr(vk.getStorage().ourUserId())
+
     var t = {
-        id: 0,
+        id: -1,
         msg: text,
-        date: convertDate(element.date()),
-        userName: element.user().firstName() + " " + element.user().lastName(),
-        icon: element.user().iconSmall(),
-        incoming: incoming,
-        offset: offset,
+        date: convertDate(Date.now()),
+        userName: usr.firstName() + " " + usr.lastName(),
+        icon: usr.iconSmall(),
+        incoming: false,
+        offset: 0,
         highlight: false,
-        isRead: element.readState(),
-        attachments: prepareAttachments(element.attachments()),
-        chatId: element.chatId(),
+        isRead: true,
+        attachments: {},
+        chatId: chtId,
+        guid: guid,
+        actionMessages: ""
     }
-}
 
-function normalizeTime(param) {
-    console.assert(param>=0)
-    if (param > 9) {
-        return ""+param
-    } else {
-        return "0"+param
+    var mmodel = findMessagesModel()
+    if (mmodel) {
+        console.log("append")
+        mmodel.insert(0,t)
     }
-}
 
-function convertDate(unixtime) {
-    var date = new Date(unixtime);
-    var hours = ""+date.getHours()
-    var minutes = normalizeTime(date.getMinutes())
-    var day = normalizeTime(date.getDate())
-    var month = normalizeTime(date.getMonth()+1)
-    var year = normalizeTime(date.getFullYear())
-    return hours+":"+minutes+", "+day+"."+month+"."+year
+    var dmodel = findDialogModel()
+
+    var i;
+    for (i=0;i<dmodel.count;i++) {
+        if (dmodel.get(i).id === chtId) {
+             break
+        }
+    }
+
+    dmodel.move(i, 0, 1)
+    dmodel.setProperty(0, "msg", text)
+    dmodel.setProperty(0, "isIncoming", false)
+    dmodel.setProperty(0, "msgId", 0)
+    dmodel.setProperty(0, "isRead", true)
 }
 
 function getFwd(data) {
@@ -631,6 +660,25 @@ function processVideocall(el) {
 
 function handlerSendMessage(data) {
     console.log("nothing done in sendMessage handler")
+    var guid = data.guid()
+    var mmodel = findMessagesModel()
+    if (mmodel) {
+        for (var i=0;i<mmodel.count;i++) {
+            var e = mmodel.get(i)
+            if (e.guid === guid) {
+                mmodel.setProperty(i, "id", data.id())
+            }
+        }
+    }
+    var dmodel = findDialogModel()
+    if (dmodel) {
+        for (var i=0;i<dmodel.count;i++) {
+            var e = dmodel.get(i)
+            if (e.guid === guid) {
+                dmodel.setProperty(i, "msgId", data.id())
+            }
+        }
+    }
 }
 
 function handlerLongPoll(data) {

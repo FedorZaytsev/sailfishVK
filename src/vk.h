@@ -62,15 +62,6 @@ public:
     Q_INVOKABLE VKStorage* getStorage() {return &storage();}
     Q_INVOKABLE bool isOurUserAuthorized();
 
-    Q_INVOKABLE void test() {
-        auto usr = storage().getUserById(storage().ourUserId());
-        qDebug()<<usr->firstName();
-                            }
-
-    //протестировать, что будет если запросить нашего польователя у стораджа но не отправлять его в скрипты
-
-    //ошибка найдена. У меня устанавивается парент для того чтобы объект не удалялся самостоятельно при помощи javascript'a, но тогда сам parent при удалении будет удалять наш объект
-
                 void sendNetworkRequest(VKAbstractHandler* handler);
                 void errorHandler(QJsonObject, VKAbstractHandler*);
                 void displayErrorMessage(QString err, ErrorHandlers displayType);

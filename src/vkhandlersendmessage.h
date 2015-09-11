@@ -20,7 +20,8 @@ public:
     void        setAttachments(QString arg)     { m_attachments = arg; }
     void        setGuid(int arg)                { m_guid = arg; }
 
-    Q_INVOKABLE int get() { return m_messageId; }
+    Q_INVOKABLE int id()                        { return m_messageId; }
+    Q_INVOKABLE int guid()                      { return m_guid; }
 
 signals:
 

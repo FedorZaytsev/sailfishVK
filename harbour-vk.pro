@@ -243,7 +243,6 @@ OTHER_FILES += qml/harbour-vk.qml \
     qml/emoji/270C.png \
     qml/emoji/2764.png \
     qml/pages/TextEx.qml \
-    qml/fonts/AppleColorEmoji.ttf \
     qml/fonts/OpenSansEmoji.ttf
 
 # to disable building translations every time, comment out the
