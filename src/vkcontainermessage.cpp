@@ -1,6 +1,7 @@
 #include "vkcontainermessage.h"
 #include "vkhandlermessages.h"
 #include "vkcontainermessageaction.h"
+#include "vkemojiparser.h"
 
 VKContainerMessage::VKContainerMessage(QObject *parent) :
     VKAbstractContainer(parent)
@@ -46,7 +47,12 @@ QSharedPointer<VKContainerMessage> VKContainerMessage::fromJson(VKStorage *stora
 
     message->setReadState(obj.value("read_state").toInt() == 1);
 
-    message->setBody(obj.value("body").toString());
+    auto body = obj.value("body").toString();
+    if (obj.contains("emoji") && obj.value("emoji").toInt() == 1) {
+        VKContainerMessage::processEmoji(body);
+    }
+    message->setBody(body);
+
     if (obj.value("chat_id").isDouble()){
         message->setChatId(obj.value("chat_id").toInt());
     } else {
@@ -99,6 +105,12 @@ void VKContainerMessage::setAttachments(QSharedPointer<VKContainerAttachments> a
 
 void VKContainerMessage::setAction(QSharedPointer<VKContainerMessageAction> action) {
     m_action = action;
+}
+
+void VKContainerMessage::processEmoji(QString &s) {
+
+    VKEmojiParser parser;
+    parser.parse(s);
 }
 
 bool VKContainerMessage::isValid() {

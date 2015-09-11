@@ -257,8 +257,8 @@ function addDialog(model, dialog, position, additionalUnreadCount) {
 function updateDialog(model, dialog, pos) {
     if (!model) return
 
-    var message = dialog.message()
-    var user = message.user()
+    var message = dialog.messagePtr()
+    var user = message.userPtr()
 
     console.log("label:","unreadCount", model.get(0).unreadCount, model.get(0).unreadCount + (message.isIncoming() ? 1 : 0), processMsg(message))
 
@@ -552,7 +552,7 @@ function processMessageNew(el) {
     }
 
 
-    console.log("adding element", dialog.message().readState(), additionalUnreadCount)
+    console.log("adding element", dialog.messagePtr().readState(), additionalUnreadCount)
     if (mpage && dialog.chatId() === mpage.id) {
         addMessage(mmodel, dialog.messagePtr(), undefined, undefined, 0)
     }

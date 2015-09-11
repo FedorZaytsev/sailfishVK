@@ -74,7 +74,10 @@ SOURCES += src/harbour-vk.cpp \
     src/debuglogbuffer.cpp \
     src/vklpunreadcount.cpp \
     src/vknetworkmanager.cpp \
-    src/vkhandlerlongpollserverkey.cpp
+    src/vkhandlerlongpollserverkey.cpp \
+    src/vkcontainermessageemoji.cpp \
+    src/vkemojiparser.cpp \
+    src/vktextwrap.cpp
 
 OTHER_FILES += qml/harbour-vk.qml \
     qml/cover/CoverPage.qml \
@@ -110,7 +113,138 @@ OTHER_FILES += qml/harbour-vk.qml \
     qml/pages/MessageLink.qml \
     qml/pages/MessageDocument.qml \
     qml/pages/LoadingFooter.qml \
-    qml/pages/MessageComponentAction.qml
+    qml/pages/MessageComponentAction.qml \
+    qml/emoji/D83DDE0A.png \
+    qml/emoji/D83DDE03.png \
+    qml/emoji/D83DDE09.png \
+    qml/emoji/D83DDE06.png \
+    qml/emoji/D83DDE1C.png \
+    qml/emoji/D83DDE0B.png \
+    qml/emoji/D83DDE0D.png \
+    qml/emoji/D83DDE0E.png \
+    qml/emoji/D83DDE12.png \
+    qml/emoji/D83DDE0F.png \
+    qml/emoji/D83DDE14.png \
+    qml/emoji/D83DDE22.png \
+    qml/emoji/D83DDE2D.png \
+    qml/emoji/D83DDE29.png \
+    qml/emoji/D83DDE28.png \
+    qml/emoji/D83DDE10.png \
+    qml/emoji/D83DDE0C.png \
+    qml/emoji/D83DDE20.png \
+    qml/emoji/D83DDE21.png \
+    qml/emoji/D83DDE07.png \
+    qml/emoji/D83DDE30.png \
+    qml/emoji/D83DDE32.png \
+    qml/emoji/D83DDE33.png \
+    qml/emoji/D83DDE37.png \
+    qml/emoji/D83DDE1A.png \
+    qml/emoji/D83DDE08.png \
+    qml/emoji/D83DDC4D.png \
+    qml/emoji/D83DDC4E.png \
+    qml/emoji/D83DDC4C.png \
+    qml/emoji/D83DDC0E.png \
+    qml/emoji/D83DDC0F.png \
+    qml/emoji/D83DDC1C.png \
+    qml/emoji/D83DDC2B.png \
+    qml/emoji/D83DDC2E.png \
+    qml/emoji/D83DDC03.png \
+    qml/emoji/D83DDC3B.png \
+    qml/emoji/D83DDC3C.png \
+    qml/emoji/D83DDC05.png \
+    qml/emoji/D83DDC13.png \
+    qml/emoji/D83DDC18.png \
+    qml/emoji/D83DDC94.png \
+    qml/emoji/D83DDCAD.png \
+    qml/emoji/D83DDC36.png \
+    qml/emoji/D83DDC31.png \
+    qml/emoji/D83DDC37.png \
+    qml/emoji/D83DDC11.png \
+    qml/emoji/D83DDC00.png \
+    qml/emoji/D83DDC0C.png \
+    qml/emoji/D83DDC1B.png \
+    qml/emoji/D83DDC1D.png \
+    qml/emoji/D83DDC1F.png \
+    qml/emoji/D83DDC2A.png \
+    qml/emoji/D83DDC2C.png \
+    qml/emoji/D83DDC2D.png \
+    qml/emoji/D83DDC3A.png \
+    qml/emoji/D83DDC3D.png \
+    qml/emoji/D83DDC2F.png \
+    qml/emoji/D83DDC5C.png \
+    qml/emoji/D83DDC7B.png \
+    qml/emoji/D83DDC14.png \
+    qml/emoji/D83DDC23.png \
+    qml/emoji/D83DDC24.png \
+    qml/emoji/D83DDC40.png \
+    qml/emoji/D83DDC42.png \
+    qml/emoji/D83DDC43.png \
+    qml/emoji/D83DDC46.png \
+    qml/emoji/D83DDC47.png \
+    qml/emoji/D83DDC48.png \
+    qml/emoji/D83DDC51.png \
+    qml/emoji/D83DDC60.png \
+    qml/emoji/D83DDCA1.png \
+    qml/emoji/D83DDCA3.png \
+    qml/emoji/D83DDCAA.png \
+    qml/emoji/D83DDCAC.png \
+    qml/emoji/D83DDD14.png \
+    qml/emoji/D83DDD25.png \
+    qml/emoji/D83CDF1F.png \
+    qml/emoji/D83CDF4C.png \
+    qml/emoji/D83CDF7A.png \
+    qml/emoji/D83CDF7B.png \
+    qml/emoji/D83CDF39.png \
+    qml/emoji/D83CDF45.png \
+    qml/emoji/D83CDF52.png \
+    qml/emoji/D83CDF81.png \
+    qml/emoji/D83CDF82.png \
+    qml/emoji/D83CDF84.png \
+    qml/emoji/D83CDFC1.png \
+    qml/emoji/D83CDFC6.png \
+    qml/emoji/D83CDF3A.png \
+    qml/emoji/D83CDF3B.png \
+    qml/emoji/D83CDF3C.png \
+    qml/emoji/D83CDF3D.png \
+    qml/emoji/D83CDF4A.png \
+    qml/emoji/D83CDF4B.png \
+    qml/emoji/D83CDF4D.png \
+    qml/emoji/D83CDF4E.png \
+    qml/emoji/D83CDF4F.png \
+    qml/emoji/D83CDF6D.png \
+    qml/emoji/D83CDF37.png \
+    qml/emoji/D83CDF38.png \
+    qml/emoji/D83CDF46.png \
+    qml/emoji/D83CDF49.png \
+    qml/emoji/D83CDF50.png \
+    qml/emoji/D83CDF51.png \
+    qml/emoji/D83CDF53.png \
+    qml/emoji/D83CDF54.png \
+    qml/emoji/D83CDF55.png \
+    qml/emoji/D83CDF56.png \
+    qml/emoji/D83CDF57.png \
+    qml/emoji/D83CDF69.png \
+    qml/emoji/D83CDF83.png \
+    qml/emoji/D83CDFAA.png \
+    qml/emoji/D83CDFB1.png \
+    qml/emoji/D83CDFB2.png \
+    qml/emoji/D83CDFB7.png \
+    qml/emoji/D83CDFB8.png \
+    qml/emoji/D83CDFBE.png \
+    qml/emoji/D83CDFC0.png \
+    qml/emoji/D83CDFE6.png \
+    qml/emoji/26BD.png \
+    qml/emoji/26C5.png \
+    qml/emoji/23F3.png \
+    qml/emoji/26BE.png \
+    qml/emoji/26C4.png \
+    qml/emoji/2600.png \
+    qml/emoji/261D.png \
+    qml/emoji/270C.png \
+    qml/emoji/2764.png \
+    qml/pages/TextEx.qml \
+    qml/fonts/AppleColorEmoji.ttf \
+    qml/fonts/OpenSansEmoji.ttf
 
 # to disable building translations every time, comment out the
 # following CONFIG line
@@ -118,9 +252,6 @@ CONFIG += sailfishapp_i18n
 TRANSLATIONS += translations/harbour-vk-de.ts
 CONFIG += precompile_header
 PRECOMPILED_HEADER += src/debug.h
-#DEFINES += "Q_DECL_CONST_FUNCTION"
-#DEFINES += "VK_DEBUG"
-
 
 HEADERS += \
     src/vk.h \
@@ -179,7 +310,10 @@ HEADERS += \
     src/debuglogbuffer.h \
     src/vklpunreadcount.h \
     src/vknetworkmanager.h \
-    src/vkhandlerlongpollserverkey.h
+    src/vkhandlerlongpollserverkey.h \
+    src/vkemojiparser.h \
+    src/vkemojiparserdata.h \
+    src/vktextwrap.h
 
 RESOURCES +=
 

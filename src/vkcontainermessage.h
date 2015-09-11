@@ -60,6 +60,8 @@ public:
     void setAttachments(QSharedPointer<VKContainerAttachments> attachments);
     void setAction(QSharedPointer<VKContainerMessageAction> action);
 
+    static void processEmoji(QString &s);
+
 private:
     int                                         m_msgId;
     QDateTime                                   m_date;

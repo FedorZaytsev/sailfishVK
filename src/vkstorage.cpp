@@ -63,7 +63,7 @@ void VKStorage::init() {
 
 
 void VKStorage::addUser(QSharedPointer<VKContainerUser> user) {
-    if (user->id() == ourUserId() && m_ourUser.isNull()) {
+    if (user->id() == ourUserId()) {
         m_ourUser = user;
         return;
     }

@@ -9,7 +9,7 @@ Item {
     Column {
         id: column
         spacing: 0
-        Label {
+        Text {
             id: label
             x: incoming ? offset : maxWidth*(1 - labelSize) + offset + padding
             width: maxWidth * labelSize
@@ -17,12 +17,14 @@ Item {
             text: msg
             color: incoming? Theme.primaryColor : Theme.highlightColor
             wrapMode: Text.Wrap
+            renderType: Text.NativeRendering
             horizontalAlignment: incoming ? Text.AlignLeft : Text.AlignRight
             onTextChanged: {
                 if (text === "") {
                     height = 0
                 }
             }
+
             Component.onCompleted: {
                 if (msg === "") {
                     height = 0

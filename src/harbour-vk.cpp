@@ -12,7 +12,7 @@
 #include <QDir>
 #include <execinfo.h>
 #include <signal.h>
-#include <exception>
+#include "vktextwrap.h"
 #include "vkpixmapprovider.h"
 #include "vkabstractcontainer.h"
 #include "vkcontainerdialog.h"
@@ -40,7 +40,6 @@
 #include "vkusertypinghelper.h"
 
 QFile global__logFile;
-bool global__isApplicationExec;
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
 void createLogFile() {
@@ -188,6 +187,7 @@ int main(int argc, char *argv[]) {
     qmlRegisterType<VKLPMessageNew>();
     qmlRegisterType<VKLPUserOffline>();
     qmlRegisterType<VKLPUserOnline>();
+    qmlRegisterType<VKTextWrap>("harbour.vk.VK", 1, 0, "VKTextWrap");
     qmlRegisterType<VKUserTypingHelper>("harbour.vk.VK", 1, 0, "UserTypingHelper");
     qmlRegisterUncreatableType<VKLPFlags>("harbour.vk.VK", 1, 0, "VKLPFlags","Cannot create VKLPFlags class");
     qmlRegisterUncreatableType<VKLPEventType>("harbour.vk.VK", 1, 0, "VKLPEventType","Cannot create VKLPEventType class");
@@ -198,8 +198,6 @@ int main(int argc, char *argv[]) {
 
     view->setSource(SailfishApp::pathTo("qml/harbour-vk.qml"));
     view->show();
-
-    global__isApplicationExec = true;
 
     int result = app->exec();
 
