@@ -8,6 +8,10 @@
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlQueryModel>
 #include <QVariant>
+#include <QFile>
+#include <QStandardPaths>
+#include <QDir>
+#include <QSettings>
 #include <QDebug>
 #include "vkcontaineruser.h"
 #include "vkcontainermessage.h"
@@ -50,12 +54,17 @@ public:
     bool isAuthorizred();
     void debugPrint();
 
+    void save();
+    void load();
+private:
 signals:
     void error(QString);
     void passToScript(QList<VKAbstractContainer*>);
 public slots:
 private:
+    QString     m_savePath;
     QString     m_accessToken;
+    QSettings   m_settings;
     QSharedPointer<VKContainerUser> m_ourUser;
     int         m_ourUserId;
 };

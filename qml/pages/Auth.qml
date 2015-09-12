@@ -6,8 +6,6 @@ import QtWebKit 3.0
 Page {
     id: authPage
 
-    Component.onCompleted: console.log("AUTH.QML")
-
     WebView {
         id: authWebView
         visible: !vk.isOurUserAuthorized()
@@ -17,10 +15,11 @@ Page {
         url: vk.getAuthPageUrl()
         onLoadingChanged: {
             function openMessanges() {
+                vk.startLongPollServer(true)
                 pageStack.replace(Qt.resolvedUrl("Dialogs.qml"),{})
             }
 
-            Debug.log("On loading changed",loadRequest.url)
+            console.log("On loading changed",loadRequest.url)
             if (vk.isOurUserAuthorized()) {
                 openMessanges()
                 return
@@ -34,7 +33,7 @@ Page {
 
                 break
             case WebView.LoadFailedStatus:
-                Debug.log("Some error while loading page, reloading")
+                console.log("Some error while loading page, reloading")
                 authWebView.url = vk.getAuthPageUrl()            //Reload
                 break
             }

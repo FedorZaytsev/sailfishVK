@@ -77,7 +77,8 @@ SOURCES += src/harbour-vk.cpp \
     src/vkhandlerlongpollserverkey.cpp \
     src/vkcontainermessageemoji.cpp \
     src/vkemojiparser.cpp \
-    src/vktextwrap.cpp
+    src/vktextwrap.cpp \
+    src/vkfilestorage.cpp
 
 OTHER_FILES += qml/harbour-vk.qml \
     qml/cover/CoverPage.qml \
@@ -312,7 +313,8 @@ HEADERS += \
     src/vkhandlerlongpollserverkey.h \
     src/vkemojiparser.h \
     src/vkemojiparserdata.h \
-    src/vktextwrap.h
+    src/vktextwrap.h \
+    src/vkfilestorage.h
 
 RESOURCES +=
 

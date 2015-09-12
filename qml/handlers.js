@@ -659,7 +659,6 @@ function processVideocall(el) {
 }
 
 function handlerSendMessage(data) {
-    console.log("nothing done in sendMessage handler")
     var guid = data.guid()
     var mmodel = findMessagesModel()
     if (mmodel) {

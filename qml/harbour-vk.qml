@@ -70,7 +70,9 @@ ApplicationWindow
             cover.unreadLabel = "" + count
         }
         Component.onCompleted: {
-            vk.startLongPollServer(true)
+            if (vk.isOurUserAuthorized()) {
+                vk.startLongPollServer(true)
+            }
         }
         onUpdatePages: {
             pageStack.find(function(page) {

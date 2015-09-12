@@ -6,15 +6,15 @@ VKStorage::VKStorage(QObject *parent) :
     QObject(parent)
 {
     m_ourUserId = 0;
-    //FOR DEBUG ONLY
-    m_accessToken = "2c1d185c5b1a708a0f619fc1b13828d2e1286d99bf4871d6141baeea4001fa3a50fc7c86959f3110c9c04";
-    m_ourUserId = 16143988;
+    m_savePath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)+"/data.dat";
+    load();
+
 }
 
 VKStorage::~VKStorage()
 {
+    save();
     qDebug()<<"destruct storage";
-    QSqlDatabase::database().close();
 }
 
 void VKStorage::init() {
@@ -181,7 +181,6 @@ bool VKStorage::isAuthorizred() {
 }
 
 QString VKStorage::accessToken() const {
-    Q_ASSERT(m_accessToken.length());
     return m_accessToken;
 }
 
@@ -240,6 +239,20 @@ void VKStorage::debugPrint() {
     while (query.next()) {
         qDebug()<<query.value("id").toInt()<<query.value("unread_count").toInt()<<query.value("is_chat").toInt()<<query.value("name").toString();
     }*/
+}
+
+void VKStorage::save() {
+
+    m_settings.setValue("token", m_accessToken);
+    m_settings.setValue("userId", m_ourUserId);
+
+}
+
+void VKStorage::load() {
+
+    m_accessToken = m_settings.value("token").toString();
+    m_ourUserId = m_settings.value("userId").toInt();
+
 }
 
 int VKStorage::getUnread(int idx) {

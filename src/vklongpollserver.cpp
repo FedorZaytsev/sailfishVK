@@ -320,7 +320,7 @@ void VKLongPollServer::updateReadyEvents() {
 
 
     for (auto k : m_cachedEvents.keys()) {
-        qDebug()<<"m_cachedEvents.count()"<< m_cachedEvents[k].count();
+        qDebug()<<"m_cachedEvents.count()"<< m_cachedEvents[k].count()<<k;
         auto &v = m_cachedEvents[k];
         for (int i=v.size()-1;i>=0;i--) {
             auto e = v[i];
