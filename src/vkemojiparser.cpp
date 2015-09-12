@@ -16,7 +16,9 @@ void VKEmojiParser::parse(QString &s) {
 
     for (int idx = 0;idx<s.size();idx++) {
         for (auto e: global__precompiledBegins) {
+
             if ((s[idx].unicode() & 0xFF00)>>8 == e) {
+                qDebug()<<"s find"<<idx<<s.size();
                 int m = match(s, idx);
                 if (m) {
                     qDebug()<<"replacing";
@@ -35,6 +37,8 @@ int VKEmojiParser::match(QString &s, int idx) {
             return m;
         }
     }
+
+    qDebug()<<QString("VKEmojiParser::match cannot find emoji smile, may be smile lost? %1 %2\n").arg(QString::number(s[idx].unicode(), 16)).arg(QString::number(s[idx+1].unicode(), 16));
     return 0;
 }
 
@@ -42,16 +46,13 @@ int VKEmojiParser::match(QString &s, int idx, const uint *ptr) {
 
     uint emoji = *ptr;
 
-    ushort high = (emoji & 0xFFFF0000) >> 16;
-    ushort low = emoji & 0x0000FFFF;
-
-    if (high == 0x0 && s[idx].unicode() == low) {   //if smile request only 2 bytes
-        qDebug()<<toString({low});
+    if (high(emoji) == 0x0 && s[idx].unicode() == low(emoji)) {   //if smile request only 2 bytes
+        qDebug()<<toString({low(emoji)});
         return 1;
     }
 
-    if (idx + 1 < s.size() && s[idx].unicode() == high && s[idx+1].unicode() == low) {
-        qDebug()<<toString({high, low});
+    if (idx + 1 < s.size() && s[idx].unicode() == high(emoji) && s[idx+1].unicode() == low(emoji)) {
+        qDebug()<<toString({high(emoji), low(emoji)});
         return 2;
     }
 
@@ -97,5 +98,13 @@ QString VKEmojiParser::toString(QVector<ushort> v) {
 QString VKEmojiParser::getLink(QString s) {
     qDebug()<<"get link"<<s;
     return QString("<img src=\"../emoji/%1.png\">").arg(s);
+}
+
+ushort VKEmojiParser::high(uint n) {
+    return (n & 0xFFFF0000) >> 16;
+}
+
+ushort VKEmojiParser::low(uint n) {
+    return n & 0x0000FFFF;
 }
 

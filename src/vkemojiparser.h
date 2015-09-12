@@ -18,6 +18,8 @@ private:
     void precompile();
     QString toString(QVector<ushort> v);
     QString getLink(QString s);
+    ushort high(uint n);
+    ushort low(uint n);
 signals:
 
 public slots:

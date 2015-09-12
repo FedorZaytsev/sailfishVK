@@ -32,6 +32,7 @@ uint global__emoji[] = {
     0xD83DDE33,
     0xD83DDE37,
     0xD83DDE1A,
+    0xD83DDE1E,
     0xD83DDE08,
     0xD83DDC4D,
     0xD83DDC4E,
