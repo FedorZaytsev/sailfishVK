@@ -49,6 +49,20 @@ SilicaFlickable {
             anchors.fill: parent
             source: img
             fillMode: Image.PreserveAspectFit
+
+            onProgressChanged: {
+                progressBar.value = progress*100
+            }
+
+            ProgressBar {
+                 id: progressBar
+                 visible: showedImage.status === Image.Loading || showedImage.status === Image.Error
+                 width: parent.width
+                 minimumValue: 0
+                 maximumValue: 100
+                 valueText: Math.floor(value)
+                 label: showedImage.status === Image.Loading ? "Loading" : "Error"
+            }
         }
 
         onPinchStarted: {

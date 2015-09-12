@@ -40,10 +40,19 @@ Item {
             }
         }
 
-        BusyIndicator {
-            anchors.fill: parent
-            enabled: imageIdentificator.status === Image.Loading
-        }
+       onProgressChanged: {
+           progressBar.value = progress*100
+       }
+
+       ProgressBar {
+            id: progressBar
+            visible: imageIdentificator.status === Image.Loading || imageIdentificator.status === Image.Error
+            width: parent.width
+            minimumValue: 0
+            maximumValue: 100
+            valueText: Math.floor(value)
+            label: imageIdentificator.status === Image.Loading ? "Loading" : "Error"
+       }
     }
 
     Label {
