@@ -41,18 +41,6 @@ Page {
                     vk.emitUpdatePages()
                 }
             }
-            MenuItem {
-                text: "gc"
-                onClicked: {
-                    gc()
-                }
-            }
-            MenuItem {
-                text: "test"
-                onClicked: {
-                    vk.test()
-                }
-            }
         }
 
 
