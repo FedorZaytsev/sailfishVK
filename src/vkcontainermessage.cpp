@@ -85,6 +85,9 @@ void VKContainerMessage::complete(VKAbstractHandler *_h) {
             break;
         }
     }
+    for (auto e: m_fwd) {
+        e->complete(_h);
+    }
     m_action->complete(h);
     m_user->complete(h);
     m_attachments->complete(h);
