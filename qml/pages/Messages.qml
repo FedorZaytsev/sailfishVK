@@ -25,7 +25,7 @@ Page {
 
     function markAsRead(id) {
         markAsReadArray.push(id)
-        console.log("length",markAsReadArray.length)
+        console.log("adding element with id",id, "storage length",markAsReadArray.length)
         if (markAsReadArray.length > 0) {
             markAsReadTimerId.start()
         }
@@ -45,7 +45,7 @@ Page {
         onTriggered: {
             console.log("timer triger",markAsReadArray)
             if (markAsReadArray.length  > 0) {
-                //vk.markAsRead(markAsReadArray)
+                vk.markAsRead(markAsReadArray)
             }
             markAsReadArray = []
         }
@@ -69,7 +69,6 @@ Page {
             id: messagesListModel
         }
         model: messagesListModel
-        spacing: Theme.paddingSmall
         footer: Column {
             PageHeader {
                 id: pageHeader

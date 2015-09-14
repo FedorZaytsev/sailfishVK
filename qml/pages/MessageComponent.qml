@@ -11,24 +11,35 @@ BackgroundItem {
     property real itemOffset: 2*padding + offset*padding
     property real maxWidth: Screen.width - itemOffset*2
     property int  idx: index
+    property bool read: isRead || id ===0
     height: {
         if (actionMessages !== "") {
             console.log("actionMessages", actionMessages,labelAction.height)
             return labelAction.height
         }
 
-        var result = textHeight + avatarImage.height + padding + messageData.height
+        var result = textHeight + avatarImage.height + 2*padding + messageData.height
         if (index >= messagesList.model.count-1 || messagesList.model.get(index+1).offset === 0) {
             result = result + padding
         }
         return result
     }
 
+    onReadChanged: {
+        if (isRead && id !== 0) {
+            var dmodel = Handlers.findDialogModel()
+            var mpage = Handlers.findMessagesPage()
+            var mmodel = Handlers.findMessagesModel()
+
+            if (dmodel !== undefined && mpage !== undefined) {
+                dmodel.setProperty(mpage.dialogIndex, "unreadCount", dmodel.get(mpage.dialogIndex).unreadCount - 1)
+            }
+        }
+    }
+
     Component.onCompleted: {
         if (!isRead && id !== 0) {
             markAsRead(id)
-            messagesList.model.setProperty(index, "isRead", true)
-            //unreadRectangle.opacity = 0
         }
     }
 
@@ -59,7 +70,7 @@ BackgroundItem {
             width: maxWidth * labelSize - avatarImage.width
             visible: actionMessages === ""
             font.pixelSize: Theme.fontSizeSmall
-            color: Theme.primaryColor//incoming? Theme.primaryColor : Theme.highlightColor
+            color: read ? Theme.primaryColor : Theme.highlightColor//incoming? Theme.primaryColor : Theme.highlightColor
             horizontalAlignment: incoming ? Text.AlignLeft : Text.AlignRight
             text: userName
         }
@@ -69,7 +80,7 @@ BackgroundItem {
             width: maxWidth * labelSize - avatarImage.width
             visible: actionMessages === ""
             font.pixelSize: Theme.fontSizeTiny
-            color: Theme.primaryColor//incoming? Theme.secondaryColor : Theme.secondaryHighlightColor
+            color: read ? Theme.primaryColor : Theme.highlightColor
             horizontalAlignment: incoming ? Text.AlignLeft : Text.AlignRight
             text: date
         }

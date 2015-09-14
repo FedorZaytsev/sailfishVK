@@ -27,6 +27,8 @@ void VKHandlerMarkAsRead::processReply(QJsonValue *reply) {
     if (reply->toInt() != 1) {
         qDebug()<<"restart handler";
         emit sendRequest(this);
+    } else {
+        emit ready(this);
     }
 
 }

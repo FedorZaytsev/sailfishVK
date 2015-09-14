@@ -3,7 +3,8 @@ var handlers = {
     "longPollServer" : handlerLongPoll,
     "messages" : handlerMessages,
     "sendMessage" : handlerSendMessage,
-    "longPollServerKey" : handlerLongPollKey
+    "longPollServerKey" : handlerLongPollKey,
+    "markAsRead" : handlerMarkAsRead
 }
 
 
@@ -383,7 +384,8 @@ function handlerMessages(data) {
     }
 
     if (mpage.offsetTop === -1 && mpage.offsetBottom === -1 && data.unreadCount() > 0) {
-        mpage.messagesList.positionViewAtIndex(Math.max(data.unreadCount(), 20), ListView.Contain)
+        console.log(Math.min(data.unreadCount(), 20), data.unreadCount())
+        mpage.messagesList.positionViewAtIndex(Math.min(data.unreadCount(), 20), ListView.Contain)
     } else if (mpage.messagesList.visibleArea.yPosition > 0.99) {
         mpage.messagesList.positionViewAtEnd()
     }
@@ -400,11 +402,15 @@ function handlerLongPollKey(data) {
 
 }
 
-function findMsgId(model, id) {
+function findMsgId(model, id, prop) {
+    if (prop === undefined) {
+        prop = "id"
+    }
+
     if (model) {
         for (var i=0;i<model.count;i++) {
             var e = model.get(i)
-            if (e.id === id) {
+            if (e[prop] === id) {
                 return i
             }
         }
@@ -536,12 +542,14 @@ function processMessageFlagsSet(el) {
         deleteMessage(id, chatId, msg)
     }
     if (flags.isSet(VKLPFlags.UNREAD)) {
-        if (msgIdMessages !== undefined) {
-            mmodel.setProperty(msgIdMessages, "isRead", flags.isSet(VKLPFlags.UNREAD))
-        }
-        if (msgIdDialogs !== undefined) {
-            console.log("label:",dmodel.get(msgIdDialogs).msgText, dmodel.get(msgIdDialogs).unreadCount, "plus")
-            dmodel.setProperty(msgIdDialogs, "unreadCount", dmodel.get(msgIdDialogs).unreadCount + 1)
+        if (msgIdMessages !== undefined && !mmodel.get(msgIdMessages).isRead) {
+
+            mmodel.setProperty(msgIdMessages, "isRead", true)
+
+            if (msgIdDialogs !== undefined) {
+                console.log("label:",dmodel.get(msgIdDialogs).msgText, dmodel.get(msgIdDialogs).unreadCount, "plus")
+                dmodel.setProperty(msgIdDialogs, "unreadCount", dmodel.get(msgIdDialogs).unreadCount + 1)
+            }
         }
     }
 
@@ -562,13 +570,14 @@ function processMessageFlagsReset(el) {
     }
 
     if (flags.isSet(VKLPFlags.UNREAD)) {
+        if (msgIdMessages !== undefined && !mmodel.get(msgIdMessages).isRead) {
 
-        if (msgIdMessages !== undefined) {
-            mmodel.setProperty(msgIdMessages, "isRead", !flags.isSet(VKLPFlags.UNREAD))
-        }
-        if (msgIdDialogs !== undefined) {
-            console.log("label:",dmodel.get(msgIdDialogs).msgText, dmodel.get(msgIdDialogs).unreadCount, "minus")
-            dmodel.setProperty(msgIdDialogs, "unreadCount", dmodel.get(msgIdDialogs).unreadCount - 1)
+            mmodel.setProperty(msgIdMessages, "isRead", false)
+
+            if (msgIdDialogs !== undefined) {
+                console.log("label:",dmodel.get(msgIdDialogs).msgText, dmodel.get(msgIdDialogs).unreadCount, "minus")
+                dmodel.setProperty(msgIdDialogs, "unreadCount", dmodel.get(msgIdDialogs).unreadCount - 1)
+            }
         }
     }
 }
@@ -695,6 +704,20 @@ function handlerSendMessage(data) {
     }
 }
 
+function handlerMarkAsRead(data) {
+    var mmodel = findMessagesModel()
+    var dmodel = findDialogModel()
+
+    for (var i=0;i<data.count();i++) {
+        var idx = findMsgId(mmodel, data.get(i))
+        console.log("idx", idx)
+        if (idx !== undefined) {
+            mmodel.setProperty(idx, "isRead", true)
+        }
+    }
+
+}
+
 function handlerLongPoll(data) {
     console.log("handlerPoll",data.count())
 
@@ -730,5 +753,6 @@ function handlerDialogs(data) {
 
     }
 }
+
 
 fullLPHandlers()

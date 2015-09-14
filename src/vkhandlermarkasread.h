@@ -13,6 +13,10 @@ public:
     virtual QString name() {return "markAsRead";}
 
     void setMsgs(QList<int> lst);
+
+    Q_INVOKABLE int count() { return m_ids.size(); }
+    Q_INVOKABLE int get(int i) { return m_ids.at(i); }
+
 signals:
 
 public slots:
