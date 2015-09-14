@@ -39,12 +39,18 @@
 #include "vklpuseronline.h"
 #include "vkusertypinghelper.h"
 
+#define LOG_FILES_COUNT 20
+
 QFile global__logFile;
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
+QString logPath() {
+    return QString("%1/logs").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
+}
+
 void createLogFile() {
 
-    QString path = QString("%1/logs").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
+    QString path = logPath();
 
     QDir dir(path);
     if (!dir.exists()) {
@@ -61,6 +67,19 @@ void createLogFile() {
     qInstallMessageHandler(myMessageOutput);
 
     qWarning()<<QCoreApplication::applicationName()<<QCoreApplication::applicationVersion()<<"log path"<<fpath;
+}
+
+void clearOldLogFiles() {
+    QDir dir(logPath());
+
+    QStringList filter;
+    filter<<"*.log";
+    auto files = dir.entryList(filter, QDir::Files, QDir::Name);
+    for (int i=LOG_FILES_COUNT; i < files.count();i++) {
+        bool res = dir.remove(files.at(i));
+        Q_ASSERT(res);
+        qDebug()<<"Removing file (too old)"<<files.at(i);
+    }
 }
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
@@ -128,17 +147,10 @@ void print_trace() {
 }
 
 void handler(int sig) {
-    void *array[10];
-    size_t size;
-
-    // get void*'s for all entries on the stack
-    size = backtrace(array, 10);
 
     // print out all the frames to stderr
     qDebug()<<"Error: signal"<<sig;
     print_trace();
-    backtrace_symbols_fd(array, size, STDERR_FILENO);
-    backtrace_symbols_fd(array, size, global__logFile.handle());
     exit(sig);
 }
 
@@ -155,6 +167,7 @@ int main(int argc, char *argv[]) {
     signal(SIGSEGV, handler);
     signal(SIGINT, handler);
     signal(SIGABRT, handler);
+    clearOldLogFiles();
 
     std::set_terminate (myterminate);
 
