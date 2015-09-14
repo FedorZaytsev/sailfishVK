@@ -367,18 +367,28 @@ function handlerMessages(data) {
     var mpage = findMessagesPage()
     mpage.ready = true
 
-    var isEmpty = mpage.messagesList.model.count === 0
-
     for (var i=0;i<data.count();i++) {
         var element = data.getPtr(i)
 
-        addMessage(model, element)
+        if ((mpage.offsetTop === -1 && mpage.offsetBottom === -1) || mpage.offsetTop <= data.offset() + data.count()) {
+            addMessage(model, element)
+        } else {
+            addMessage(model, element, undefined, undefined, 0)
+        }
     }
-    if (mpage.messagesList.visibleArea.yPosition > 0.99) {
+
+    if (mpage.offsetTop === -1 && mpage.offsetBottom === -1 && data.unreadCount() > 0) {
+        mpage.messagesList.positionViewAtIndex(Math.max(data.unreadCount(), 20), ListView.Contain)
+    } else if (mpage.messagesList.visibleArea.yPosition > 0.99) {
         mpage.messagesList.positionViewAtEnd()
     }
 
-    mpage.offset += 20
+    if (mpage.offsetBottom > data.offset()  || mpage.offsetBottom === -1) {
+        mpage.offsetBottom = data.offset();
+    }
+    if (mpage.offsetTop < data.offset() + data.count() || mpage.offsetTop === -1) {
+        mpage.offsetTop = data.offset() + data.count()
+    }
 }
 
 function handlerLongPollKey(data) {
@@ -706,7 +716,7 @@ function handlerDialogs(data) {
     var mod = findDialogModel()
     if (!mod) return
 
-    pageStack.currentPage.offset += 20
+    pageStack.currentPage.offset = data.offset()
     pageStack.currentPage.ready = true
     for (var i=0;i<data.count();i++) {
         var dialog = data.atPtr(i)

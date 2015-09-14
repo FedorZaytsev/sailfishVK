@@ -9,13 +9,14 @@ BackgroundItem {
     property alias dialogElementAlias : dialogElement
 
     Loader {
+        id: loader
         sourceComponent: unreadCount > 0 ? unreadCountLabel : undefined
     }
     Component {
         id: unreadCountLabel
         Label {
-            x: Screen.width - Theme.paddingMedium - 100 - Theme.paddingMedium
-            width: 100
+            x: Screen.width - Theme.paddingMedium - width - Theme.paddingMedium
+            width: 50
             horizontalAlignment: Text.AlignRight
             text: "<b>" + unreadCount + "</b>"
             color: unreadCount > 0 ? Theme.highlightColor : Theme.primaryColor
@@ -34,6 +35,8 @@ BackgroundItem {
                 Label {
                     id: chatName
                     text: "<b>"+name+"</b>"
+                    elide: Text.ElideRight
+                    width: Screen.width - 2*delegate.x - row.spacing - iconHolder.width - (unreadCount > 0 ? loader.item.width : 0)
                     color: unreadCount > 0 ? Theme.highlightColor : Theme.primaryColor
                 }
                 GlassItem {

@@ -54,7 +54,7 @@ public:
     Q_INVOKABLE bool updateAccessToken(QString url);
     Q_INVOKABLE void getDialogs(int offset);
     Q_INVOKABLE void startLongPollServer(bool updateTs);
-    Q_INVOKABLE void getMessages(int id, bool isChat, int offset);
+    Q_INVOKABLE void getMessages(int id, bool isChat, int offset, int count);
     Q_INVOKABLE void markAsRead(QList<int> msgs);
     Q_INVOKABLE void sendMessage(int guid, int userId, bool isChat, QString text, QString forward, QString attachments);
     Q_INVOKABLE void dropAuthorization();

@@ -148,7 +148,7 @@ void VK::startLongPollServer(bool updateTs) {
 }
 
 
-void VK::getMessages(int id, bool isChat, int offset) {
+void VK::getMessages(int id, bool isChat, int offset, int count) {
     VKHandlerMessages* messagesHandler = new VKHandlerMessages(&storage(), this);
     if (isChat) {
         messagesHandler->setChatId(id);
@@ -156,7 +156,7 @@ void VK::getMessages(int id, bool isChat, int offset) {
         messagesHandler->setUserId(id);
     }
     messagesHandler->setOffset(offset);
-    messagesHandler->setCount(20);
+    messagesHandler->setCount(count);
     QObject::connect(messagesHandler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
     QObject::connect(messagesHandler, &VKAbstractHandler::sendRequest, this, &VK::processHandler);
 

@@ -2,21 +2,31 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Page {
+    id: messages
     property string listHeader: "unknown"
     property string avatarUrl: ""
     property alias messagesListModel: messagesListModel
     property alias messagesList: messagesList
     property int id
     property int dialogIndex
-    property int offset
+    property int offsetTop : -1
+    property int offsetBottom : -1
     property bool isChat
     property bool ready: false
     property var markAsReadArray: []
 
+    onOffsetBottomChanged: {
+        console.log(offsetBottom)
+    }
+
+    onOffsetTopChanged: {
+        console.log(offsetTop)
+    }
+
     function markAsRead(id) {
         markAsReadArray.push(id)
-        console.log("length",markAsRead.length)
-        if (markAsRead.length > 0) {
+        console.log("length",markAsReadArray.length)
+        if (markAsReadArray.length > 0) {
             markAsReadTimerId.start()
         }
     }
@@ -35,7 +45,7 @@ Page {
         onTriggered: {
             console.log("timer triger",markAsReadArray)
             if (markAsReadArray.length  > 0) {
-                vk.markAsRead(markAsReadArray)
+                //vk.markAsRead(markAsReadArray)
             }
             markAsReadArray = []
         }
@@ -76,8 +86,12 @@ Page {
 
         onMovementEnded: {
             if (visibleArea.yPosition < 0.01) {
-                console.log("loading additional",offset)
-                vk.getMessages(id,isChat,offset)
+                console.log("loading additional at top",offsetTop)
+                vk.getMessages(id, isChat, offsetTop, 20)
+            }
+            if (visibleArea.yPosition + visibleArea.heightRatio > 0.99 && offsetBottom > 0) {
+                console.log("loading additional at bottom",offsetBottom)
+                vk.getMessages(id, isChat, Math.max(offsetBottom - 20, 0), Math.min(offsetBottom, 20))
             }
         }
         delegate: Component {
@@ -93,7 +107,7 @@ Page {
     }
 
     Component.onCompleted: {
-        vk.getMessages(id,isChat,offset)
+        vk.getMessages(id, isChat, -1, 20)
     }
 
     BusyIndicator {

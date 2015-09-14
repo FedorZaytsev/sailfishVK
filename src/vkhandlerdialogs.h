@@ -33,6 +33,8 @@ public:
     Q_INVOKABLE VKAbstractContainer* atPtr(int idx);
     Q_INVOKABLE int count();
 
+    Q_INVOKABLE int offset() { return m_offset; }
+
     QSharedPointer<VKAbstractContainer> at(int idx);
 
 signals:

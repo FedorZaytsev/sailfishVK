@@ -3,11 +3,6 @@ import QtQuick 2.0
 Item {
     width: 100
     height: 100
-    //property string icon1
-    //property string icon2
-    //property string icon3
-    //property string icon4
-
 
     Loader {
         sourceComponent: {

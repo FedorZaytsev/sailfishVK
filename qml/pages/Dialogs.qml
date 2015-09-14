@@ -12,7 +12,7 @@ Page {
         offset = 0
         dialogsList.model.clear()
         ready = false
-        vk.getDialogs(offset)
+        vk.getDialogs(0)
         console.log("dialogs page updated")
     }
 
@@ -60,13 +60,13 @@ Page {
         onMovementEnded: {
             if (visibleArea.yPosition + visibleArea.heightRatio > 0.99) {
                 console.log("getDialogs scroll");
-                vk.getDialogs(offset)
+                vk.getDialogs(offset + 20)
             }
         }
 
         VerticalScrollDecorator {}
         Component.onCompleted: {
-            vk.getDialogs(offset)
+            vk.getDialogs(0)
         }
         BusyIndicator {
             anchors.centerIn: dialogsList

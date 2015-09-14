@@ -16,7 +16,7 @@ class VKHandlerMessages : public VKAbstractHandler
 public:
     explicit VKHandlerMessages(VKStorage* storage, QObject *parent = 0);
     virtual const QNetworkRequest processRequest();
-    virtual void processReply(QJsonValue *reply);
+    virtual void processReply(QJsonValue *_reply);
     virtual QString name();
     void setOffset(int offset);
     void setCount(int count);
@@ -27,6 +27,8 @@ public:
 
     Q_INVOKABLE int count();
     Q_INVOKABLE VKContainerMessage* getPtr(int i);
+    Q_INVOKABLE int offset() { return m_offset; }
+    Q_INVOKABLE int unreadCount() { return m_unreadCount; }
 
 
     QSharedPointer<VKContainerMessage> get(int i);
@@ -38,6 +40,7 @@ private:
     int m_offset;
     int m_count;
     int m_id;
+    int m_unreadCount;
     bool m_isChat;
     int m_startMsgId;
     bool m_reverse;
