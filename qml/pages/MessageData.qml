@@ -15,7 +15,7 @@ Item {
             width: maxWidth * labelSize
             font.pixelSize: Theme.fontSizeMedium
             text: msg
-            color: incoming? Theme.primaryColor : Theme.highlightColor
+            color: Theme.primaryColor//incoming? Theme.primaryColor : Theme.highlightColor
             wrapMode: Text.Wrap
             renderType: Text.NativeRendering
             horizontalAlignment: incoming ? Text.AlignLeft : Text.AlignRight

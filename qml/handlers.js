@@ -239,6 +239,9 @@ function processMsg(msg) {
         if (msg.countFwd() > 0) {
             return "["+qsTr("Messages")+"]"
         }
+        if (msg.actionPtr().text() !== "") {
+            return "["+msg.actionPtr().text()+"]"
+        }
     }
     return msg.body()
 }
@@ -367,13 +370,15 @@ function handlerMessages(data) {
     var mpage = findMessagesPage()
     mpage.ready = true
 
-    for (var i=0;i<data.count();i++) {
-        var element = data.getPtr(i)
-
-        if ((mpage.offsetTop === -1 && mpage.offsetBottom === -1) || mpage.offsetTop <= data.offset() + data.count()) {
-            addMessage(model, element)
-        } else {
+    if (mpage.offsetBottom > data.offset()) {
+        for (var i=data.count()-1;i>=0;i--) {
+            var element = data.getPtr(i)
             addMessage(model, element, undefined, undefined, 0)
+        }
+    } else {
+        for (var i=0;i<data.count();i++) {
+            var element = data.getPtr(i)
+            addMessage(model, element)
         }
     }
 

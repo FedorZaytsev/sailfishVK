@@ -69,6 +69,7 @@ Page {
             id: messagesListModel
         }
         model: messagesListModel
+        spacing: Theme.paddingSmall
         footer: Column {
             PageHeader {
                 id: pageHeader
@@ -94,13 +95,13 @@ Page {
                 vk.getMessages(id, isChat, Math.max(offsetBottom - 20, 0), Math.min(offsetBottom, 20))
             }
         }
-        delegate: Component {
+        delegate: MessageComponent{} /*Component {
             Loader {
                 source: actionMessages === "" ?
                             "MessageComponent.qml" :
                             "MessageComponentAction.qml"
             }
-        }
+        }*/
 
         verticalLayoutDirection: ListView.BottomToTop
         VerticalScrollDecorator {}

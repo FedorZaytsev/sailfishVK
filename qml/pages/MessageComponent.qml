@@ -11,13 +11,24 @@ BackgroundItem {
     property real itemOffset: 2*padding + offset*padding
     property real maxWidth: Screen.width - itemOffset*2
     property int  idx: index
-    height: textHeight + avatarImage.height + 2*padding + messageData.height +
-            ((index >= messagesList.model.count-1 || messagesList.model.get(index+1).offset === 0) ? padding : 0)
+    height: {
+        if (actionMessages !== "") {
+            console.log("actionMessages", actionMessages,labelAction.height)
+            return labelAction.height
+        }
+
+        var result = textHeight + avatarImage.height + padding + messageData.height
+        if (index >= messagesList.model.count-1 || messagesList.model.get(index+1).offset === 0) {
+            result = result + padding
+        }
+        return result
+    }
 
     Component.onCompleted: {
         if (!isRead && id !== 0) {
             markAsRead(id)
-            isRead = true
+            messagesList.model.setProperty(index, "isRead", true)
+            //unreadRectangle.opacity = 0
         }
     }
 
@@ -25,12 +36,13 @@ BackgroundItem {
         highlighted = customHighlight
     }
 
-    //Disabled
+
     Item {
         x:  incoming ? avatarImage.width + itemOffset + 2*padding + Math.max(userNameId.contentWidth, dateId.contentWidth) :
                        maxWidth*(1 - labelSize) + itemOffset + Math.max(userNameId.width, dateId.width) - Math.max(userNameId.contentWidth, dateId.contentWidth) - width - padding
         width: userNameId.height + dateId.height
         height: userNameId.height + dateId.height
+        visible: actionMessages === ""
         BusyIndicator {
             id: busy
             anchors.centerIn: parent
@@ -40,12 +52,14 @@ BackgroundItem {
 
     Column {
         y: -Theme.paddingSmall
+        visible: actionMessages === ""
         Label {
             id: userNameId
             x: incoming ? avatarImage.width + itemOffset + padding : maxWidth*(1 - labelSize) + itemOffset
             width: maxWidth * labelSize - avatarImage.width
+            visible: actionMessages === ""
             font.pixelSize: Theme.fontSizeSmall
-            color: incoming? Theme.primaryColor : Theme.highlightColor
+            color: Theme.primaryColor//incoming? Theme.primaryColor : Theme.highlightColor
             horizontalAlignment: incoming ? Text.AlignLeft : Text.AlignRight
             text: userName
         }
@@ -53,8 +67,9 @@ BackgroundItem {
             id: dateId
             x: incoming ? avatarImage.width + itemOffset + padding : maxWidth*(1 - labelSize) + itemOffset
             width: maxWidth * labelSize - avatarImage.width
+            visible: actionMessages === ""
             font.pixelSize: Theme.fontSizeTiny
-            color: incoming? Theme.primaryColor : Theme.highlightColor
+            color: Theme.primaryColor//incoming? Theme.secondaryColor : Theme.secondaryHighlightColor
             horizontalAlignment: incoming ? Text.AlignLeft : Text.AlignRight
             text: date
         }
@@ -67,9 +82,11 @@ BackgroundItem {
         width: 50
         height: 50
         source: icon
+        visible: actionMessages === ""
     }
     MessageData {
         id: messageData
+        visible: actionMessages === ""
         anchors.top: avatarImage.bottom
         anchors.topMargin: padding
         anchors.bottomMargin: padding
@@ -102,6 +119,7 @@ BackgroundItem {
     }
 
     Repeater {
+        visible: actionMessages === ""
         model: offset ? offset : 0
         delegate: Rectangle {
             x: incoming ? (index + 1)*padding + padding : maxWidth + padding + itemOffset + (index + 1)*padding
@@ -116,6 +134,16 @@ BackgroundItem {
 
             }
         }
+    }
+
+    Label {
+        id: labelAction
+        width: maxWidth
+        horizontalAlignment: Text.AlignHCenter
+        font.pixelSize: Theme.fontSizeMedium
+        visible: actionMessages !== ""
+        wrapMode: Text.Wrap
+        text: actionMessages
     }
 
 }
