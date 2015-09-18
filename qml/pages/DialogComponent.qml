@@ -31,7 +31,9 @@ BackgroundItem {
         }
 
         Column {
-            Row {
+            Item {
+                width: chatName.width + chatName.height
+                height: chatName.height
                 Label {
                     id: chatName
                     text: "<b>"+name+"</b>"
@@ -40,6 +42,7 @@ BackgroundItem {
                     color: unreadCount > 0 ? Theme.highlightColor : Theme.primaryColor
                 }
                 GlassItem {
+                    x: chatName.x + chatName.contentWidth + Theme.paddingMedium
                     height: chatName.height
                     width: chatName.height
                     falloffRadius: 0.2

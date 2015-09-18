@@ -74,7 +74,7 @@ void clearOldLogFiles() {
 
     QStringList filter;
     filter<<"*.log";
-    auto files = dir.entryList(filter, QDir::Files, QDir::Name);
+    auto files = dir.entryList(filter, QDir::Files, QDir::Time);
     for (int i=LOG_FILES_COUNT; i < files.count();i++) {
         bool res = dir.remove(files.at(i));
         Q_ASSERT(res);
@@ -147,17 +147,24 @@ void print_trace() {
 }
 
 void handler(int sig) {
+    void *array[10];
+    size_t size;
+
+    // get void*'s for all entries on the stack
+    size = backtrace(array, 10);
 
     // print out all the frames to stderr
-    qDebug()<<"Error: signal"<<sig;
-    print_trace();
+    fprintf(stderr, "Error: signal %d:\n", sig);
+    backtrace_symbols_fd(array, size, STDERR_FILENO);
     exit(sig);
 }
 
-void myterminate() {
-    print_trace();
-}
 
+void myterminate() {
+    handler(0);
+}
+#include <sys/resource.h>
+#include <QDir>
 int main(int argc, char *argv[]) {
 
     QCoreApplication::setApplicationName("harbour-vk");
@@ -168,6 +175,7 @@ int main(int argc, char *argv[]) {
     signal(SIGINT, handler);
     signal(SIGABRT, handler);
     clearOldLogFiles();
+
 
     std::set_terminate (myterminate);
 

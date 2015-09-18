@@ -32,7 +32,7 @@
 #include "vklpcounterupdate.h"
 
 #define MAX_USER_ID 2000000000
-#define TIMEOUT_REQUEST (2*60*1000)
+#define TIMEOUT_REQUEST (60*1000) //60 seconds
 //Long Poll server
 //Have his own parser, network manager and so on
 

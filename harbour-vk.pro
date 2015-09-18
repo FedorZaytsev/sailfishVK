@@ -16,6 +16,9 @@ QMAKE_CXXFLAGS += -Werror -std=c++0x -g -rdynamic -DQT_SHAREDPOINTER_TRACK_POINT
 
 CONFIG += sailfishapp c++11
 
+#CONFIG(ARMV7,ARMV7|I486):LIBS += ""
+#CONFIG(I486,ARMV7|I486):LIBS += ""
+
 SOURCES += src/harbour-vk.cpp \
     src/vk.cpp \
     src/vkpixmapprovider.cpp \

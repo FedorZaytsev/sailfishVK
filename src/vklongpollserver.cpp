@@ -16,7 +16,7 @@ VKLongPollServer::VKLongPollServer(VKStorage* storage, QObject *parent) :
     setPts(0);
     QObject::connect(&m_manager, &QNetworkAccessManager::finished, this, &VKLongPollServer::networkDataReady);
 
-    m_timer.setInterval(3*60*1000);
+    m_timer.setInterval(TIMEOUT_REQUEST);
     m_timer.setSingleShot(false);
     QObject::connect(&m_timer, &QTimer::timeout, this, &VKLongPollServer::watchdogTimer);
     m_timer.start();
