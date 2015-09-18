@@ -11,7 +11,7 @@ BackgroundItem {
     property real itemOffset: 2*padding + offset*padding
     property real maxWidth: Screen.width - itemOffset*2
     property int  idx: index
-    property bool read: isRead || id ===0
+    property bool read: isRead
     height: {
         if (actionMessages !== "") {
             console.log("actionMessages", actionMessages,labelAction.height)

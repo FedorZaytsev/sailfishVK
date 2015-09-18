@@ -110,6 +110,13 @@ void VKContainerMessage::setAction(QSharedPointer<VKContainerMessageAction> acti
     m_action = action;
 }
 
+void VKContainerMessage::setReadState(bool arg) {
+    m_readState = arg;
+    for (auto e: m_fwd) {
+        e->setReadState(arg);
+    }
+}
+
 void VKContainerMessage::processEmoji(QString &s) {
 
     VKEmojiParser parser;

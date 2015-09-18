@@ -51,7 +51,6 @@ public:
     void setMsgId(int arg) { m_msgId = arg; }
     void setDate(QDateTime arg) { m_date = arg; }
     void setIsIncoming(bool arg) { m_isIncoming = arg; }
-    void setReadState(bool arg) { m_readState = arg; }
     void setBody(QString arg) { m_body = arg; }
     void setIsChat(bool arg) { m_isChat = arg; }
     void setChatId(int arg) { m_chatId = arg; }
@@ -59,6 +58,7 @@ public:
     void addFwdMsg(QSharedPointer<VKContainerMessage> arg);
     void setAttachments(QSharedPointer<VKContainerAttachments> attachments);
     void setAction(QSharedPointer<VKContainerMessageAction> action);
+    void setReadState(bool arg);
 
     static void processEmoji(QString &s);
 
