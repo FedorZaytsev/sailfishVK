@@ -384,9 +384,8 @@ function handlerMessages(data) {
     }
 
     if (mpage.offsetTop === -1 && mpage.offsetBottom === -1 && data.unreadCount() > 0) {
-        console.log(Math.min(data.unreadCount(), 20), data.unreadCount())
         mpage.messagesList.positionViewAtIndex(Math.min(data.unreadCount(), 20), ListView.Contain)
-    } else if (mpage.messagesList.visibleArea.yPosition > 0.99) {
+    } else if (mpage.messagesList.visibleArea.yPosition > 0.99 && mpage.offsetBottom === -1) {
         mpage.messagesList.positionViewAtEnd()
     }
 
@@ -589,12 +588,14 @@ function processMessageDelete(el) {
 }
 
 function processMessageNew(el) {
+
     var dmodel = findDialogModel()
     var mmodel = findMessagesModel()
     var mpage = findMessagesPage()
     var dialog = el.dialogPtr()
     var additionalUnreadCount = 0
     var dialogId = findMsgId(dmodel, dialog.chatId())
+    var messageId = findMsgId(mmodel, dialog.messagePtr().msgId())
 
     console.log("label:","dialogId",dialogId, "chatId", dialog.chatId(), "dmodel.get(dialogId).unreadCount", dmodel?dmodel.get(dialogId).unreadCount:"no dmodel")
     if (dialogId !== undefined) {
@@ -604,6 +605,10 @@ function processMessageNew(el) {
         addDialog(dmodel, dialog, 0, additionalUnreadCount)
     }
 
+
+    if (mpage.offsetBottom > 0 || messageId !== undefined) {
+        return;
+    }
 
     console.log("adding element", dialog.messagePtr().readState(), additionalUnreadCount)
     if (mpage && dialog.chatId() === mpage.id) {
