@@ -606,7 +606,7 @@ function processMessageNew(el) {
     }
 
 
-    if (mpage.offsetBottom > 0 || messageId !== undefined) {
+    if (mpage && mpage.offsetBottom > 0 || messageId !== undefined) {
         return;
     }
 

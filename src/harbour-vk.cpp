@@ -222,6 +222,8 @@ int main(int argc, char *argv[]) {
 
     int result = app->exec();
 
+    qDebug()<<"application finished successfully";
+
     return result;
 }
 
