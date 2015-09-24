@@ -12,6 +12,7 @@
 #include <QDir>
 #include <execinfo.h>
 #include <signal.h>
+#include <dlfcn.h>
 #include "vktextwrap.h"
 #include "vkpixmapprovider.h"
 #include "vkabstractcontainer.h"
@@ -82,6 +83,12 @@ void clearOldLogFiles() {
     }
 }
 
+void logBaseAddress() {
+    Dl_info info;
+    dladdr((const void*)&logBaseAddress, &info);
+    qDebug()<<"Main module address:"<<QString("0x")+QString::number((unsigned int)info.dli_fbase,16).toUpper();
+}
+
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
 
     QString stringType;
@@ -126,26 +133,6 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
     }
 }
 
-#include <sys/types.h>
-#include <sys/wait.h>
-void print_trace() {
-    char pid_buf[30];
-    sprintf(pid_buf, "%d", getpid());
-    char name_buf[512];
-    name_buf[readlink("/proc/self/exe", name_buf, 511)]=0;
-    int child_pid = fork();
-    if (!child_pid) {
-        qDebug()<<"!child_pid";
-        dup2(2,1); // redirect output to stderr
-        fprintf(stdout,"stack trace for %s pid=%s\n",name_buf,pid_buf);
-        execlp("gdb", "gdb", "--batch", "-n", "-ex", "thread", "-ex", "bt", name_buf, pid_buf, NULL);
-        abort(); /* If gdb failed to start */
-    } else {
-        qDebug()<<"waitpid";
-        waitpid(child_pid,NULL,0);
-    }
-}
-
 void handler(int sig) {
     void *array[10];
     size_t size;
@@ -154,8 +141,9 @@ void handler(int sig) {
     size = backtrace(array, 10);
 
     // print out all the frames to stderr
-    fprintf(stderr, "Error: signal %d:\n", sig);
+    qDebug()<<"Error: signal"<<sig;
     backtrace_symbols_fd(array, size, STDERR_FILENO);
+    backtrace_symbols_fd(array, size, global__logFile.handle());
     exit(sig);
 }
 
@@ -165,17 +153,18 @@ void myterminate() {
 }
 #include <sys/resource.h>
 #include <QDir>
+
 int main(int argc, char *argv[]) {
 
     QCoreApplication::setApplicationName("harbour-vk");
     QCoreApplication::setApplicationVersion(QString("%1.%2 %3").arg(VK_MAJOR_VERSION).arg(VK_MINOR_VERSION).arg(VK_DEVELOP_STATE));
 
     createLogFile();
+    logBaseAddress();
     signal(SIGSEGV, handler);
     signal(SIGINT, handler);
     signal(SIGABRT, handler);
     clearOldLogFiles();
-
 
     std::set_terminate (myterminate);
 
@@ -183,7 +172,6 @@ int main(int argc, char *argv[]) {
     QScopedPointer<QQuickView> view(SailfishApp::createView());
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
-
 
     qmlRegisterType<VK>("harbour.vk.VK", 1, 0, "VK");
     qmlRegisterType<VKLongPollServer>();

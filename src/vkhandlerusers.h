@@ -2,7 +2,6 @@
 #define VKHANDLERUSERS_H
 
 #include <QObject>
-#include <QSqlQuery>
 #include "vkabstracthandler.h"
 #include "vkcontaineruser.h"
 

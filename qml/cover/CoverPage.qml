@@ -32,15 +32,10 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 CoverBackground {
-    /*Label {
-        id: label
-        anchors.centerIn: parent
-        text: qsTr("My Cover")
-    }*/
     id:coverId
-    property alias unreadLabel : coverMessagesCount.text
+    //property alias unreadLabel : coverMessagesCount.text
 
-    Row {
+    /*Row {
         anchors.centerIn: parent
         spacing: 20
 
@@ -57,6 +52,21 @@ CoverBackground {
             font.bold: true
             font.pixelSize: Theme.fontSizeHuge
         }
+    }*/
+
+    Column {
+        anchors.fill: parent
+
+        ConversationComponent {
+            id: label1
+        }
+        ConversationComponent {
+            id: label2
+        }
+        ConversationComponent {
+            id: label3
+        }
+
     }
 
     /*CoverActionList {

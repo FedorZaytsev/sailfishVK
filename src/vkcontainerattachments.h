@@ -3,7 +3,6 @@
 
 #include <QJsonArray>
 #include <QJsonObject>
-#include <QSqlQuery>
 #include <QSharedPointer>
 #include "vkabstractcontainer.h"
 

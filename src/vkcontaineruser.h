@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QJsonObject>
-#include <QSqlQuery>
 #include "vkstorage.h"
 #include "vkabstractcontainer.h"
 

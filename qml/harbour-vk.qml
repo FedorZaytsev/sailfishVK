@@ -67,7 +67,7 @@ ApplicationWindow
             }
         }
         onUnreadCountChanged: {
-            cover.unreadLabel = "" + count
+            //cover.unreadLabel = "" + count
         }
         Component.onCompleted: {
             if (vk.isOurUserAuthorized()) {

@@ -73,5 +73,8 @@ Page {
             running: !ready
             size: BusyIndicatorSize.Large
         }
+        onModelChanged: {
+            console.log("model changed!")
+        }
     }
 }

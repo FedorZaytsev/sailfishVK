@@ -38,7 +38,7 @@ BackgroundItem {
                     id: chatName
                     text: "<b>"+name+"</b>"
                     elide: Text.ElideRight
-                    width: Screen.width - 2*delegate.x - row.spacing - iconHolder.width - (unreadCount > 0 ? loader.item.width : 0)
+                    width: Screen.width - 2*delegate.x - row.spacing - iconHolder.width - (loader.item ? loader.item.width : 0)
                     color: unreadCount > 0 ? Theme.highlightColor : Theme.primaryColor
                 }
                 GlassItem {
