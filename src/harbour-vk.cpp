@@ -58,7 +58,7 @@ void createLogFile() {
         dir.mkpath(".");
     }
 
-    QString fpath = QString("%1/sailVK_%2.log").arg(path).arg(QDateTime::currentDateTime().toString("yy_M_d_h_m_s"));
+    QString fpath = QString("%1/sailVK_%2.log").arg(path).arg(QDateTime::currentDateTime().toString("yy_MM_dd_hh_mm_ss"));
 
     global__logFile.setFileName(fpath);
     if(!global__logFile.open(QIODevice::WriteOnly)) {
