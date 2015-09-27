@@ -99,6 +99,7 @@ void VKContainerMessage::setUser(QSharedPointer<VKContainerUser> arg) {
 }
 
 void VKContainerMessage::addFwdMsg(QSharedPointer<VKContainerMessage> arg) {
+    arg->setReadState(readState());
     m_fwd.append(arg);
 }
 
