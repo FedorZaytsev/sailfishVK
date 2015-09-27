@@ -86,7 +86,15 @@ QString VK::getAuthPageUrl() {
                                 "&redirect_uri=https://oauth.vk.com/blank.html"
                                 "&display=mobile"
                                 "&v=5.28"
-                                "&response_type=token";
+            "&response_type=token";
+}
+
+VKStorage *VK::getStorage()
+{
+    if (QQmlEngine::objectOwnership(&storage()) != QQmlEngine::CppOwnership) {
+        QQmlEngine::setObjectOwnership(&storage(), QQmlEngine::CppOwnership);
+    }
+    return &storage();
 }
 
 void VK::addDebugLogLine(const QString &line) {

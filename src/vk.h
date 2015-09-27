@@ -59,7 +59,7 @@ public:
     Q_INVOKABLE void sendMessage(int guid, int userId, bool isChat, QString text, QString forward, QString attachments);
     Q_INVOKABLE void dropAuthorization();
     Q_INVOKABLE QString getAuthPageUrl();
-    Q_INVOKABLE VKStorage* getStorage() {return &storage();}
+    Q_INVOKABLE VKStorage* getStorage();
     Q_INVOKABLE bool isOurUserAuthorized();
 
                 void sendNetworkRequest(VKAbstractHandler* handler);
