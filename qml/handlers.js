@@ -277,6 +277,11 @@ function addDialog(model, dialog, position, additionalUnreadCount) {
     } else {
         model.append(t)
     }
+
+    //update cover
+    if (model.count <= 3) {
+        applicationWindow.cover.update(model.count, {dialog: t.name, message: t.msg, read: t.isRead || !t.isIncoming})
+    }
 }
 
 function updateDialog(model, dialog, pos) {
@@ -296,6 +301,14 @@ function updateDialog(model, dialog, pos) {
     model.setProperty(0, "isRead", message.readState())
     model.setProperty(0, "unreadCount", model.get(0).unreadCount + (message.isIncoming() ? 1 : 0))
 
+    //update cover
+    var dat = {dialog: model.get(0).name, message: model.get(0).msg, isRead: model.get(0).isRead || !model.get(0).isIncoming}
+    if (pos <= 3) {
+        applicationWindow.cover.swap(pos, 1)
+        applicationWindow.cover.update(1, dat)
+    } else {
+        applicationWindow.cover.insertFirst(dat)
+    }
 
 }
 
@@ -322,7 +335,6 @@ function showFakeMessage(chtId, guid, text, forward, attachments) {
 
     var mmodel = findMessagesModel()
     if (mmodel) {
-        console.log("append")
         mmodel.insert(0,t)
     }
 
@@ -340,6 +352,15 @@ function showFakeMessage(chtId, guid, text, forward, attachments) {
     dmodel.setProperty(0, "isIncoming", false)
     dmodel.setProperty(0, "msgId", 0)
     dmodel.setProperty(0, "isRead", true)
+
+    //update cover
+    var dat = {dialog: dmodel.get(0).name, message: dmodel.get(0).msg, isRead: dmodel.get(0).isRead || !dmodel.get(0).isIncoming}
+    if (pos <= 3) {
+        applicationWindow.cover.swap(pos, 1)
+        applicationWindow.cover.update(1, dat)
+    } else {
+        applicationWindow.cover.insertFirst(dat)
+    }
 }
 
 function getFwd(data) {
@@ -457,6 +478,11 @@ function deleteMessage(msgId, chatId, prev) {
         dmodel.setProperty(id, "msgId", prev.msgId())
         dmodel.setProperty(id, "isIncoming", prev.isIncoming())
         dmodel.setProperty(id, "authorAvatar50", prev.user().iconSmall())
+
+        //update cover
+        if (msgIdDialogs <= 3) {
+            applicationWindow.cover.update(msgIdDialogs, {message: dmodel.get(id).msgText, isRead: dmodel.get(id).isRead || !dmodel.get(id).isIncoming})
+        }
     }
 }
 
@@ -472,6 +498,11 @@ function restoreMessage(msg) {
         dmodel.setProperty(id, "msgId", el.msgId())
         dmodel.setProperty(id, "isIncoming", el.isIncoming())
         dmodel.setProperty(id, "authorAvatar50", el.userPtr().iconSmall())
+
+        //update cover
+        if (id <= 3) {
+            applicationWindow.cover.update(id, {message: dmodel.get(id).msgText, isRead: dmodel.get(id).isRead || !dmodel.get(id).isIncoming})
+        }
     }
 
     var messages = findMessagesPage()
@@ -517,9 +548,15 @@ function processMessageFlagsChange(el) {
         }
     }
     if (msgIdDialogs) {
-        dmodel.setProperty(msgIdDialogs, "incoming", !flags.isSet(VKLPFlags.OUTBOX))
+        dmodel.setProperty(msgIdDialogs, "isIncoming", !flags.isSet(VKLPFlags.OUTBOX))
         dmodel.setProperty(msgIdDialogs, "isChat", flags.isSet(VKLPFlags.CHAT))
+
+        //update cover
+        if (msgIdDialogs <= 3) {
+            applicationWindow.cover.update(msgIdDialogs, {isRead: dmodel.get(msgIdDialogs).isRead || !dmodel.get(msgIdDialogs).isIncoming})
+        }
     }
+
 
 }
 
@@ -548,6 +585,11 @@ function processMessageFlagsSet(el) {
             if (msgIdDialogs !== undefined) {
                 console.log("label:",dmodel.get(msgIdDialogs).msgText, dmodel.get(msgIdDialogs).unreadCount, "plus")
                 dmodel.setProperty(msgIdDialogs, "unreadCount", dmodel.get(msgIdDialogs).unreadCount + 1)
+
+                //update cover
+                if (msgIdDialogs <= 3) {
+                    applicationWindow.cover.update(msgIdDialogs, {isRead: dmodel.get(msgIdDialogs).isRead || !dmodel.get(msgIdDialogs).isIncoming})
+                }
             }
         }
     }
@@ -576,6 +618,11 @@ function processMessageFlagsReset(el) {
             if (msgIdDialogs !== undefined) {
                 console.log("label:",dmodel.get(msgIdDialogs).msgText, dmodel.get(msgIdDialogs).unreadCount, "minus")
                 dmodel.setProperty(msgIdDialogs, "unreadCount", dmodel.get(msgIdDialogs).unreadCount - 1)
+
+                //update cover
+                if (msgIdDialogs <= 3) {
+                    applicationWindow.cover.update(msgIdDialogs, {isRead: dmodel.get(msgIdDialogs).isRead || !dmodel.get(msgIdDialogs).isIncoming})
+                }
             }
         }
     }

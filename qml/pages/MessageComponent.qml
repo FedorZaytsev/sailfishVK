@@ -38,7 +38,7 @@ BackgroundItem {
     }
 
     Component.onCompleted: {
-        if (!isRead && id !== 0) {
+        if (!isRead && id !== 0 && incoming) {
             markAsRead(id)
         }
     }

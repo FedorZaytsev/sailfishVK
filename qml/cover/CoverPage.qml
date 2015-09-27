@@ -56,30 +56,83 @@ CoverBackground {
 
     Column {
         anchors.fill: parent
+        anchors.margins: Theme.paddingLarge
+        spacing: Theme.paddingMedium
 
         ConversationComponent {
             id: label1
+            width: Theme.coverSizeLarge.width - 2*Theme.paddingLarge
         }
         ConversationComponent {
             id: label2
+            width: Theme.coverSizeLarge.width - 2*Theme.paddingLarge
         }
         ConversationComponent {
             id: label3
+            width: Theme.coverSizeLarge.width - 2*Theme.paddingLarge
         }
 
     }
 
-    /*CoverActionList {
-        id: coverAction
-
-        CoverAction {
-            iconSource: "image://theme/icon-cover-next"
+    function getLabel(idx) {
+        var obj
+        if (idx === 1) {
+            obj = label1
+        } else if (idx === 2) {
+            obj = label2
+        } else if (idx === 3) {
+            obj = label3
         }
+        return obj
+    }
 
-        CoverAction {
-            iconSource: "image://theme/icon-cover-pause"
+    function store(idx) {
+        var obj = getLabel(idx)
+        return {dialog: obj.dialogName, message: obj.messageText, read: obj.isRead}
+    }
+
+    function load(idx, t) {
+        var obj = getLabel(idx)
+        obj.dialogName = t.dialog
+        obj.messageText = t.message
+        obj.isRead = t.read
+    }
+
+    function swap(idx1, idx2) {
+        var t = store(idx1)
+        load(idx1, store(idx2))
+        load(idx2, t)
+
+    }
+
+    function insertFirst(t) {
+        var t
+
+        //2 => 3
+        t = store(2)
+        load(3, t)
+
+        //1 => 2
+        t = store(1)
+        load(2, t)
+
+        update(1, t)
+    }
+
+    function update(idx, t) {
+        var obj = getLabel(idx)
+        if (obj) {
+            if ( t.dialog ) {
+                obj.dialogName = t.dialog
+            }
+            if ( t.message ) {
+                obj.messageText = t.message
+            }
+            if ( t.read ) {
+                obj.isRead = t.read
+            }
         }
-    }*/
+    }
 }
 
 
