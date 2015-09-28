@@ -82,7 +82,10 @@ CoverBackground {
             obj = label2
         } else if (idx === 3) {
             obj = label3
+        } else {
+            console.log("cannot get label with index",idx)
         }
+
         return obj
     }
 
