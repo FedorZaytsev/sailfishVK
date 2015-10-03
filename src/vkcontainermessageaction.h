@@ -30,9 +30,9 @@ public:
     Q_INVOKABLE int userId() { return m_actionMid; }
     Q_INVOKABLE QString text() { return m_actionText; }
 
-    void setType(int id) { m_actionType = id; }
-    void setUserId(int id) { m_actionMid = id; }
-    void setText(QString text) { m_actionText = text; }
+    void setType(int id);
+    void setUserId(int id);
+    void setText(QString text);
 
 signals:
 

@@ -22,15 +22,15 @@ public:
     Q_INVOKABLE int         album()         { return m_albumId; }
     Q_INVOKABLE int         genre()         { return m_genreId; }
 
-    void setId(int arg)                     { m_id = arg; }
-    void setOwnerId(int arg)                { m_ownerId = arg; }
-    void setArtist(QString arg)             { m_artist = arg; }
-    void setTitle(QString arg)              { m_title = arg; }
-    void setDuration(int arg)               { m_duration = arg; }
-    void setUrl(QString arg)                { m_url = arg; }
-    void setLyrics(int arg)                 { m_lyricsId = arg; }
-    void setAlbum(int arg)                  { m_albumId = arg; }
-    void setGenre(int arg)                  { m_genreId = arg; }
+    void setId(int arg);
+    void setOwnerId(int arg);
+    void setArtist(QString arg);
+    void setTitle(QString arg);
+    void setDuration(int arg);
+    void setUrl(QString arg);
+    void setLyrics(int arg);
+    void setAlbum(int arg);
+    void setGenre(int arg);
 
 signals:
 

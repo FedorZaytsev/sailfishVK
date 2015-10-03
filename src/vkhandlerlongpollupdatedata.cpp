@@ -111,7 +111,7 @@ const QNetworkRequest VKHandlerLongPollUpdateData::processRequest() {
 
 void VKHandlerLongPollUpdateData::processReply(QJsonValue *reply) {
     m_data = *reply;
-    emit ready(this);
+    //emit ready(this);
 }
 
 void VKHandlerLongPollUpdateData::setUserIds(QList<QString> &userIds) {

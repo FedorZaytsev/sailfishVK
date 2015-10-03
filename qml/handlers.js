@@ -276,7 +276,7 @@ function addDialog(model, dialog, position, additionalUnreadCount) {
         model.insert(position, t)
     } else {
         model.append(t)
-    }
+    }   
 
     //update cover
     if (model.count <= 3) {
@@ -805,6 +805,8 @@ function handlerDialogs(data) {
 
     }
 }
+
+
 
 
 fullLPHandlers()

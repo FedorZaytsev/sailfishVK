@@ -34,23 +34,23 @@ public:
     Q_INVOKABLE bool canEdit()          { return m_canEdit; }
 
 
-    void setId(int arg)                 { m_id = arg; }
-    void setOwnerId(int arg)            { m_ownerId = arg; }
-    void setTitle(QString arg)          { m_title = arg; }
-    void setDescription(QString arg)    { m_description = arg; }
-    void setDuration(int arg)           { m_duration = arg; }
-    void setLink(QString arg)           { m_link = arg; }
-    void setPhoto130(QString arg)       { m_photo130 = arg; }
-    void setPhoto320(QString arg)       { m_photo320 = arg; }
-    void setPhoto640(QString arg)       { m_photo640 = arg; }
-    void setDate(QDateTime arg)         { m_date = arg; }
-    void setAddingDate(QDateTime arg)   { m_addingDate = arg; }
-    void setViews(int arg)              { m_views = arg; }
-    void setComments(int arg)           { m_comments = arg; }
-    void setPlayerUrl(QString arg)      { m_playerUrl = arg; }
-    void setIsProcessing(bool arg)      { m_isProcessing = arg; }
-    void setAccessToken(QString arg)    { m_accessToken = arg; }
-    void setCanEdit(bool arg)           { m_canEdit = arg; }
+    void setId(int arg);
+    void setOwnerId(int arg);
+    void setTitle(QString arg);
+    void setDescription(QString arg);
+    void setDuration(int arg);
+    void setLink(QString arg);
+    void setPhoto130(QString arg);
+    void setPhoto320(QString arg);
+    void setPhoto640(QString arg);
+    void setDate(QDateTime arg);
+    void setAddingDate(QDateTime arg);
+    void setViews(int arg);
+    void setComments(int arg);
+    void setPlayerUrl(QString arg);
+    void setIsProcessing(bool arg);
+    void setAccessToken(QString arg);
+    void setCanEdit(bool arg);
 
 
 signals:

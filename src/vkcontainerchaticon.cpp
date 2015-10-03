@@ -3,6 +3,7 @@
 VKContainerChatIcon::VKContainerChatIcon(QObject *parent) :
     VKAbstractContainer(parent)
 {
+    m_type = eVKContainerChatIcon;
 }
 
 VKContainerChatIcon::~VKContainerChatIcon()
@@ -12,6 +13,7 @@ VKContainerChatIcon::~VKContainerChatIcon()
 void VKContainerChatIcon::add(QString icon) {
     Q_ASSERT(m_icons.length() < 4);
     m_icons.append(process(icon));
+    emit dataChanged(this);
 }
 
 QString VKContainerChatIcon::get(int idx) {

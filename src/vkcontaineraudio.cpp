@@ -3,6 +3,7 @@
 VKContainerAudio::VKContainerAudio(QObject *parent) :
     VKAbstractContainer(parent)
 {
+    m_type = eVKContainerAudio;
 }
 
 QSharedPointer<VKContainerAudio> VKContainerAudio::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users) {
@@ -21,4 +22,41 @@ QSharedPointer<VKContainerAudio> VKContainerAudio::fromJson(VKStorage *storage, 
     audio->setUrl(obj.value("url").toString());
 
     return QSharedPointer<VKContainerAudio>(audio);
+}
+
+
+void VKContainerAudio::setId(int arg) {
+    SET_ARG(m_id, arg);
+}
+
+void VKContainerAudio::setOwnerId(int arg) {
+    SET_ARG(m_ownerId, arg);
+}
+
+void VKContainerAudio::setArtist(QString arg) {
+    SET_ARG(m_artist, arg);
+}
+
+void VKContainerAudio::setTitle(QString arg) {
+    SET_ARG(m_title, arg);
+}
+
+void VKContainerAudio::setDuration(int arg) {
+    SET_ARG(m_duration, arg);
+}
+
+void VKContainerAudio::setUrl(QString arg) {
+    SET_ARG(m_url, arg);
+}
+
+void VKContainerAudio::setLyrics(int arg) {
+    SET_ARG(m_lyricsId, arg);
+}
+
+void VKContainerAudio::setAlbum(int arg) {
+    SET_ARG(m_albumId, arg);
+}
+
+void VKContainerAudio::setGenre(int arg) {
+    SET_ARG(m_genreId, arg);
 }

@@ -91,9 +91,7 @@ QString VK::getAuthPageUrl() {
 
 VKStorage *VK::getStorage()
 {
-    if (QQmlEngine::objectOwnership(&storage()) != QQmlEngine::CppOwnership) {
-        QQmlEngine::setObjectOwnership(&storage(), QQmlEngine::CppOwnership);
-    }
+    QQmlEngine::setObjectOwnership(&storage(), QQmlEngine::CppOwnership);
     return &storage();
 }
 
@@ -113,6 +111,16 @@ QString VK::getLogPath() {
 QString VK::getLogName() {
     QFileInfo info(global__logFile);
     return info.fileName();
+}
+
+void VK::setDefaultSlotsForHandler(VKAbstractHandler *handler) {
+    QObject::connect(handler, &VKAbstractHandler::partlyReady, [this](VKAbstractHandler* h) {
+        emit this->handlerPartlyReady(h, h->name());
+    });
+    QObject::connect(handler, &VKAbstractHandler::allDataReady, [](VKAbstractHandler* h) {
+        h->deleteLater();
+    });
+    QObject::connect(handler, &VKAbstractHandler::sendRequest, this, &VK::processHandler);
 }
 
 bool VK::updateAccessToken(QString str_url) {
@@ -137,8 +145,7 @@ void VK::getDialogs(int offset) {
     dialogHandler->setOffset(offset);
     dialogHandler->setLongPoll(!m_longPoll->initilized());
     dialogHandler->setPreviewLength(60);
-    QObject::connect(dialogHandler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
-    QObject::connect(dialogHandler, &VKAbstractHandler::sendRequest, this, &VK::processHandler);
+    setDefaultSlotsForHandler(dialogHandler);
     QObject::connect(dialogHandler, &VKHandlerDialogs::unreadCountChanged, [this](int count) {
         emit this->unreadCountChanged(count);
     });
@@ -149,7 +156,7 @@ void VK::getDialogs(int offset) {
 void VK::startLongPollServer(bool updateTs) {
     VKHandlerLongPollServerKey* handler = new VKHandlerLongPollServerKey(this, &storage(), this);
     handler->setUpdateTs(updateTs);
-    QObject::connect(handler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
+    //QObject::connect(handler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
     QObject::connect(handler, &VKAbstractHandler::sendRequest, this, &VK::processHandler);
 
     sendNetworkRequest(handler);
@@ -165,8 +172,7 @@ void VK::getMessages(int id, bool isChat, int offset, int count) {
     }
     messagesHandler->setOffset(offset);
     messagesHandler->setCount(count);
-    QObject::connect(messagesHandler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
-    QObject::connect(messagesHandler, &VKAbstractHandler::sendRequest, this, &VK::processHandler);
+    setDefaultSlotsForHandler(messagesHandler);
 
     sendNetworkRequest(messagesHandler);
 }
@@ -178,7 +184,7 @@ void VK::markAsRead(QList<int> msgs) {
     VKHandlerMarkAsRead* handler = new VKHandlerMarkAsRead(&storage(), this);
 
     handler->setMsgs(msgs);
-    QObject::connect(handler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
+    //QObject::connect(handler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
     QObject::connect(handler, &VKAbstractHandler::sendRequest, this, &VK::processHandler);
 
     sendNetworkRequest(handler);
@@ -194,7 +200,7 @@ void VK::sendMessage(int guid, int userId, bool isChat, QString text, QString fo
     handler->setIsChat(isChat);
     handler->setText(text);
     handler->setUserId(userId);
-    QObject::connect(handler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
+    //QObject::connect(handler, &VKAbstractHandler::ready, this, &VK::sendHandlertoScript);
     QObject::connect(handler, &VKAbstractHandler::sendRequest, this, &VK::processHandler);
 
     sendNetworkRequest(handler);

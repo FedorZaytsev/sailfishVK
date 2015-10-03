@@ -6,6 +6,7 @@
 #include "vklpeventtype.h"
 #include "vkcontainerdialog.h"
 #include "vkcontainermessage.h"
+#include "vkcontaineruser.h"
 
 class VKLPAbstract : public QObject
 {

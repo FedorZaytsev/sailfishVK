@@ -25,14 +25,15 @@ public:
     Q_INVOKABLE QString iconLarge() const   { return m_iconLarge; }
     Q_INVOKABLE bool isOnline() const       { return m_online; }
     Q_INVOKABLE bool isValid() const        { return m_valid; }
+    Q_INVOKABLE QString userName() const;
 
-    void setId(int arg)                     { m_id = arg; }
-    void setFirstName(QString arg)          { m_firstName = arg; }
-    void setLastName(QString arg)           { m_lastName = arg; }
-    void setIconSmall(QString arg)          { m_iconSmall = arg; }
-    void setIconMedium(QString arg)         { m_iconMedium = arg; }
-    void setIconLarge(QString arg)          { m_iconLarge = arg; }
-    void setIsOnline(bool arg)              { m_online = arg; }
+    void setId(int arg);
+    void setFirstName(QString arg);
+    void setLastName(QString arg);
+    void setIconSmall(QString arg);
+    void setIconMedium(QString arg);
+    void setIconLarge(QString arg);
+    void setIsOnline(bool arg);
     void valid(bool b)                      { m_valid = b; }
 private:
     int m_id;

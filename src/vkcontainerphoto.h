@@ -31,20 +31,20 @@ public:
     Q_INVOKABLE QString     maxSuitablePhoto();
     Q_INVOKABLE QSize       maxSuitableSize();
 
-    void setId(int id) { m_id = id; }
-    void setAlbumId(int id) { m_albumId = id; }
-    void setOwnerId(int id) { m_ownerId = id; }
-    void setUserId(int id) { m_userId = id; }
-    void setPhoto75(QString photo) { m_photo75 = photo; }
-    void setPhoto130(QString photo) { m_photo130 = photo; }
-    void setPhoto604(QString photo) { m_photo604 = photo; }
-    void setPhoto807(QString photo) { m_photo807 = photo; }
-    void setPhoto1280(QString photo) { m_photo1280 = photo; }
-    void setPhoto2560(QString photo) { m_photo2560 = photo; }
-    void setWidth(int width) { m_width = width; }
-    void setHeight(int height) { m_height = height; }
-    void setDate(QDateTime date) { m_date = date; }
-    void setText(QString text) { m_text = text; }
+    void setId(int id);
+    void setAlbumId(int id);
+    void setOwnerId(int id);
+    void setUserId(int id);
+    void setPhoto75(QString photo);
+    void setPhoto130(QString photo);
+    void setPhoto604(QString photo);
+    void setPhoto807(QString photo);
+    void setPhoto1280(QString photo);
+    void setPhoto2560(QString photo);
+    void setWidth(int width);
+    void setHeight(int height);
+    void setDate(QDateTime date);
+    void setText(QString text);
 private:
     QSize calculatePhotoSize(QSize size);
 signals:

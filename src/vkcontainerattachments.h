@@ -7,8 +7,6 @@
 #include "vkabstractcontainer.h"
 
 class VKStorage;
-class VKContainerPhoto;
-class VKContainerVideo;
 class VKContainerAttachments : public VKAbstractContainer
 {
     Q_OBJECT

@@ -3,6 +3,7 @@
 VKContainerSticker::VKContainerSticker(QObject *parent) :
     VKAbstractContainer(parent)
 {
+    m_type = eVKContainerSticker;
 }
 
 QSharedPointer<VKContainerSticker> VKContainerSticker::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {

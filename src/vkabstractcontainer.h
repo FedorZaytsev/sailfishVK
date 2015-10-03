@@ -4,6 +4,11 @@
 #include <QObject>
 #include <QDebug>
 #include <QQmlEngine>
+#include <QJsonObject>
+#include <QJsonArray>
+
+#define SET_ARG(param, arg) do{ bool b = false; if (param != arg) { b = true; } param = arg; if (b) { emit dataChanged(this); } }while(0)
+#define SET_ARG_NOCHECK(param, arg) do{ param = arg; emit dataChanged(this); }while(0)
 
 class VKAbstractHandler;
 class VKAbstractContainer : public QObject
@@ -14,10 +19,33 @@ public:
     virtual void complete(VKAbstractHandler* h);
     virtual void copyTo(VKAbstractContainer* container);
 
-signals:
+    int type() { return m_type; }
 
+    void printOwnership();
+
+    enum ContainerType {
+        eVKContainerAbstract,
+        eVKContainerAttachment,
+        eVKContainerAudio,
+        eVKContainerChatIcon,
+        eVKContainerDialog,
+        eVKContainerDocument,
+        eVKContainerLink,
+        eVKContainerMessage,
+        eVKContainerMessageAction,
+        eVKContainerPhoto,
+        eVKContainerSticker,
+        eVKContainerUser,
+        eVKContainerVideo,
+        eVKContainerWall,
+        eVKContainerWallReply,
+    };
+
+signals:
+    void dataChanged(VKAbstractContainer* container);
 public slots:
-private:
+protected:
+    int m_type;
 };
 
 #endif // VKABSTRACTCONTAINER_H

@@ -8,6 +8,7 @@ VKHandlerMessages::VKHandlerMessages(VKStorage* storage, QObject *parent) :
     setUserId(0);
     setStartMessageId(0);
     setReverse(0);
+    m_recievedCount = 0;
     m_unreadCount = 0;
 }
 
@@ -73,19 +74,22 @@ void VKHandlerMessages::processReply(QJsonValue *_reply) {
         auto message = e.toObject();
 
         auto msg = VKContainerMessage::fromJson(storage(), message, users, unknownUsers);
-        m_messages.push_back(msg);
+        storage()->addMessage(msg);
     }
+    m_recievedCount = messages.count();
+
+    emit partlyReady(this);
 
     //Additional request for case when we don't have info about users in fwd messages
     if (unknownUsers.length()) {
         qDebug()<<"We need additional users info about"<<unknownUsers;
         auto usersHandler = new VKHandlerUsers(storage(), this);
         usersHandler->setUsers(unknownUsers);
-        requestAdditionInfo(usersHandler);
-    } else {
-        qDebug()<<"ready";
-        emit ready(this);
+        //requestAdditionInfo(usersHandler);
     }
+    //error here
+
+    emit allDataReady(this);
 }
 
 QString VKHandlerMessages::name() {
@@ -119,9 +123,9 @@ void VKHandlerMessages::setReverse(bool rev) {
 }
 
 int VKHandlerMessages::count() {
-    return m_messages.count();
+    return m_recievedCount;
 }
-
+/*
 QSharedPointer<VKContainerMessage> VKHandlerMessages::get(int i) {
     return m_messages.at(i);
 }
@@ -129,16 +133,16 @@ QSharedPointer<VKContainerMessage> VKHandlerMessages::get(int i) {
 VKContainerMessage *VKHandlerMessages::getPtr(int i) {
     return m_messages.at(i).data();
 }
-
+*/
 void VKHandlerMessages::additionDataReady(VKAbstractHandler *h) {
     auto handler = dynamic_cast<VKHandlerUsers*>(h);
     Q_ASSERT(handler != nullptr);
 
-    qDebug()<<"additional info ready, updating";
-    for (auto e: m_messages) {
-        e->complete(handler);
-    }
+    //qDebug()<<"additional info ready, updating";
+    //for (auto e: m_messages) {
+    //    e->complete(handler);
+    //}
 
-    emit ready(this);
+    //emit ready(this);
 
 }

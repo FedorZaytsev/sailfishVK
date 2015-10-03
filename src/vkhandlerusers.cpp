@@ -34,7 +34,7 @@ void VKHandlerUsers::processReply(QJsonValue *reply) {
         m_users.append(user);
     }
 
-    emit ready(this);
+    //emit ready(this);
 }
 
 QString VKHandlerUsers::name() {

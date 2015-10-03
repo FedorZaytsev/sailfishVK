@@ -1,12 +1,13 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.vk.VK 1.0
 
 Page {
     id: messages
+    objectName: "messagesPage"
     property string listHeader: "unknown"
     property string avatarUrl: ""
-    property alias messagesListModel: messagesListModel
-    property alias messagesList: messagesList
+    property alias listAlias: messagesList
     property int id
     property int dialogIndex
     property int offsetTop : -1
@@ -14,6 +15,7 @@ Page {
     property bool isChat
     property bool ready: false
     property var markAsReadArray: []
+    property int downloadCount: 20
 
     onOffsetBottomChanged: {
         console.log(offsetBottom)
@@ -65,10 +67,10 @@ Page {
                 }
             }
         }
-        ListModel {
-            id: messagesListModel
-        }
-        model: messagesListModel
+        //ListModel {
+        //    id: messagesListModel
+        //}
+        model: VisualMessageModel{}
         footer: Column {
             PageHeader {
                 id: pageHeader

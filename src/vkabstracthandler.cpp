@@ -10,7 +10,7 @@ VKAbstractHandler::VKAbstractHandler(VKStorage* storage,QObject *parent) :
 
 void VKAbstractHandler::requestAdditionInfo(VKAbstractHandler *h) {
     m_additionalDataHandler = h;
-    QObject::connect(m_additionalDataHandler, &VKAbstractHandler::ready, this, &VKAbstractHandler::additionDataReady);
+    //QObject::connect(m_additionalDataHandler, &VKAbstractHandler::ready, this, &VKAbstractHandler::additionDataReady);
     sendRequest(m_additionalDataHandler);
 }
 

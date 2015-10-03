@@ -6,6 +6,7 @@ VKContainerMessageAction::VKContainerMessageAction(QObject *parent) :
 {
     setType(ACTION_INVALID);
     m_actionMid = 0;
+    m_type = eVKContainerMessageAction;
 }
 
 QSharedPointer<VKContainerMessageAction> VKContainerMessageAction::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> &userIds) {
@@ -81,4 +82,16 @@ void VKContainerMessageAction::complete(VKAbstractHandler *_h) {
             }
         }
     }
+}
+
+void VKContainerMessageAction::setType(int id) {
+    SET_ARG(m_actionType, id);
+}
+
+void VKContainerMessageAction::setUserId(int id) {
+    SET_ARG(m_actionMid, id);
+}
+
+void VKContainerMessageAction::setText(QString text) {
+    SET_ARG(m_actionText, text);
 }

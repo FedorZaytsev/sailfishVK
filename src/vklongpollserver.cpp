@@ -160,7 +160,7 @@ void VKLongPollServer::sendUpdateDataRequest(QList<QString> &userIds,
                                              QList<QString> &checkMessages,
                                              QList<QString> &removed) {
     auto updateData = new VKHandlerLongPollUpdateData(storage(), this);
-    QObject::connect(updateData, &VKHandlerLongPollUpdateData::ready, this, &VKLongPollServer::updateDataReady);
+    //QObject::connect(updateData, &VKHandlerLongPollUpdateData::ready, this, &VKLongPollServer::updateDataReady);
 
     updateData->setUserIds(userIds);
     updateData->setMsgIds(messageIds);
@@ -221,21 +221,21 @@ void VKLongPollServer::updateDataReady(VKAbstractHandler *handler) {
     for (auto e : messages) {
         auto dialog = e.toObject();
         auto dlg = VKContainerDialog::fromJson(storage(), dialog, users, unknownUsers);
-        qDebug()<<"new dialog"<<dlg->chatName()<<dlg->chatId()<<dlg->message()->msgId();
+        qDebug()<<"new dialog"<<dlg->chatName()<<dlg->id()<<dlg->message()->id();
         m_updateDialogs.append(dlg);
     }
 
     for (auto e : checkMsgs) {
         auto message = e.toObject();
         auto msg = VKContainerMessage::fromJson(storage(), message, checkUsers, unknownUsers);
-        qDebug()<<"new message"<<msg->msgId()<<msg->body().mid(0,10);
+        qDebug()<<"new message"<<msg->id()<<msg->body().mid(0,10);
         m_updateMessages.append(msg);
     }
 
     for (auto e : removedMsgs) {
         auto message = e.toObject();
         auto msg = VKContainerMessage::fromJson(storage(), message, removedUsers, unknownUsers);
-        qDebug()<<"new message"<<msg->msgId()<<msg->body().mid(0,10);
+        qDebug()<<"new message"<<msg->id()<<msg->body().mid(0,10);
         m_updateMessages.append(msg);
     }
 
@@ -256,8 +256,8 @@ void VKLongPollServer::updateDataReady(VKAbstractHandler *handler) {
 
         //Additional request for case when we don't have info about users in fwd messages
         qDebug()<<"We need additional users info about"<<lst.join(",");
-        auto handlerUsers = new VKHandlerUsers(storage(), this);
-        QObject::connect(handlerUsers, &VKHandlerUsers::ready, this, &VKLongPollServer::additionalInformationAboutUsersReady);
+        //auto handlerUsers = new VKHandlerUsers(storage(), this);
+        //QObject::connect(handlerUsers, &VKHandlerUsers::ready, this, &VKLongPollServer::additionalInformationAboutUsersReady);
     }
 
     handler->deleteLater();
@@ -302,13 +302,13 @@ void VKLongPollServer::updateReadyEvents() {
 
     qDebug()<<"m_updateDialogs.count()"<<m_updateDialogs.count();
     for (auto e: m_updateDialogs) {
-        qDebug()<<e->message()->msgId()<<e->message()->body().mid(0,15);
+        qDebug()<<e->message()->id()<<e->message()->body().mid(0,15);
     }
     qDebug()<<"----";
 
     qDebug()<<"m_updateMessages.count()"<<m_updateMessages.count();
     for (auto e: m_updateMessages) {
-        qDebug()<<e->msgId()<<e->user()->lastName();
+        qDebug()<<e->id()<<e->user()->lastName();
     }
     qDebug()<<"----";
 

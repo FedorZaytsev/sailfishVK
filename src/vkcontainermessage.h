@@ -27,7 +27,7 @@ public:
     static QSharedPointer<VKContainerMessage> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users, QVector<int> &userIds);
     virtual void complete(VKAbstractHandler* _h);
 
-    Q_INVOKABLE int msgId() const                                   { return m_msgId; }
+    Q_INVOKABLE int id() const                                      { return m_id; }
     Q_INVOKABLE QDateTime date() const                              { return m_date; }
     Q_INVOKABLE bool isIncoming() const                             { return m_isIncoming; }
     Q_INVOKABLE VKContainerUser* userPtr() const                    { return m_user.data(); }
@@ -48,12 +48,12 @@ public:
     QSharedPointer<VKContainerMessageAction> action() const      { return m_action; }
     QSharedPointer<VKContainerMessage> getFwd(int i) const;
 
-    void setMsgId(int arg) { m_msgId = arg; }
-    void setDate(QDateTime arg) { m_date = arg; }
-    void setIsIncoming(bool arg) { m_isIncoming = arg; }
-    void setBody(QString arg) { m_body = arg; }
-    void setIsChat(bool arg) { m_isChat = arg; }
-    void setChatId(int arg) { m_chatId = arg; }
+    void setId(int arg);
+    void setDate(QDateTime arg);
+    void setIsIncoming(bool arg);
+    void setBody(QString arg);
+    void setIsChat(bool arg);
+    void setChatId(int arg);
     void setUser(QSharedPointer<VKContainerUser> arg);
     void addFwdMsg(QSharedPointer<VKContainerMessage> arg);
     void setAttachments(QSharedPointer<VKContainerAttachments> attachments);
@@ -63,7 +63,7 @@ public:
     static void processEmoji(QString &s);
 
 private:
-    int                                         m_msgId;
+    int                                         m_id;
     QDateTime                                   m_date;
     bool                                        m_isIncoming;       //optimaze bool flags
     bool                                        m_readState;

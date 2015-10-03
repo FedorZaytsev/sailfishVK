@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.vk.VK 1.0
 import "../handlers.js" as Handlers
 
 BackgroundItem {
@@ -19,7 +20,7 @@ BackgroundItem {
         }
 
         var result = textHeight + avatarImage.height + 2*padding + messageData.height
-        if (index >= messagesList.model.count-1 || messagesList.model.get(index+1).offset === 0) {
+        if (index >= messagesList.model.count-1 || messagesList.model.get(index+1, VisualMessageModel.eRoleOffset) === 0) {
             result = result + padding
         }
         return result
@@ -32,7 +33,10 @@ BackgroundItem {
             var mmodel = Handlers.findMessagesModel()
 
             if (dmodel !== undefined && mpage !== undefined) {
-                dmodel.setProperty(mpage.dialogIndex, "unreadCount", dmodel.get(mpage.dialogIndex).unreadCount - 1)
+
+                //ERROR
+
+                //dmodel.setProperty(mpage.dialogIndex, "unreadCount", dmodel.get(mpage.dialogIndex).unreadCount - 1)
             }
         }
     }
@@ -70,7 +74,7 @@ BackgroundItem {
             width: maxWidth * labelSize - avatarImage.width
             visible: actionMessages === ""
             font.pixelSize: Theme.fontSizeSmall
-            color: read ? Theme.primaryColor : Theme.highlightColor//incoming? Theme.primaryColor : Theme.highlightColor
+            color: read ? Theme.primaryColor : Theme.highlightColor
             horizontalAlignment: incoming ? Text.AlignLeft : Text.AlignRight
             text: userName
         }
@@ -109,19 +113,19 @@ BackgroundItem {
         var idx = index+1
         var model = messagesList.model
 
-        model.setProperty(index, "highlight", pressed)
+        model.setProperty(index, VisualMessageModel.eRoleHighlight, pressed)
 
-        if (model.get(index).offset !== 0) {
+        if (model.get(index, VisualMessageModel.eRoleOffset) !== 0) {
             while (idx < model.count) {
-                model.setProperty(idx, "highlight", pressed)
-                if (model.get(idx).offset === 0) break
+                model.setProperty(idx, VisualMessageModel.eRoleHighlight, pressed)
+                if (model.get(idx, VisualMessageModel.eRoleOffset) === 0) break
                 idx++
             }
         }
 
         idx = index-1
-        while (idx >= 0 && model.get(idx).offset !== 0) {
-            model.setProperty(idx, "highlight", pressed)
+        while (idx >= 0 && model.get(idx, VisualMessageModel.eRoleOffset) !== 0) {
+            model.setProperty(idx, VisualMessageModel.eRoleHighlight, pressed)
             idx--
         }
 
@@ -137,7 +141,7 @@ BackgroundItem {
             width: 2
             color: Theme.secondaryHighlightColor
             height: {
-                if ((backgrd.idx > 0 && (messagesList.model.get(backgrd.idx - 1).offset < offset)) || backgrd.idx === 0) {
+                if ((backgrd.idx > 0 && (messagesList.model.get(backgrd.idx - 1, VisualMessageModel.eRoleOffset) < offset)) || backgrd.idx === 0) {
                     return backgrd.height - padding
                 }
                 return backgrd.height

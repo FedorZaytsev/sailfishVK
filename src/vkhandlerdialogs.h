@@ -9,8 +9,10 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include "vkabstracthandler.h"
+#include "vkhandlerusers.h"
 #include "vkcontainerdialog.h"
-#include "vkhandlermessages.h"
+#include "vkcontainermessage.h"
+#include "vkcontaineruser.h"
 
 class VK;
 
@@ -48,7 +50,7 @@ private:
     u_int32_t m_previewLength;
     u_int32_t m_unread;
     bool m_longPollRequested;
-    QList<QSharedPointer<VKAbstractContainer>> m_dialogs;
+    //QList<QSharedPointer<VKAbstractContainer>> m_dialogs;
 };
 
 #endif // VKHEADERDIALOGS_H

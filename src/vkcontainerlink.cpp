@@ -3,6 +3,19 @@
 VKContainerLink::VKContainerLink(QObject *parent) :
     VKAbstractContainer(parent)
 {
+    m_type = eVKContainerLink;
+}
+
+void VKContainerLink::setUrl(QString arg) {
+    SET_ARG(m_url, arg);
+}
+
+void VKContainerLink::setTitle(QString arg) {
+    SET_ARG(m_title, arg);
+}
+
+void VKContainerLink::setDescription(QString arg) {
+    SET_ARG(m_description, arg);
 }
 
 QSharedPointer<VKContainerLink> VKContainerLink::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {

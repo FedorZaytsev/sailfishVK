@@ -7,8 +7,9 @@ VKContainerDialog::VKContainerDialog(QObject *parent) :
     VKAbstractContainer(parent)
 {
     m_unreadCount = 0;
-    m_chatId = 0;
+    m_id = 0;
     m_isChat = false;
+    m_type = eVKContainerDialog;
 }
 
 VKContainerDialog::~VKContainerDialog()
@@ -35,22 +36,27 @@ QSharedPointer<VKContainerDialog> VKContainerDialog::fromJson(VKStorage *storage
 
     if (message.contains("chat_id")) {
         dialog->setIsChat(true);
-        dialog->setChatId(message.value("chat_id").toInt());
+        dialog->setId(message.value("chat_id").toInt());
     } else {
         dialog->setIsChat(false);
-        dialog->setChatId(message.value("user_id").toInt());
+        dialog->setId(message.value("user_id").toInt());
     }
 
     if (message.value("title").toString() != " ... ") {
         dialog->setChatName(message.value("title").toString());
     } else {
         int user_id = message.value("user_id").toInt();
+        bool b = false;
         for (auto e : users) {
             auto el = e.toObject();
             if (el.value("id").toInt() == user_id) {
                 dialog->setChatName(QString("%1 %2") .arg(el.value("first_name").toString()) .arg(el.value("last_name").toString()));
+                b = true;
                 break;
             }
+        }
+        if (!b) {
+            dialog->setChatName(message.value("title").toString());
         }
     }
 
@@ -77,16 +83,43 @@ void VKContainerDialog::complete(VKAbstractHandler *users) {
     m_chatIcon->complete(users);
 }
 
+QDateTime VKContainerDialog::date() const {
+    if (!m_message) {
+        return QDateTime();
+    }
+    return m_message->date();
+}
+
+void VKContainerDialog::setUnreadCount(int arg) {
+    Q_ASSERT(arg >= 0);
+
+    SET_ARG(m_unreadCount, arg);
+}
+
+void VKContainerDialog::setId(int arg) {
+    SET_ARG(m_id, arg);
+}
+
+void VKContainerDialog::setIsChat(bool arg) {
+    SET_ARG(m_isChat, arg);
+}
+
 void VKContainerDialog::setChatName(QString arg) {
-    m_chatName = arg;
+    SET_ARG(m_chatName, arg);
 }
 
 void VKContainerDialog::setChatIcon(QSharedPointer<VKContainerChatIcon> arg) {
-    m_chatIcon = arg;
+    SET_ARG_NOCHECK(m_chatIcon, arg);
+    QObject::connect(m_chatIcon.data(), &VKAbstractContainer::dataChanged, [this](VKAbstractContainer* ) {
+        emit this->dataChanged(this);
+    });
 }
 
 void VKContainerDialog::setMessage(QSharedPointer<VKContainerMessage> arg) {
-    m_message = arg;
+    SET_ARG_NOCHECK(m_message, arg);
+    QObject::connect(m_message.data(), &VKAbstractContainer::dataChanged, [this](VKAbstractContainer* ) {
+        emit this->dataChanged(this);
+    });
 }
 
 

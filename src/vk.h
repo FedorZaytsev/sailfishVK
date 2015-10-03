@@ -19,13 +19,14 @@
 #include "vkstorage.h"
 #include "vkabstracthandler.h"
 #include "vkhandlerdialogs.h"
+#include "vkhandlermessages.h"
 #include "vkhandlermarkasread.h"
+#include "vkhandlersendmessage.h"
 #include "vkhandlerlongpollserverkey.h"
 #include "pendingrequest.h"
 #include "vkabstractcontainer.h"
 #include "qmllist.h"
 #include "vklongpollserver.h"
-#include "vkhandlersendmessage.h"
 #include "debuglogbuffer.h"
 #include "vknetworkmanager.h"
 
@@ -76,11 +77,15 @@ public:
     Q_INVOKABLE void inform() {emit displayError("test infrom message",ERROR_HANDLER_INFORM);}
     Q_INVOKABLE void emitUpdatePages() {emit updatePages();}
 
+private:
+    VKStorage& storage() {return m_VKStorage;}
+    void setDefaultSlotsForHandler(VKAbstractHandler* handler);
 signals:
     void handlerReady(QString name, VKAbstractHandler* handler);
     void displayError(QString reason, ErrorHandlers type);
     void unreadCountChanged(int count);
     void updatePages();
+    void handlerPartlyReady(VKAbstractHandler* handler, QString name);
 public slots:
     void requestFinished(QNetworkReply*);
     void storageError(QString);
@@ -88,7 +93,6 @@ public slots:
     void sendHandlertoScript(VKAbstractHandler* handler);
     void processHandler(VKAbstractHandler* handler);
 private:
-    VKStorage& storage() {return m_VKStorage;}
     VKStorage m_VKStorage;
     VKNetworkManager m_manager;
     VKLongPollServer* m_longPoll;

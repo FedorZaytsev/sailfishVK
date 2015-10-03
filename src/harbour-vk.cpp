@@ -13,6 +13,7 @@
 #include <execinfo.h>
 #include <signal.h>
 #include <dlfcn.h>
+#include <unistd.h>
 #include "vktextwrap.h"
 #include "vkpixmapprovider.h"
 #include "vkabstractcontainer.h"
@@ -39,6 +40,8 @@
 #include "vklpuseroffline.h"
 #include "vklpuseronline.h"
 #include "vkusertypinghelper.h"
+#include "vkvisualdialogmodel.h"
+#include "vkvisualmessagemodel.h"
 
 #define LOG_FILES_COUNT 20
 
@@ -185,7 +188,7 @@ int main(int argc, char *argv[]) {
     qmlRegisterType<VKHandlerDialogs>();
     qmlRegisterType<VKStorage>();
     qmlRegisterType<QmlList>();
-    qmlRegisterType<VKContainerAttachments>("harbour.vk.VK", 1, 0, "VKContainerAttachments");
+    qmlRegisterType<VKContainerAttachments>();
     qmlRegisterType<VKContainerPhoto>();
     qmlRegisterType<VKLPAbstract>();
     qmlRegisterType<VKLPMessageDelete>();
@@ -200,6 +203,8 @@ int main(int argc, char *argv[]) {
     qmlRegisterType<VKUserTypingHelper>("harbour.vk.VK", 1, 0, "UserTypingHelper");
     qmlRegisterUncreatableType<VKLPFlags>("harbour.vk.VK", 1, 0, "VKLPFlags","Cannot create VKLPFlags class");
     qmlRegisterUncreatableType<VKLPEventType>("harbour.vk.VK", 1, 0, "VKLPEventType","Cannot create VKLPEventType class");
+    qmlRegisterType<VKVisualDialogModel>("harbour.vk.VK", 1, 0, "VisualDialogModel");
+    qmlRegisterType<VKVisualMessageModel>("harbour.vk.VK", 1, 0, "VisualMessageModel");
 
     QQmlEngine* engine = view->engine();
     QObject::connect(engine, &QQmlEngine::quit, app.data(), &QGuiApplication::quit);

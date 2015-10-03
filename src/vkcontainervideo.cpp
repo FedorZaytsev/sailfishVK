@@ -3,6 +3,75 @@
 VKContainerVideo::VKContainerVideo(QObject *parent) :
     VKAbstractContainer(parent)
 {
+    m_type = eVKContainerVideo;
+}
+
+void VKContainerVideo::setId(int arg) {
+    SET_ARG(m_id, arg);
+}
+
+void VKContainerVideo::setOwnerId(int arg) {
+    SET_ARG(m_ownerId, arg);
+}
+
+void VKContainerVideo::setTitle(QString arg) {
+    SET_ARG(m_title, arg);
+}
+
+void VKContainerVideo::setDescription(QString arg) {
+    SET_ARG(m_description, arg);
+}
+
+void VKContainerVideo::setDuration(int arg) {
+    SET_ARG(m_duration, arg);
+}
+
+void VKContainerVideo::setLink(QString arg) {
+    SET_ARG(m_link, arg);
+}
+
+void VKContainerVideo::setPhoto130(QString arg) {
+    SET_ARG(m_photo130, arg);
+}
+
+void VKContainerVideo::setPhoto320(QString arg) {
+    SET_ARG(m_photo320, arg);
+}
+
+void VKContainerVideo::setPhoto640(QString arg) {
+    SET_ARG(m_photo640, arg);
+}
+
+void VKContainerVideo::setDate(QDateTime arg) {
+    SET_ARG(m_date, arg);
+}
+
+void VKContainerVideo::setAddingDate(QDateTime arg) {
+    SET_ARG(m_addingDate, arg);
+}
+
+void VKContainerVideo::setViews(int arg) {
+    SET_ARG(m_views, arg);
+}
+
+void VKContainerVideo::setComments(int arg) {
+    SET_ARG(m_comments, arg);
+}
+
+void VKContainerVideo::setPlayerUrl(QString arg) {
+    SET_ARG(m_playerUrl, arg);
+}
+
+void VKContainerVideo::setIsProcessing(bool arg) {
+    SET_ARG(m_isProcessing, arg);
+}
+
+void VKContainerVideo::setAccessToken(QString arg) {
+    SET_ARG(m_accessToken, arg);
+}
+
+void VKContainerVideo::setCanEdit(bool arg) {
+    SET_ARG(m_canEdit, arg);
 }
 
 QSharedPointer<VKContainerVideo> VKContainerVideo::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {

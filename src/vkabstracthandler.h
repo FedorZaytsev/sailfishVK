@@ -5,6 +5,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QUrlQuery>
 #include "vkstorage.h"
 #include "vkabstractcontainer.h"
@@ -26,7 +27,8 @@ public:
 protected:
     const QNetworkRequest generateRequest(QString method, QList<QPair<QString,QString>>& args);
 signals:
-    void ready(VKAbstractHandler*);
+    void partlyReady(VKAbstractHandler* handler);
+    void allDataReady(VKAbstractHandler* handler);
     void sendRequest(VKAbstractHandler* handler);
 public slots:
     virtual void additionDataReady(VKAbstractHandler* h);

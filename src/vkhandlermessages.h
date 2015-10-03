@@ -26,12 +26,12 @@ public:
     void setReverse(bool rev);
 
     Q_INVOKABLE int count();
-    Q_INVOKABLE VKContainerMessage* getPtr(int i);
+//    Q_INVOKABLE VKContainerMessage* getPtr(int i);
     Q_INVOKABLE int offset() { return m_offset; }
     Q_INVOKABLE int unreadCount() { return m_unreadCount; }
 
 
-    QSharedPointer<VKContainerMessage> get(int i);
+//    QSharedPointer<VKContainerMessage> get(int i);
 signals:
 
 public slots:
@@ -39,13 +39,12 @@ public slots:
 private:
     int m_offset;
     int m_count;
+    int m_recievedCount;
     int m_id;
     int m_unreadCount;
     bool m_isChat;
     int m_startMsgId;
     bool m_reverse;
-
-    QVector<QSharedPointer<VKContainerMessage>> m_messages;
 };
 
 #endif // VKHANDLERMESSAGES_H

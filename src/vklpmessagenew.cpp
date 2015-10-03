@@ -46,7 +46,7 @@ void VKLPMessageNew::complete(QVector<QSharedPointer<VKContainerDialog>> dialogs
 
     qDebug()<<"requesting"<<id();
     for (auto e : dialogs) {
-        if (e->message()->msgId() == id()) {
+        if (e->message()->id() == id()) {
             qDebug()<<"found requested";
             m_dialog = e;
             m_valid = true;

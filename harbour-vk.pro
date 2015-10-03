@@ -81,7 +81,13 @@ SOURCES += src/harbour-vk.cpp \
     src/vkcontainermessageemoji.cpp \
     src/vkemojiparser.cpp \
     src/vktextwrap.cpp \
-    src/vkfilestorage.cpp
+    src/vkfilestorage.cpp \
+    src/vkvisibledialog.cpp \
+    src/vkvisibleobject.cpp \
+    src/vkvisualdialogmodel.cpp \
+    src/vkstoragecomparator.cpp \
+    src/vkvisualmessagemodel.cpp \
+    src/vkvisibleparseattachments.cpp
 
 OTHER_FILES += qml/harbour-vk.qml \
     qml/cover/CoverPage.qml \
@@ -650,7 +656,8 @@ OTHER_FILES += qml/harbour-vk.qml \
     qml/emoji/D83CDDE7D83CDDFE.png \
     qml/pages/TextEx.qml \
     qml/fonts/OpenSansEmoji.ttf \
-    qml/cover/ConversationComponent.qml
+    qml/cover/ConversationComponent.qml \
+    qml/main.js
 
 # to disable building translations every time, comment out the
 # following CONFIG line
@@ -720,7 +727,13 @@ HEADERS += \
     src/vkemojiparser.h \
     src/vkemojiparserdata.h \
     src/vktextwrap.h \
-    src/vkfilestorage.h
+    src/vkfilestorage.h \
+    src/vkvisibledialog.h \
+    src/vkvisibleobject.h \
+    src/vkstoragecomparator.h \
+    src/vkvisualdialogmodel.h \
+    src/vkvisualmessagemodel.h \
+    src/vkvisibleparseattachments.h
 
 RESOURCES +=
 

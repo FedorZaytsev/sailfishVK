@@ -22,14 +22,14 @@ public:
     Q_INVOKABLE QString photo130() { return m_photo130; }
 
 
-    void setId(int arg) { m_id = arg; }
-    void setOwnerId(int arg) { m_ownerId = arg; }
-    void setTitle(QString arg) { m_title = arg; }
-    void setSize(int arg) { m_size = arg; }
-    void setExt(QString arg) { m_ext = arg; }
-    void setUrl(QString arg) { m_url = arg; }
-    void setPhoto100(QString arg) { m_photo100 = arg; }
-    void setPhoto130(QString arg) { m_photo130 = arg; }
+    void setId(int arg);
+    void setOwnerId(int arg);
+    void setTitle(QString arg);
+    void setSize(int arg);
+    void setExt(QString arg);
+    void setUrl(QString arg);
+    void setPhoto100(QString arg);
+    void setPhoto130(QString arg);
 
 signals:
 

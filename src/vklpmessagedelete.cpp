@@ -23,7 +23,7 @@ void VKLPMessageDelete::complete(QVector<QSharedPointer<VKContainerDialog>> dial
     Q_UNUSED(users);
     qDebug()<<"requesting"<<id();
     for (auto e : messages) {
-        if (e->msgId() == id()) {
+        if (e->id() == id()) {
             m_message = e;
             m_valid = true;
             break;

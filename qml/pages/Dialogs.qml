@@ -1,11 +1,13 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.vk.VK 1.0
 
 Page {
     id: dialogsPage
-    property alias dialogListAlias : dialogsList
-    property alias dialogsListModelAlias : dialogsListModel
+    objectName: "dialogsPage"
+    property alias listAlias : dialogsList
     property int offset
+    property int downloadCount: 20
     property bool ready: false
 
     function updatePage() {
@@ -15,7 +17,7 @@ Page {
         vk.getDialogs(0)
         console.log("dialogs page updated")
     }
-
+    
     SilicaListView {
         id: dialogsList
         anchors.fill: parent
@@ -41,12 +43,17 @@ Page {
                     vk.emitUpdatePages()
                 }
             }
+            MenuItem {
+                text: "test"
+                onClicked: {
+                    console.log("call test")
+                    dialogsList.model.test()
+                }
+            }
         }
 
 
-        model: ListModel {
-            id: dialogsListModel
-        }
+        model: VisualDialogModel{}
         spacing: Theme.paddingLarge
         header: PageHeader {
             id: pageHeader
@@ -60,7 +67,7 @@ Page {
         onMovementEnded: {
             if (visibleArea.yPosition + visibleArea.heightRatio > 0.99) {
                 console.log("getDialogs scroll");
-                vk.getDialogs(offset + 20)
+                vk.getDialogs(offset + downloadCount)
             }
         }
 
@@ -70,6 +77,10 @@ Page {
         }
         BusyIndicator {
             anchors.centerIn: dialogsList
+
+            //We cannot change 'ready' property to comparing model.count with 0 because
+            //They may be new in VK and without any dialogs
+            //But I haven't tested this case, may be there will be another errors
             running: !ready
             size: BusyIndicatorSize.Large
         }

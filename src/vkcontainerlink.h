@@ -15,9 +15,9 @@ public:
     Q_INVOKABLE QString title() { return m_title; }
     Q_INVOKABLE QString description() { return m_description; }
 
-    void setUrl(QString arg) { m_url = arg; }
-    void setTitle(QString arg) { m_title = arg; }
-    void setDescription(QString arg) { m_description = arg; }
+    void setUrl(QString arg);
+    void setTitle(QString arg);
+    void setDescription(QString arg);
 
 signals:
 

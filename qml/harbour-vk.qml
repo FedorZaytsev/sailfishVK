@@ -34,6 +34,7 @@ import harbour.vk.VK 1.0
 import "cover"
 import "pages"
 import "handlers.js" as Handlers
+import "main.js" as Main
 
 ApplicationWindow
 {
@@ -80,6 +81,10 @@ ApplicationWindow
                     page.updatePage()
                 }
             })
+        }
+        onHandlerPartlyReady: {
+            console.log(name);
+            Main.requestData(handler, name)
         }
     }
 

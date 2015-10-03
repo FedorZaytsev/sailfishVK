@@ -52,10 +52,12 @@ void VKHandlerDialogs::processReply(QJsonValue *reply) {
         Q_ASSERT(el.value("item").isObject());
         Q_ASSERT(el.value("users").isArray());
         auto dialog = VKContainerDialog::fromJson(storage(), el.value("item").toObject(), el.value("users").toArray(), unknownUsers);
-        m_dialogs.push_back(dialog);
+        storage()->addDialog(dialog);
     }
 
     setUnread(reply->toObject().value("unreadCount").toInt());
+
+    emit partlyReady(this);
 
     //Additional request for case when we don't have info about users in fwd messages
     if (unknownUsers.length()) {
@@ -64,7 +66,7 @@ void VKHandlerDialogs::processReply(QJsonValue *reply) {
         usersHandler->setUsers(unknownUsers);
         requestAdditionInfo(usersHandler);
     } else {
-        emit ready(this);
+        emit allDataReady(this);
     }
 }
 
@@ -94,27 +96,34 @@ void VKHandlerDialogs::setLongPoll(bool b) {
 }
 
 VKAbstractContainer* VKHandlerDialogs::atPtr(int idx) {
-    return m_dialogs[idx].data();
+    Q_UNUSED(idx);
+    Q_ASSERT(0);
+    //return m_dialogs[idx].data();
+    return NULL;
 }
 
 int VKHandlerDialogs::count() {
-    return m_dialogs.count();
+    //return m_dialogs.count();
+    return 0;
 }
 
 QSharedPointer<VKAbstractContainer> VKHandlerDialogs::at(int idx) {
-    return m_dialogs[idx];
+    Q_UNUSED(idx);
+    //return m_dialogs[idx];
+    return QSharedPointer<VKAbstractContainer>();
 }
 
 void VKHandlerDialogs::additionDataReady(VKAbstractHandler *h) {
     auto handler = dynamic_cast<VKHandlerUsers*>(h);
     Q_ASSERT(handler != nullptr);
+    Q_ASSERT(0);
 
     qDebug()<<"additional info ready, updating";
-    for (auto e: m_dialogs) {
-        e->complete(handler);
-    }
+    //for (auto e: m_dialogs) {
+    //    e->complete(handler);
+    //}
 
-    emit ready(this);
+    //emit ready(this);
 }
 
 

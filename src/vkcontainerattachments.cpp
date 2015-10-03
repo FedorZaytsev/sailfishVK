@@ -11,6 +11,7 @@
 VKContainerAttachments::VKContainerAttachments(QObject *parent) :
     VKAbstractContainer(parent)
 {
+    m_type = eVKContainerAttachment;
 }
 
 QSharedPointer<VKContainerAttachments> VKContainerAttachments::fromJson(VKStorage *storage, QJsonArray obj, QJsonArray users) {

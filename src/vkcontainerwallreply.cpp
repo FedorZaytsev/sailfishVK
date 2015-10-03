@@ -3,6 +3,7 @@
 VKContainerWallReply::VKContainerWallReply(QObject *parent) :
     VKAbstractContainer(parent)
 {
+    m_type = eVKContainerWallReply;
 }
 
 QSharedPointer<VKContainerWallReply> VKContainerWallReply::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {

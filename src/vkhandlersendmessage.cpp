@@ -40,7 +40,7 @@ void VKHandlerSendMessage::processReply(QJsonValue *reply) {
     m_messageId = reply->toObject().value("id").toInt();
     m_guid = reply->toObject().value("guid").toInt();
 
-    emit ready(this);
+    //emit ready(this);
 }
 
 QString VKHandlerSendMessage::name() {

@@ -3,7 +3,6 @@
 
 #include "vklpabstract.h"
 #include "vklpeventtype.h"
-#include "vkcontainermessage.h"
 
 class VKLPMessageDelete : public VKLPAbstract
 {

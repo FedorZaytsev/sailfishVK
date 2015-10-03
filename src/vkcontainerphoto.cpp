@@ -3,6 +3,7 @@
 VKContainerPhoto::VKContainerPhoto(QObject *parent) :
     VKAbstractContainer(parent)
 {
+    m_type = eVKContainerPhoto;
 }
 
 QSharedPointer<VKContainerPhoto> VKContainerPhoto::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
@@ -51,6 +52,62 @@ QSize VKContainerPhoto::maxSuitableSize() {
     }
     Q_ASSERT(0);
     return QSize();
+}
+
+void VKContainerPhoto::setId(int id) {
+    SET_ARG(m_id, id);
+}
+
+void VKContainerPhoto::setAlbumId(int id) {
+    SET_ARG(m_albumId, id);
+}
+
+void VKContainerPhoto::setOwnerId(int id) {
+    SET_ARG(m_ownerId, id);
+}
+
+void VKContainerPhoto::setUserId(int id) {
+    SET_ARG(m_userId, id);
+}
+
+void VKContainerPhoto::setPhoto75(QString photo) {
+    SET_ARG(m_photo75, photo);
+}
+
+void VKContainerPhoto::setPhoto130(QString photo) {
+    SET_ARG(m_photo130, photo);
+}
+
+void VKContainerPhoto::setPhoto604(QString photo) {
+    SET_ARG(m_photo604, photo);
+}
+
+void VKContainerPhoto::setPhoto807(QString photo) {
+    SET_ARG(m_photo807, photo);
+}
+
+void VKContainerPhoto::setPhoto1280(QString photo) {
+    SET_ARG(m_photo1280, photo);
+}
+
+void VKContainerPhoto::setPhoto2560(QString photo) {
+    SET_ARG(m_photo2560, photo);
+}
+
+void VKContainerPhoto::setWidth(int width) {
+    SET_ARG(m_width, width);
+}
+
+void VKContainerPhoto::setHeight(int height) {
+    SET_ARG(m_height, height);
+}
+
+void VKContainerPhoto::setDate(QDateTime date) {
+    SET_ARG(m_date, date);
+}
+
+void VKContainerPhoto::setText(QString text) {
+    SET_ARG(m_text, text);
 }
 
 QSize VKContainerPhoto::calculatePhotoSize(QSize size) {
