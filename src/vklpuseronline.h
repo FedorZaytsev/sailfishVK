@@ -7,7 +7,7 @@ class VKLPUserOnline : public VKLPAbstract
 {
     Q_OBJECT
 public:
-    explicit VKLPUserOnline(QObject *parent = 0);
+    explicit VKLPUserOnline(VKStorage *storage, QObject *parent = 0);
     void fromLP(const QJsonArray &data);
 
     enum Enum {

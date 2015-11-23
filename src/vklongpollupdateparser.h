@@ -18,16 +18,16 @@ public:
     int parseIds(const QString& data, int position, VKLongPollContainer& fwd);
     int parseFwd(const QString& data, int position, VKLongPollContainer& fwd, int isStart);
     void debugPrint(VKLongPollContainer& c, QString separator);
-    QList<QString> uniqueUsers() {return m_uniqueUsers;}
-    QList<QString> topMessages() {return m_topMessages;}
+    QVector<int> uniqueUsers() {return m_uniqueUsers;}
+    QVector<int> topMessages() {return m_topMessages;}
     VKLongPollContainer& container() {return m_container;}
 signals:
 
 public slots:
 private:
     VKLongPollContainer m_container;
-    QList<QString> m_uniqueUsers;
-    QList<QString> m_topMessages;
+    QVector<int> m_uniqueUsers;
+    QVector<int> m_topMessages;
 };
 
 #endif // VKLONGPOLLUPDATEPARSER_H

@@ -2,14 +2,13 @@
 #define VKCONTAINERAUDIO_H
 
 #include "vkabstractcontainer.h"
-#include "vkstorage.h"
 
 class VKContainerAudio;
 class VKContainerAudio : public VKAbstractContainer
 {
     Q_OBJECT
 public:
-    explicit VKContainerAudio(QObject *parent = 0);
+    explicit VKContainerAudio(VKStorage *storage, QObject *parent = 0);
     static QSharedPointer<VKContainerAudio> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users);
 
     Q_INVOKABLE int         id()            { return m_id; }

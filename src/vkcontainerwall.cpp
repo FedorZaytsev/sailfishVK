@@ -1,18 +1,20 @@
 #include "vkcontainerwall.h"
 
-VKContainerWall::VKContainerWall(QObject *parent) :
-    VKAbstractContainer(parent)
+VKContainerWall::VKContainerWall(VKStorage *storage, QObject *parent) :
+    VKAbstractContainer(storage, parent)
 {
     m_type = eVKContainerWall;
 }
 
-QSharedPointer<VKContainerWall> VKContainerWall::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
+QSharedPointer<VKContainerWall> VKContainerWall::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users) {
     Q_UNUSED(storage);
     Q_UNUSED(obj);
     Q_UNUSED(users);
-    Q_UNUSED(userIds);
 
-    auto wall = new VKContainerWall;
+    auto wall = QSharedPointer<VKContainerWall>(new VKContainerWall(storage));
+    wall->beginObjectChange();
 
-    return QSharedPointer<VKContainerWall>(wall);
+    wall->setValid();
+    wall->endObjectChange();
+    return wall;
 }

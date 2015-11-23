@@ -1,10 +1,11 @@
 #include "vklpabstract.h"
 
-VKLPAbstract::VKLPAbstract(QObject *parent) :
-    QObject(parent)
+VKLPAbstract::VKLPAbstract(VKStorage *storage, QObject *parent) :
+    IVKCompletable(parent)
 {
     m_valid = false;
     m_type = VKLPEventType::INVALID;
+    m_storage = storage;
 }
 
 void VKLPAbstract::complete(QVector<QSharedPointer<VKContainerDialog>> dialogs,

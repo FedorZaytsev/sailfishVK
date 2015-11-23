@@ -6,7 +6,6 @@
 #include <QSharedPointer>
 #include "vkabstractcontainer.h"
 
-class VKStorage;
 class VKContainerAttachments : public VKAbstractContainer
 {
     Q_OBJECT
@@ -25,7 +24,7 @@ public:
     };
     Q_ENUMS(AttachmentsType)
 
-    explicit VKContainerAttachments(QObject *parent = 0);
+    explicit VKContainerAttachments(VKStorage *storage, QObject *parent = 0);
     static QSharedPointer<VKContainerAttachments> fromJson(VKStorage *storage, QJsonArray obj, const QJsonArray users = QJsonArray());
 
     Q_INVOKABLE int count(AttachmentsType type);

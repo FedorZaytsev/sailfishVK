@@ -1,16 +1,17 @@
 #include "vkcontainerdocument.h"
 
-VKContainerDocument::VKContainerDocument(QObject *parent) :
-    VKAbstractContainer(parent)
+VKContainerDocument::VKContainerDocument(VKStorage *storage, QObject *parent) :
+    VKAbstractContainer(storage, parent)
 {
     m_type = eVKContainerDocument;
 }
 
-QSharedPointer<VKContainerDocument> VKContainerDocument::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
+QSharedPointer<VKContainerDocument> VKContainerDocument::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users) {
     Q_UNUSED(storage);
     Q_UNUSED(users);
-    Q_UNUSED(userIds);
-    auto doc = new VKContainerDocument;
+
+    auto doc = QSharedPointer<VKContainerDocument>(new VKContainerDocument(storage));
+    doc->beginObjectChange();
 
     doc->setExt(obj.value("ext").toString());
     doc->setId(obj.value("id").toInt());
@@ -21,7 +22,9 @@ QSharedPointer<VKContainerDocument> VKContainerDocument::fromJson(VKStorage *sto
     doc->setTitle(obj.value("title").toString());
     doc->setUrl(obj.value("url").toString());
 
-    return QSharedPointer<VKContainerDocument>(doc);
+    doc->setValid();
+    doc->endObjectChange();
+    return doc;
 }
 
 

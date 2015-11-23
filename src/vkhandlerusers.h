@@ -2,9 +2,11 @@
 #define VKHANDLERUSERS_H
 
 #include <QObject>
+#include <QSet>
 #include "vkabstracthandler.h"
 #include "vkcontaineruser.h"
 
+class VKHandlerUsers;
 class VKHandlerUsers : public VKAbstractHandler
 {
     Q_OBJECT
@@ -15,18 +17,18 @@ public:
     virtual QString name();
     void setUsers(QVector<int> ids);
     void setFields(QString fields);
+    QVector<int> users();
+    QString fields();
 
-    Q_INVOKABLE int count();
-    Q_INVOKABLE VKContainerUser* getPtr(int i);
-
-    QSharedPointer<VKContainerUser> get(int i);
+    void merge(VKAbstractHandler *handler);
+private:
+    QString mergeFields(QString f1, QString f2);
 signals:
 
 public slots:
 private:
     QVector<int> m_userIds;
     QString m_fields;
-    QVector<QSharedPointer<VKContainerUser>> m_users;
 };
 
 #endif // VKHANDLERUSERS_H

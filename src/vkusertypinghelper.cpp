@@ -15,7 +15,6 @@ void VKUserTypingHelper::addUser(QString user) {
         m_timer.start();
     }
     m_users[user] = QDateTime::currentDateTime().addSecs(TYPING_SECS_COUNT);
-    //m_users.push_back({user, QDateTime::currentDateTime().addSecs(TYPING_SECS_COUNT)});
     qDebug()<<"ready";
 }
 

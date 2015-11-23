@@ -77,15 +77,17 @@ public:
     Q_INVOKABLE void inform() {emit displayError("test infrom message",ERROR_HANDLER_INFORM);}
     Q_INVOKABLE void emitUpdatePages() {emit updatePages();}
 
+                bool isNetworkBusy();
+
 private:
-    VKStorage& storage() {return m_VKStorage;}
-    void setDefaultSlotsForHandler(VKAbstractHandler* handler);
+                VKStorage& storage() {return m_VKStorage;}
+                void setDefaultSlotsForHandler(VKAbstractHandler* handler);
 signals:
     void handlerReady(QString name, VKAbstractHandler* handler);
     void displayError(QString reason, ErrorHandlers type);
     void unreadCountChanged(int count);
     void updatePages();
-    void handlerPartlyReady(VKAbstractHandler* handler, QString name);
+    void ready(VKAbstractHandler* handler, QString name);
 public slots:
     void requestFinished(QNetworkReply*);
     void storageError(QString);

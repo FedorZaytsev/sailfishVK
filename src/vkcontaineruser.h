@@ -12,10 +12,12 @@ class VKContainerUser : public VKAbstractContainer
 {
     Q_OBJECT
 public:
-    explicit VKContainerUser(QObject *parent = 0);
+    explicit VKContainerUser(VKStorage *storage, QObject *parent = 0);
     ~VKContainerUser();
+    virtual void completed();
 
     static QSharedPointer<VKContainerUser> fromJson(VKStorage *storage, const QJsonObject &obj);
+    void updateFrom(QSharedPointer<VKContainerUser> user);
 
     Q_INVOKABLE int id() const              { return m_id; }
     Q_INVOKABLE QString firstName() const   { return m_firstName; }
@@ -24,7 +26,6 @@ public:
     Q_INVOKABLE QString iconMedium() const  { return m_iconMedium; }
     Q_INVOKABLE QString iconLarge() const   { return m_iconLarge; }
     Q_INVOKABLE bool isOnline() const       { return m_online; }
-    Q_INVOKABLE bool isValid() const        { return m_valid; }
     Q_INVOKABLE QString userName() const;
 
     void setId(int arg);
@@ -34,7 +35,6 @@ public:
     void setIconMedium(QString arg);
     void setIconLarge(QString arg);
     void setIsOnline(bool arg);
-    void valid(bool b)                      { m_valid = b; }
 private:
     int m_id;
     QString m_firstName;
@@ -43,7 +43,6 @@ private:
     QString m_iconMedium;
     QString m_iconLarge;
     bool m_online;
-    bool m_valid;
 };
 
 

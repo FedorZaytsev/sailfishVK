@@ -15,9 +15,11 @@ Item {
         return 0
     }
 
-    function calculateSize(sourceSize, param, test) {
+    function calculateSize(sourceSize, param, type) {
         if (Math.max(sourceSize.width, sourceSize.height) > maxSize) {
             var factor = maxSize / Math.max(sourceSize.width,sourceSize.height)
+            console.log(sourceSize.width,sourceSize.height)
+            console.log("calculateSize", param * factor, type)
             return param * factor
         }
         return param
@@ -28,8 +30,8 @@ Item {
         x: incoming ? offset : maxWidth - width - offset
         fillMode: Image.PreserveAspectFit
         source: (images && images.length > 0) ? images[0].image : ""
-        width: (images && images.length>0) ? calculateSize(images[0].imageSize, images[0].imageSize.width,"calc width") : 0
-        height: (images && images.length>0) ? calculateSize(images[0].imageSize, images[0].imageSize.height,"calc height") : 0
+        width: (images && images.length>0) ? calculateSize(images[0].imageSize, images[0].imageSize.width, "width") : 0
+        height: (images && images.length>0) ? calculateSize(images[0].imageSize, images[0].imageSize.height, "height") : 0
         MouseArea {
             anchors.fill: parent
             onClicked: {

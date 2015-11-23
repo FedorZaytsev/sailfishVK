@@ -1,7 +1,7 @@
 #include "vklpuseronline.h"
 
-VKLPUserOnline::VKLPUserOnline(QObject *parent) :
-    VKLPAbstract(parent)
+VKLPUserOnline::VKLPUserOnline(VKStorage *storage, QObject *parent) :
+    VKLPAbstract(storage, parent)
 {
     m_type = VKLPEventType::USER_ONLINE;
     m_device = 0;
@@ -16,6 +16,11 @@ void VKLPUserOnline::fromLP(const QJsonArray &data) {
     }
     m_device = type;
 
+    if (storage()->isContainsUser(m_userId)) {
+        storage()->getUserById(m_userId)->setIsOnline(true);
+    }
+
+    deleteLater();
     m_valid = true;
 }
 

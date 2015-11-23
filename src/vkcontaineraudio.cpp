@@ -1,7 +1,7 @@
 #include "vkcontaineraudio.h"
 
-VKContainerAudio::VKContainerAudio(QObject *parent) :
-    VKAbstractContainer(parent)
+VKContainerAudio::VKContainerAudio(VKStorage *storage, QObject *parent) :
+    VKAbstractContainer(storage, parent)
 {
     m_type = eVKContainerAudio;
 }
@@ -9,7 +9,8 @@ VKContainerAudio::VKContainerAudio(QObject *parent) :
 QSharedPointer<VKContainerAudio> VKContainerAudio::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users) {
     Q_UNUSED(storage);
     Q_UNUSED(users);
-    auto audio = new VKContainerAudio;
+    auto audio = new VKContainerAudio(storage);
+    audio->beginObjectChange();
 
     audio->setAlbum(obj.value("album").toInt());
     audio->setArtist(obj.value("artist").toString());
@@ -21,6 +22,8 @@ QSharedPointer<VKContainerAudio> VKContainerAudio::fromJson(VKStorage *storage, 
     audio->setTitle(obj.value("title").toString());
     audio->setUrl(obj.value("url").toString());
 
+    audio->setValid();
+    audio->endObjectChange();
     return QSharedPointer<VKContainerAudio>(audio);
 }
 

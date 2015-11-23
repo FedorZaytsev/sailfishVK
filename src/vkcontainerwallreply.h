@@ -8,8 +8,8 @@ class VKContainerWallReply : public VKAbstractContainer
 {
     Q_OBJECT
 public:
-    explicit VKContainerWallReply(QObject *parent = 0);
-    static QSharedPointer<VKContainerWallReply> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users, QVector<int> userIds = QVector<int>());
+    explicit VKContainerWallReply(VKStorage *storage, QObject *parent = 0);
+    static QSharedPointer<VKContainerWallReply> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users);
 
 signals:
 

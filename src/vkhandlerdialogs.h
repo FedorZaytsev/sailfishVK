@@ -15,7 +15,7 @@
 #include "vkcontaineruser.h"
 
 class VK;
-
+class VKHandlerDialogs;
 class VKHandlerDialogs : public VKAbstractHandler
 {
     Q_OBJECT
@@ -32,17 +32,11 @@ public:
     void setUnread(int unread);
     void setLongPoll(bool b);
 
-    Q_INVOKABLE VKAbstractContainer* atPtr(int idx);
-    Q_INVOKABLE int count();
-
-    Q_INVOKABLE int offset() { return m_offset; }
-
-    QSharedPointer<VKAbstractContainer> at(int idx);
+    int offset() { return m_offset; }
 
 signals:
     void unreadCountChanged(int count);
 public slots:
-    virtual void additionDataReady(VKAbstractHandler* h);
 
 private:
     u_int32_t m_offset;
@@ -50,7 +44,7 @@ private:
     u_int32_t m_previewLength;
     u_int32_t m_unread;
     bool m_longPollRequested;
-    //QList<QSharedPointer<VKAbstractContainer>> m_dialogs;
+    QVector<QSharedPointer<VKContainerDialog>> m_dialogs;
 };
 
 #endif // VKHEADERDIALOGS_H

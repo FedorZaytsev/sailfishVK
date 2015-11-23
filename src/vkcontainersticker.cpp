@@ -1,19 +1,20 @@
 #include "vkcontainersticker.h"
 
-VKContainerSticker::VKContainerSticker(QObject *parent) :
-    VKAbstractContainer(parent)
+VKContainerSticker::VKContainerSticker(VKStorage *storage, QObject *parent) :
+    VKAbstractContainer(storage, parent)
 {
     m_type = eVKContainerSticker;
 }
 
-QSharedPointer<VKContainerSticker> VKContainerSticker::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
+QSharedPointer<VKContainerSticker> VKContainerSticker::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users) {
     Q_UNUSED(storage);
     Q_UNUSED(obj);
     Q_UNUSED(users);
-    Q_UNUSED(userIds);
 
-    auto sticker = new VKContainerSticker;
+    auto sticker = new VKContainerSticker(storage);
+    sticker->beginObjectChange();
 
-
+    sticker->setValid();
+    sticker->endObjectChange();
     return QSharedPointer<VKContainerSticker>(sticker);
 }

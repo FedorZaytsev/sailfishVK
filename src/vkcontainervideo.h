@@ -12,8 +12,8 @@ class VKContainerVideo : public VKAbstractContainer
 {
     Q_OBJECT
 public:
-    explicit VKContainerVideo(QObject *parent = 0);
-    static QSharedPointer<VKContainerVideo> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users, QVector<int> userIds = QVector<int>());
+    explicit VKContainerVideo(VKStorage *storage, QObject *parent = 0);
+    static QSharedPointer<VKContainerVideo> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users);
 
     Q_INVOKABLE int id()                { return m_id; }
     Q_INVOKABLE int ownerId()           { return m_ownerId; }

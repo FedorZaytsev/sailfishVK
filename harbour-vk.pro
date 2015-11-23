@@ -78,16 +78,20 @@ SOURCES += src/harbour-vk.cpp \
     src/vklpunreadcount.cpp \
     src/vknetworkmanager.cpp \
     src/vkhandlerlongpollserverkey.cpp \
-    src/vkcontainermessageemoji.cpp \
     src/vkemojiparser.cpp \
     src/vktextwrap.cpp \
     src/vkfilestorage.cpp \
-    src/vkvisibledialog.cpp \
-    src/vkvisibleobject.cpp \
     src/vkvisualdialogmodel.cpp \
     src/vkstoragecomparator.cpp \
     src/vkvisualmessagemodel.cpp \
-    src/vkvisibleparseattachments.cpp
+    src/vkvisibleparseattachments.cpp \
+    src/vkadditionaldatapair.cpp \
+    src/ivkcompletable.cpp \
+    src/vkadditionalhelper.cpp \
+    src/vkhandlerfirstmessage.cpp \
+    src/vkhandlermessagebyid.cpp \
+    src/vkhandlerdialogbyid.cpp \
+    src/vkusertyping.cpp
 
 OTHER_FILES += qml/harbour-vk.qml \
     qml/cover/CoverPage.qml \
@@ -728,12 +732,17 @@ HEADERS += \
     src/vkemojiparserdata.h \
     src/vktextwrap.h \
     src/vkfilestorage.h \
-    src/vkvisibledialog.h \
-    src/vkvisibleobject.h \
     src/vkstoragecomparator.h \
     src/vkvisualdialogmodel.h \
     src/vkvisualmessagemodel.h \
-    src/vkvisibleparseattachments.h
+    src/vkvisibleparseattachments.h \
+    src/vkadditionaldatapair.h \
+    src/ivkcompletable.h \
+    src/vkadditionalhelper.h \
+    src/vkhandlerfirstmessage.h \
+    src/vkhandlermessagebyid.h \
+    src/vkhandlerdialogbyid.h \
+    src/vkusertyping.h
 
 RESOURCES +=
 

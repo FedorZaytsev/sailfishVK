@@ -29,7 +29,7 @@ VK::VK(QObject *parent) :
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, dir.path());
 
 
-    m_VKStorage.init();
+    m_VKStorage.init(this);
     QObject::connect(&m_VKStorage, &VKStorage::error, this, &VK::storageError);
     QObject::connect(&m_manager, &VKNetworkManager::finished, this, &VK::requestFinished);
     QObject::connect(m_longPoll, &VKLongPollServer::updatePages, [this]() {
@@ -113,11 +113,13 @@ QString VK::getLogName() {
     return info.fileName();
 }
 
+bool VK::isNetworkBusy() {
+    return m_manager.isBusy();
+}
+
 void VK::setDefaultSlotsForHandler(VKAbstractHandler *handler) {
-    QObject::connect(handler, &VKAbstractHandler::partlyReady, [this](VKAbstractHandler* h) {
-        emit this->handlerPartlyReady(h, h->name());
-    });
-    QObject::connect(handler, &VKAbstractHandler::allDataReady, [](VKAbstractHandler* h) {
+    QObject::connect(handler, &VKAbstractHandler::ready, [this](VKAbstractHandler* h) {
+        emit this->ready(h, h->name());
         h->deleteLater();
     });
     QObject::connect(handler, &VKAbstractHandler::sendRequest, this, &VK::processHandler);

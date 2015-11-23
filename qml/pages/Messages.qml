@@ -67,9 +67,6 @@ Page {
                 }
             }
         }
-        //ListModel {
-        //    id: messagesListModel
-        //}
         model: VisualMessageModel{}
         footer: Column {
             PageHeader {
@@ -87,6 +84,7 @@ Page {
         }
 
         onMovementEnded: {
+            console.log(visibleArea.yPosition)
             if (visibleArea.yPosition < 0.01) {
                 console.log("loading additional at top",offsetTop)
                 vk.getMessages(id, isChat, offsetTop, 20)

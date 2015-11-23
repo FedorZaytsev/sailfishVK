@@ -25,7 +25,7 @@ public:
     void addDialog(QSharedPointer<VKContainerDialog> dialog);
     Q_INVOKABLE void appendDialogs(VKStorage *storage, int count);
 
-    Q_INVOKABLE void test();
+    Q_INVOKABLE int count();
     
     enum Roles {
         eRoleName = Qt::UserRole + 1,
@@ -51,9 +51,12 @@ signals:
 
 public slots:
     void someDataChanged(VKAbstractContainer* container);
+    void onDialogMove(int from, int to);
+    void onDialogDelete(int id);
+    void onDialogCreated(int position, QSharedPointer<VKContainerDialog> d);
 private:
 
-    QVector<QSharedPointer<VKContainerDialog>> m_dialogs;
+    QList<QSharedPointer<VKContainerDialog>> m_dialogs;
 };
 
 #endif // VKVISUALDIALOGMODEL_H

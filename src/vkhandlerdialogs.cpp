@@ -46,28 +46,17 @@ void VKHandlerDialogs::processReply(QJsonValue *reply) {
 
     QJsonArray dialogs = reply->toObject().value("dialogs").toArray();
 
-    QVector<int> unknownUsers;
     for (auto e : dialogs) {
         auto el = e.toObject();
         Q_ASSERT(el.value("item").isObject());
         Q_ASSERT(el.value("users").isArray());
-        auto dialog = VKContainerDialog::fromJson(storage(), el.value("item").toObject(), el.value("users").toArray(), unknownUsers);
+        auto dialog = VKContainerDialog::fromJson(storage(), el.value("item").toObject(), el.value("users").toArray());
         storage()->addDialog(dialog);
     }
 
     setUnread(reply->toObject().value("unreadCount").toInt());
 
-    emit partlyReady(this);
-
-    //Additional request for case when we don't have info about users in fwd messages
-    if (unknownUsers.length()) {
-        qDebug()<<"We need additional users info about"<<unknownUsers;
-        auto usersHandler = new VKHandlerUsers(storage(), this);
-        usersHandler->setUsers(unknownUsers);
-        requestAdditionInfo(usersHandler);
-    } else {
-        emit allDataReady(this);
-    }
+    emit ready(this);
 }
 
 QString VKHandlerDialogs::name() {
@@ -94,36 +83,3 @@ void VKHandlerDialogs::setUnread(int unread) {
 void VKHandlerDialogs::setLongPoll(bool b) {
     m_longPollRequested = b;
 }
-
-VKAbstractContainer* VKHandlerDialogs::atPtr(int idx) {
-    Q_UNUSED(idx);
-    Q_ASSERT(0);
-    //return m_dialogs[idx].data();
-    return NULL;
-}
-
-int VKHandlerDialogs::count() {
-    //return m_dialogs.count();
-    return 0;
-}
-
-QSharedPointer<VKAbstractContainer> VKHandlerDialogs::at(int idx) {
-    Q_UNUSED(idx);
-    //return m_dialogs[idx];
-    return QSharedPointer<VKAbstractContainer>();
-}
-
-void VKHandlerDialogs::additionDataReady(VKAbstractHandler *h) {
-    auto handler = dynamic_cast<VKHandlerUsers*>(h);
-    Q_ASSERT(handler != nullptr);
-    Q_ASSERT(0);
-
-    qDebug()<<"additional info ready, updating";
-    //for (auto e: m_dialogs) {
-    //    e->complete(handler);
-    //}
-
-    //emit ready(this);
-}
-
-

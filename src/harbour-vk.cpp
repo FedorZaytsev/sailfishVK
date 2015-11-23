@@ -92,6 +92,7 @@ void logBaseAddress() {
     qDebug()<<"Main module address:"<<QString("0x")+QString::number((unsigned int)info.dli_fbase,16).toUpper();
 }
 
+
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
 
     QString stringType;

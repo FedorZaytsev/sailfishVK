@@ -2,7 +2,11 @@
 #define VKHANDLERLONGPOLLUPDATEDATA_H
 
 #include "vkabstracthandler.h"
+#include "vklpabstract.h"
 
+class VKContainerDialog;
+class VKContainerMessage;
+class VKContainerUser;
 class VKHandlerLongPollUpdateData : public VKAbstractHandler
 {
     Q_OBJECT
@@ -16,8 +20,13 @@ public:
             void setChatIds(QList<QString> &chatIds);
             void setCheckIds(QList<QString> &checkIds);
             void setRemoved(QList<QString> &removed);
-
+            void setEvents(QVector<QSharedPointer<VKLPAbstract>> events);
+            QVector<QSharedPointer<VKLPAbstract>> events();
+            QVector<QSharedPointer<VKContainerDialog>>& dialogs();
+            QVector<QSharedPointer<VKContainerMessage>>& messages();
+            QVector<QSharedPointer<VKContainerUser>>& users();
 signals:
+            void ready(VKAbstractHandler* h);
 public slots:
 private:
 
@@ -26,6 +35,11 @@ private:
     QList<QString> m_chatIds;
     QList<QString> m_checkIds;
     QList<QString> m_removed;
+    QVector<QSharedPointer<VKLPAbstract>> m_events;
+
+    QVector<QSharedPointer<VKContainerDialog>> m_updateDialogs;
+    QVector<QSharedPointer<VKContainerMessage>> m_updateMessages;
+    QVector<QSharedPointer<VKContainerUser>> m_updateUsers;
 
 };
 

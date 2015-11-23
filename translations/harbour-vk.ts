@@ -46,6 +46,33 @@
     </message>
 </context>
 <context>
+    <name>VKContainerMessageAction</name>
+    <message>
+        <source>Chat photo updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chat photo removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chat %1 created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chat title updated to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 invited</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 kicked</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>handlers</name>
     <message>
         <source>Messages</source>

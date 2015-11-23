@@ -20,6 +20,7 @@ public:
     VKAbstractHandler* getHandlerByReply(QNetworkReply* reply);
     void sendRequest(VKAbstractHandler* handler);
     void remove(QNetworkReply* reply);
+    bool isBusy();
 private:
     void send(VKAbstractHandler* handler);
 signals:

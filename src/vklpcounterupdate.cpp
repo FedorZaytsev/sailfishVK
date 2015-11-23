@@ -1,7 +1,7 @@
 #include "vklpcounterupdate.h"
 
-VKLPCounterUpdate::VKLPCounterUpdate(QObject *parent) :
-    VKLPAbstract(parent)
+VKLPCounterUpdate::VKLPCounterUpdate(VKStorage *storage, QObject *parent) :
+    VKLPAbstract(storage, parent)
 {
     m_type = VKLPEventType::COUNTER_UPDATE;
     m_count = 0;

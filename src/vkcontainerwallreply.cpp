@@ -1,19 +1,21 @@
 #include "vkcontainerwallreply.h"
 
-VKContainerWallReply::VKContainerWallReply(QObject *parent) :
-    VKAbstractContainer(parent)
+VKContainerWallReply::VKContainerWallReply(VKStorage *storage, QObject *parent) :
+    VKAbstractContainer(storage, parent)
 {
     m_type = eVKContainerWallReply;
 }
 
-QSharedPointer<VKContainerWallReply> VKContainerWallReply::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
+QSharedPointer<VKContainerWallReply> VKContainerWallReply::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users) {
     Q_UNUSED(storage);
     Q_UNUSED(obj);
     Q_UNUSED(users);
-    Q_UNUSED(userIds);
 
-    auto wallReply = new VKContainerWallReply;
+    auto wallReply = QSharedPointer<VKContainerWallReply>(new VKContainerWallReply(storage));
+    wallReply->beginObjectChange();
 
-    return QSharedPointer<VKContainerWallReply>(wallReply);
+    wallReply->setValid();
+    wallReply->endObjectChange();
+    return wallReply;
 }
 

@@ -1,37 +1,28 @@
 #include "vklpmessagedelete.h"
 
-VKLPMessageDelete::VKLPMessageDelete(QObject *parent) :
-    VKLPAbstract(parent)
+VKLPMessageDelete::VKLPMessageDelete(VKStorage *storage, QObject *parent) :
+    VKLPAbstract(storage, parent)
 {
-    m_id = 0;
-    m_userId = 0;
-    m_isChat = false;
-    m_type = VKLPEventType::MESSAGE_DELETE;
 }
 
-void VKLPMessageDelete::fromLP(const QJsonArray &data, QList<QString> &l) {
-    setId(data.at(1).toInt());
-    l.push_back(QString::number(id()));
+void VKLPMessageDelete::fromLP(const QJsonArray &data) {
+
+    m_handler = QSharedPointer<VKLPMessageFlagsSet>(new VKLPMessageFlagsSet(storage(), this));
+    m_handler->setId(data.at(1).toInt());
     if (data.count() > 2) {
-        setUserId(data.at(2).toInt());
+        m_handler->setUserId(data.at(2).toInt());
     }
+
+    auto flags = QSharedPointer<VKLPFlags>(new VKLPFlags);
+    flags->set(VKLPFlags::DELETED);
+    m_handler->setFlags(flags);
+
+    m_handler->process();
+
     m_valid = false;
+
 }
 
-void VKLPMessageDelete::complete(QVector<QSharedPointer<VKContainerDialog>> dialogs, QVector<QSharedPointer<VKContainerMessage>> messages, QVector<QSharedPointer<VKContainerUser>> users) {
-    Q_UNUSED(dialogs);
-    Q_UNUSED(users);
-    qDebug()<<"requesting"<<id();
-    for (auto e : messages) {
-        if (e->id() == id()) {
-            m_message = e;
-            m_valid = true;
-            break;
-        }
-    }
-}
-
-void VKLPMessageDelete::setUserId(int id) {
-    m_userId = id > 2000000000 ? id - 2000000000 : id;
-    m_isChat = id > 2000000000;
+bool VKLPMessageDelete::needPreviousMessage() {
+    return m_handler->needPreviousMessage();
 }

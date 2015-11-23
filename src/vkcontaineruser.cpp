@@ -1,19 +1,26 @@
 #include "vkcontaineruser.h"
 
-VKContainerUser::VKContainerUser(QObject *parent) :
-    VKAbstractContainer(parent)
+VKContainerUser::VKContainerUser(VKStorage *storage, QObject *parent) :
+    VKAbstractContainer(storage, parent)
 {
-    valid(true);
+    beginObjectChange();
     setIsOnline(false);
+    endObjectChange();
     m_type = eVKContainerUser;
 }
 
 VKContainerUser::~VKContainerUser() {
 }
 
+void VKContainerUser::completed() {
+    Q_ASSERT(0);
+}
+
 QSharedPointer<VKContainerUser> VKContainerUser::fromJson(VKStorage *storage, const QJsonObject &obj) {
     Q_UNUSED(storage);
-    auto user = QSharedPointer<VKContainerUser>(new VKContainerUser);
+    auto user = QSharedPointer<VKContainerUser>(new VKContainerUser(storage));
+    user->beginObjectChange();
+
     user->setId(obj.value("id").toInt());
     user->setFirstName(obj.value("first_name").toString());
     user->setLastName(obj.value("last_name").toString());
@@ -21,7 +28,27 @@ QSharedPointer<VKContainerUser> VKContainerUser::fromJson(VKStorage *storage, co
     user->setIconMedium(obj.value("photo_100").toString());
     user->setIconLarge(obj.value("photo_200").toString());
     user->setIsOnline(obj.value("online").toInt() == 1 || obj.value("online_mobile").toInt() == 1);
+
+    user->setValid();
+    user->endObjectChange();
     return user;
+}
+
+void VKContainerUser::updateFrom(QSharedPointer<VKContainerUser> user) {
+    Q_ASSERT(id() == user->id());
+    bool updated = false;
+
+    UPDATE_ARG_CHECK(user,  firstName,  setFirstName,   updated);
+    UPDATE_ARG_CHECK(user,  lastName,   setLastName,    updated);
+    UPDATE_ARG_CHECK(user,  iconSmall,  setIconSmall,   updated);
+    UPDATE_ARG_CHECK(user,  iconMedium, setIconMedium,  updated);
+    UPDATE_ARG_CHECK(user,  iconLarge,  setIconLarge,   updated);
+    UPDATE_ARG_CHECK(user,  isOnline,   setIsOnline,    updated);
+
+    if (updated) {
+        emitChange();
+    }
+
 }
 
 QString VKContainerUser::userName() const {

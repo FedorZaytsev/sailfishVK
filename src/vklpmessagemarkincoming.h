@@ -8,20 +8,16 @@ class VKLPMessageMarkIncoming : public VKLPAbstract
 {
     Q_OBJECT
 public:
-    explicit VKLPMessageMarkIncoming(QObject *parent = 0);
+    explicit VKLPMessageMarkIncoming(VKStorage *storage, QObject *parent = 0);
     void fromLP(const QJsonArray &data);
 
-    Q_INVOKABLE int userId() { return m_userId; }
-    Q_INVOKABLE int untilMsg() { return m_msgId; }
+    virtual void mark();
 signals:
 
 public slots:
 protected:
-    void setUserId(int id);
-private:
-    int m_userId;
-    bool m_isChat;
-    int m_msgId;
+    int m_msgIdFrom;
+    int m_msgIdTo;
 };
 
 #endif // VKLPMESSAGEMARKINCOMING_H

@@ -6,8 +6,9 @@
 #include "vk.h"
 
 VKLongPollServer::VKLongPollServer(VKStorage* storage, QObject *parent) :
-    VKAbstractHandler(storage, parent)
+    QObject(parent)
 {
+    m_storage = storage;
     m_vk = NULL;
     m_initialized = false;
     setStorage(0);
@@ -33,22 +34,6 @@ void VKLongPollServer::init(VK* vk, VKStorage* storage) {
     qDebug()<<"initialized";
 }
 
-int VKLongPollServer::count() {
-    return m_readyEvents.count();
-}
-
-VKLPAbstract *VKLongPollServer::atPtr(int idx) {
-    return m_readyEvents.at(idx).data();
-}
-
-void VKLongPollServer::clean() {
-    m_readyEvents.clear();
-}
-
-QSharedPointer<VKLPAbstract> VKLongPollServer::at(int idx) {
-    return m_readyEvents.at(idx);
-}
-
 void VKLongPollServer::forceRequest() {
     //mode 66 = 64+2 = return user device + attachments
     QUrl url(QString("https://%1?act=a_check&key=%2&ts=%3&wait=25&mode=66").arg(server()).arg(key()).arg(ts()));
@@ -60,80 +45,87 @@ void VKLongPollServer::forceRequest() {
     m_manager.get(QNetworkRequest(url));
 }
 
-void VKLongPollServer::processUpdate(QJsonArray &update,
+void VKLongPollServer::processUpdate(QJsonArray &update/*,
                                      QList<QString> &userIds,
                                      QList<QString> &messageIds,
                                      QList<QString> &chatIds,
                                      QList<QString> &checkMessages,
-                                     QList<QString> &removed) {
-    QSharedPointer<VKLPAbstract> e;
+                                     QList<QString> &removed,
+                                     QVector<QSharedPointer<VKLPAbstract>> &cached*/) {
+    VKLPAbstract* e;
+
+    //checkMessages - getting previous message
+    //removed - getting message with constant id
+    //userIds - getting user
+    //messageIds - getting messags
+    //chatIds - getting dialogs
 
     int type = update.at(0).toInt();
     switch (type) {
     case VKLPEventType::MESSAGE_DELETE: {
-        auto event = QSharedPointer<VKLPMessageDelete>(new VKLPMessageDelete(this));
-        event->fromLP(update, checkMessages);
-        e = event.dynamicCast<VKLPAbstract>();
+        auto event = new VKLPMessageDelete(storage(), this);
+        event->fromLP(update);
+        e = event;
     } break;
     case VKLPEventType::MESSAGE_FLAGS_CHANGE: {
-        auto event = QSharedPointer<VKLPMessageFlagsChange>(new VKLPMessageFlagsChange(this));
+        auto event = new VKLPMessageFlagsChange(storage(), this);
         event->fromLP(update);
-        e = event.dynamicCast<VKLPAbstract>();
+        e = event;
     } break;
     case VKLPEventType::MESSAGE_FLAGS_RESET: {
-        auto event = QSharedPointer<VKLPMessageFlagsReset>(new VKLPMessageFlagsReset(this));
-        event->fromLP(update, removed);
-        e = event.dynamicCast<VKLPAbstract>();
+        auto event = new VKLPMessageFlagsReset(storage(), this);
+        event->fromLP(update);
+        e = event;
     } break;
     case VKLPEventType::MESSAGE_FLAGS_SET: {
-        auto event = QSharedPointer<VKLPMessageFlagsSet>(new VKLPMessageFlagsSet(this));
-        event->fromLP(update, checkMessages);
-        e = event.dynamicCast<VKLPAbstract>();
+        auto event = new VKLPMessageFlagsSet(storage(), this);
+        event->fromLP(update);
+        e = event;
     } break;
     case VKLPEventType::MESSAGE_NEW: {
-        auto event = QSharedPointer<VKLPMessageNew>(new VKLPMessageNew(this));
-        event->fromLP(update, messageIds, userIds, chatIds);
-        e = event.dynamicCast<VKLPAbstract>();
+        auto event = new VKLPMessageNew(storage(), this);
+        event->fromLP(update);
+        e = event;
     } break;
     case VKLPEventType::MESSAGE_MARK_READ_INCOMING: {
-        auto event = QSharedPointer<VKLPMessageMarkIncoming>(new VKLPMessageMarkIncoming(this));
+        auto event = new VKLPMessageMarkIncoming(storage(), this);
         event->fromLP(update);
-        e = event.dynamicCast<VKLPAbstract>();
+        e = event;
     } break;
     case VKLPEventType::MESSAGE_MARK_READ_OUTCOMING: {
-        auto event = QSharedPointer<VKLPMessageMarkOutcoming>(new VKLPMessageMarkOutcoming(this));
+        auto event = new VKLPMessageMarkOutcoming(storage(), this);
         event->fromLP(update);
-        e = event.dynamicCast<VKLPAbstract>();
+        e = event;
     } break;
     case VKLPEventType::USER_OFFLINE: {
-        auto event = QSharedPointer<VKLPUserOffline>(new VKLPUserOffline(this));
+        auto event = new VKLPUserOffline(storage(), this);
         event->fromLP(update);
-        e = event.dynamicCast<VKLPAbstract>();
+        e = event;
     } break;
     case VKLPEventType::USER_ONLINE: {
-        auto event = QSharedPointer<VKLPUserOnline>(new VKLPUserOnline(this));
+        auto event = new VKLPUserOnline(storage(), this);
         event->fromLP(update);
-        e = event.dynamicCast<VKLPAbstract>();
+        e = event;
     } break;
     case VKLPEventType::CHAT_UPDATED: {
-        auto event = QSharedPointer<VKLPChatUpdated>(new VKLPChatUpdated(this));
+        auto event = new VKLPChatUpdated(storage(), this);
         event->fromLP(update);
-        e = event.dynamicCast<VKLPAbstract>();
+        e = event;
     } break;
     case VKLPEventType::USER_TYPING: {
-        auto event = QSharedPointer<VKLPUserTyping>(new VKLPUserTyping(this));
-        event->fromLP(update, userIds);
-        e = event.dynamicCast<VKLPAbstract>();
+        auto event = new VKLPUserTyping(storage(), this);
+        event->fromLP(update);
+        e = event;
     } break;
     case VKLPEventType::CHAT_USER_TYPING: {
-        auto event = QSharedPointer<VKLPChatUserTyping>(new VKLPChatUserTyping(this));
-        event->fromLP(update, userIds);
-        e = event.dynamicCast<VKLPAbstract>();
+        auto event = new VKLPChatUserTyping(storage(), this);
+        event->fromLP(update);
+        e = event;
     } break;
     case VKLPEventType::COUNTER_UPDATE:  {
-        auto event = QSharedPointer<VKLPCounterUpdate>(new VKLPCounterUpdate(this));
+        auto event = new VKLPCounterUpdate(storage(), this);
         event->fromLP(update);
-        e = event.dynamicCast<VKLPAbstract>();
+        e = event;
     } break;
     case 101: {
     } break;
@@ -145,28 +137,38 @@ void VKLongPollServer::processUpdate(QJsonArray &update,
     } break;
     }
 
-    if (e) {
-        if (e->isValid()) {
-            m_readyEvents.push_back(e);
-        } else {
-            m_cachedEvents[e->type()].push_back(e);
+    Q_UNUSED(e);
+
+    /*if (!e.isNull()) {
+        if (!e->isValid()) {
+            cached.push_back(e);
         }
-    }
+    }*/
+
+    //if (e) {
+        //if (e->isValid()) {
+        //    m_readyEvents.push_back(e);
+        //} //else {
+            //m_cachedEvents[e->type()].push_back(e);
+        //}
+    //}
 }
 
 void VKLongPollServer::sendUpdateDataRequest(QList<QString> &userIds,
                                              QList<QString> &messageIds,
                                              QList<QString> &chatIds,
                                              QList<QString> &checkMessages,
-                                             QList<QString> &removed) {
+                                             QList<QString> &removed,
+                                             QVector<QSharedPointer<VKLPAbstract> > &cached) {
     auto updateData = new VKHandlerLongPollUpdateData(storage(), this);
-    //QObject::connect(updateData, &VKHandlerLongPollUpdateData::ready, this, &VKLongPollServer::updateDataReady);
+    QObject::connect(updateData, &VKHandlerLongPollUpdateData::ready, this, &VKLongPollServer::updateDataReady);
 
     updateData->setUserIds(userIds);
     updateData->setMsgIds(messageIds);
     updateData->setChatIds(chatIds);
     updateData->setCheckIds(checkMessages);
     updateData->setRemoved(removed);
+    updateData->setEvents(cached);
     vk()->sendNetworkRequest(updateData);
 }
 
@@ -205,87 +207,32 @@ QString VKLongPollServer::type2string(VKLPEventType::E_VKUPDATE type) {
     }
 }
 
-void VKLongPollServer::updateDataReady(VKAbstractHandler *handler) {
+void VKLongPollServer::updateDataReady(VKAbstractHandler *h) {
 
-    qDebug()<<"ready, updating";
+    auto* handler = dynamic_cast<VKHandlerLongPollUpdateData*>(h);
 
-    QJsonObject data = handler->data().toObject();
-    auto messages = data.value("messages").toObject().value("items").toArray();
-    auto users = data.value("users").toArray();
-    auto checkMsgs = data.value("check").toArray();
-    auto checkUsers = data.value("checkUsers").toArray();
-    auto removedMsgs = data.value("removed").toArray();
-    auto removedUsers = data.value("removedUsers").toArray();
+    auto& dialogs = handler->dialogs();
+    auto& messages = handler->messages();
+    auto& users = handler->users();
+    auto events = handler->events();
 
-    QVector<int> unknownUsers;
-    for (auto e : messages) {
-        auto dialog = e.toObject();
-        auto dlg = VKContainerDialog::fromJson(storage(), dialog, users, unknownUsers);
-        qDebug()<<"new dialog"<<dlg->chatName()<<dlg->id()<<dlg->message()->id();
-        m_updateDialogs.append(dlg);
+    qDebug()<<"Dialogs:";
+    for (auto dialog: dialogs) {
+        qDebug()<<"     "<<dialog->chatName();
+    }
+    qDebug()<<"Messages:";
+    for (auto message: messages) {
+        qDebug()<<"     "<<message->id()<<message->body().mid(0,15);
+    }
+    qDebug()<<"Users:";
+    for (auto user: users) {
+        qDebug()<<"     "<<user->firstName()<<user->lastName();
     }
 
-    for (auto e : checkMsgs) {
-        auto message = e.toObject();
-        auto msg = VKContainerMessage::fromJson(storage(), message, checkUsers, unknownUsers);
-        qDebug()<<"new message"<<msg->id()<<msg->body().mid(0,10);
-        m_updateMessages.append(msg);
+    for (auto e: events) {
+        e->complete(dialogs, messages, users);
     }
 
-    for (auto e : removedMsgs) {
-        auto message = e.toObject();
-        auto msg = VKContainerMessage::fromJson(storage(), message, removedUsers, unknownUsers);
-        qDebug()<<"new message"<<msg->id()<<msg->body().mid(0,10);
-        m_updateMessages.append(msg);
-    }
-
-    for (auto e : users) {
-        auto user = e.toObject();
-        auto usr = VKContainerUser::fromJson(storage(), user);
-        qDebug()<<"new user"<<usr->id()<<usr->firstName()<<usr->lastName();
-        m_updateUsers.append(usr);
-    }
-
-    if (!unknownUsers.length()) {
-        updateReadyEvents();
-    } else {
-        QStringList lst;
-        for (auto e: unknownUsers) {
-            lst.append(QString::number(e));
-        }
-
-        //Additional request for case when we don't have info about users in fwd messages
-        qDebug()<<"We need additional users info about"<<lst.join(",");
-        //auto handlerUsers = new VKHandlerUsers(storage(), this);
-        //QObject::connect(handlerUsers, &VKHandlerUsers::ready, this, &VKLongPollServer::additionalInformationAboutUsersReady);
-    }
-
-    handler->deleteLater();
-}
-
-void VKLongPollServer::additionalInformationAboutUsersReady(VKAbstractHandler *h) {
-
-    auto handler = dynamic_cast<VKHandlerUsers*>(h);
-
-    for (auto e: m_updateDialogs) {
-        for (int i=0;i<handler->count();i++) {
-            auto el = handler->get(i);
-            if (e->message()->user()->id() == el->id()) {
-                e->message()->setUser(el);
-            }
-        }
-    }
-
-    for (auto e: m_updateMessages) {
-        for (int i=0;i<handler->count();i++) {
-            auto el = handler->get(i);
-            if (e->user()->id() == el->id()) {
-                e->setUser(el);
-            }
-        }
-    }
-
-    updateReadyEvents();
     handler->deleteLater();
 }
 
@@ -298,22 +245,26 @@ void VKLongPollServer::watchdogTimer() {
 
 }
 
-void VKLongPollServer::updateReadyEvents() {
+/*
+void VKLongPollServer::updateReadyEvents(QVector<QSharedPointer<VKLPAbstract>> events) {
 
     qDebug()<<"m_updateDialogs.count()"<<m_updateDialogs.count();
     for (auto e: m_updateDialogs) {
-        qDebug()<<e->message()->id()<<e->message()->body().mid(0,15);
+        storage()->addDialog(e);
+        qDebug()<<e->id()<<e->chatName();
     }
     qDebug()<<"----";
 
     qDebug()<<"m_updateMessages.count()"<<m_updateMessages.count();
     for (auto e: m_updateMessages) {
+        storage()->addMessage(e);
         qDebug()<<e->id()<<e->user()->lastName();
     }
     qDebug()<<"----";
 
     qDebug()<<"m_updateUsers.count()"<<m_updateUsers.count();
     for (auto e: m_updateUsers) {
+        storage()->addUser(e);
         qDebug()<<e->id()<<e->firstName()<<e->lastName();
     }
     qDebug()<<"----";
@@ -341,6 +292,7 @@ void VKLongPollServer::updateReadyEvents() {
     qDebug()<<"emit ready";
     vk()->sendHandlertoScript(this);
 }
+*/
 
 void VKLongPollServer::networkDataReady(QNetworkReply *reply) {
     if (reply->error() == QNetworkReply::NoError) {
@@ -356,19 +308,11 @@ void VKLongPollServer::networkDataReady(QNetworkReply *reply) {
         QJsonObject object = document.object();
         if (object.value("updates").isArray()) {
             QJsonArray updates = object.value("updates").toArray();
-            QList<QString> userIds, messageIds, chatIds, checkMessages, removed;
+
             for (auto e : updates) {
                 auto el = e.toArray();
-                processUpdate(el, userIds, messageIds, chatIds, checkMessages, removed);
+                processUpdate(el/*, userIds, messageIds, chatIds, checkMessages, removed, cached*/);
             }
-            qDebug()<<"LongPoll request users"<<userIds<<"and messages"<<messageIds<<"chatIds"<<chatIds<<"checkMessages"<<checkMessages<<"removed"<<removed;
-            if (userIds.length() || messageIds.length() || chatIds.length() || checkMessages.length() || removed.length()) {
-                sendUpdateDataRequest(userIds, messageIds, chatIds, checkMessages, removed);
-            }
-            if (m_readyEvents.length()) {
-                vk()->sendHandlertoScript(this);
-            }
-            qDebug()<<"sent request";
         } else {
             qDebug()<<"no update field";
         }

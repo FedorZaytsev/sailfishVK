@@ -82,7 +82,7 @@ ApplicationWindow
                 }
             })
         }
-        onHandlerPartlyReady: {
+        onReady: {
             console.log(name);
             Main.requestData(handler, name)
         }

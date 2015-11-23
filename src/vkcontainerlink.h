@@ -8,8 +8,8 @@ class VKContainerLink : public VKAbstractContainer
 {
     Q_OBJECT
 public:
-    explicit VKContainerLink(QObject *parent = 0);
-    static QSharedPointer<VKContainerLink> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users, QVector<int> userIds = QVector<int>());
+    explicit VKContainerLink(VKStorage *storage, QObject *parent = 0);
+    static QSharedPointer<VKContainerLink> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users);
 
     Q_INVOKABLE QString url() { return m_url; }
     Q_INVOKABLE QString title() { return m_title; }

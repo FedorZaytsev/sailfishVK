@@ -8,8 +8,8 @@ class VKContainerSticker : public VKAbstractContainer
 {
     Q_OBJECT
 public:
-    explicit VKContainerSticker(QObject *parent = 0);
-    static QSharedPointer<VKContainerSticker> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users, QVector<int> userIds = QVector<int>());
+    explicit VKContainerSticker(VKStorage *storage, QObject *parent = 0);
+    static QSharedPointer<VKContainerSticker> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users);
 
 signals:
 

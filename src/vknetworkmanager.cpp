@@ -19,7 +19,7 @@ void VKNetworkManager::sendRequest(VKAbstractHandler *handler) {
 
     qDebug()<<"adding handler in network manager";
     auto time = QDateTime::currentDateTimeUtc();
-    if (m_time < time) {
+    if (!isBusy()) {
         qDebug()<<"direct send";
         send(handler);
         m_time = time.addMSecs(WAIT_TIME_MS);                              //400ms
@@ -38,10 +38,14 @@ void VKNetworkManager::remove(QNetworkReply *reply) {
     m_networkReplies.remove(reply);
 }
 
+bool VKNetworkManager::isBusy() {
+    return m_time > QDateTime::currentDateTimeUtc();
+}
+
 void VKNetworkManager::send(VKAbstractHandler *handler) {
     qDebug()<<QTime::currentTime().toString("mm.ss.zzz");
     QNetworkRequest request = handler->processRequest();
-    qDebug()<<request.url().toString();
+    qDebug()<<QUrl::fromPercentEncoding(request.url().toString().toLatin1());
     QNetworkReply *reply = m_manager.get(request);
 
     m_networkReplies[reply] = handler;

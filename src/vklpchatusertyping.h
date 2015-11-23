@@ -7,7 +7,8 @@ class VKLPChatUserTyping : public VKLPUserTyping
 {
     Q_OBJECT
 public:
-    explicit VKLPChatUserTyping(QObject *parent = 0);
+    explicit VKLPChatUserTyping(VKStorage *storage, QObject *parent = 0);
+    virtual int parseChatId(int id);
 
 signals:
 

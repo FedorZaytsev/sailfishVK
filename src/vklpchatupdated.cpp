@@ -1,7 +1,7 @@
 #include "vklpchatupdated.h"
 
-VKLPChatUpdated::VKLPChatUpdated(QObject *parent) :
-    VKLPAbstract(parent)
+VKLPChatUpdated::VKLPChatUpdated(VKStorage *storage, QObject *parent) :
+    VKLPAbstract(storage, parent)
 {
     m_chatId = 0;
     m_byUser = false;

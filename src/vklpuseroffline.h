@@ -7,7 +7,7 @@ class VKLPUserOffline : public VKLPAbstract
 {
     Q_OBJECT
 public:
-    explicit VKLPUserOffline(QObject *parent = 0);
+    explicit VKLPUserOffline(VKStorage *storage, QObject *parent = 0);
     void fromLP(const QJsonArray &data);
 
     Q_INVOKABLE int userId() { return m_userId; }

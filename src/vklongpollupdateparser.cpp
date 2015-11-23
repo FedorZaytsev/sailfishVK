@@ -46,13 +46,13 @@ int VKLongPollUpdateParser::parseIds(const QString &data, int position, VKLongPo
         
         QString userId = "1";
         position = parseUserId(data, position, userId);
-        c.setUserId(userId);
-        m_uniqueUsers.append(userId);
+        c.setUserId(userId.toInt());
+        m_uniqueUsers.append(userId.toInt());
 
 
         QString msgId = "1";
         position = parseMsgId(data, position + 1, msgId);
-        c.setMessageId(msgId);
+        c.setMessageId(msgId.toInt());
 
         if (position == data.length()) {
             qDebug()<<"end1 add to"<<fwd.userId()<<c.userId();

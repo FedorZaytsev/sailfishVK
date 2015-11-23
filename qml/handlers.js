@@ -1,17 +1,17 @@
 var handlers = {
-    "dialogs" : handlerDialogs,
+    /*"dialogs" : handlerDialogs,
     "longPollServer" : handlerLongPoll,
     "messages" : handlerMessages,
     "sendMessage" : handlerSendMessage,
     "longPollServerKey" : handlerLongPollKey,
-    "markAsRead" : handlerMarkAsRead
+    "markAsRead" : handlerMarkAsRead*/
 }
 
 
 var longPollHandlers = {}
 function fullLPHandlers() {
     if (typeof VKLPEventType !== "undefined") {
-        longPollHandlers[VKLPEventType.MESSAGE_DELETE] = processMessageDelete
+        /*longPollHandlers[VKLPEventType.MESSAGE_DELETE] = processMessageDelete
         longPollHandlers[VKLPEventType.MESSAGE_FLAGS_CHANGE] = processMessageFlagsChange
         longPollHandlers[VKLPEventType.MESSAGE_FLAGS_SET] = processMessageFlagsSet
         longPollHandlers[VKLPEventType.MESSAGE_FLAGS_RESET] = processMessageFlagsReset
@@ -24,7 +24,7 @@ function fullLPHandlers() {
         longPollHandlers[VKLPEventType.USER_TYPING] = processTyping
         longPollHandlers[VKLPEventType.CHAT_USER_TYPING] = processTyping
         longPollHandlers[VKLPEventType.VIDEOCALL] = processVideocall
-        longPollHandlers[VKLPEventType.COUNTER_UPDATE] = processCounterUpdate
+        longPollHandlers[VKLPEventType.COUNTER_UPDATE] = processCounterUpdate*/
     }
 }
 
@@ -36,9 +36,10 @@ function printObject(obj) {
 
 function ready(name, data) {
     console.log("ready",name)
-    console.assert(handlers[name])
-
-    handlers[name](data)
+    if (handlers[name]) {
+        console.assert(handlers[name])
+        handlers[name](data)
+    }
 }
 
 function findMessagesPage() {

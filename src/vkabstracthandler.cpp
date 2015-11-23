@@ -5,7 +5,12 @@ VKAbstractHandler::VKAbstractHandler(VKStorage* storage,QObject *parent) :
 {
     m_storage = storage;
     m_additionalDataHandler = nullptr;
-    Q_ASSERT(parent);
+    //Q_ASSERT(parent);
+}
+
+void VKAbstractHandler::merge(VKAbstractHandler *handler) {
+    Q_ASSERT(0);
+    Q_UNUSED(handler);
 }
 
 void VKAbstractHandler::requestAdditionInfo(VKAbstractHandler *h) {

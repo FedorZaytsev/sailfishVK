@@ -1,5 +1,8 @@
 #include "vktextwrap.h"
 
+
+//UNUSED
+
 VKTextWrap::VKTextWrap(QObject *parent) :
     QObject(parent)
 {

@@ -9,10 +9,10 @@ class VKContainerMessageAction : public VKAbstractContainer
 {
     Q_OBJECT
 public:
-    explicit VKContainerMessageAction(QObject *parent = 0);
+    explicit VKContainerMessageAction(VKStorage *storage, QObject *parent = 0);
 
-    static QSharedPointer<VKContainerMessageAction> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users, QVector<int> &userIds);
-    virtual void complete(VKAbstractHandler* _h);
+    static QSharedPointer<VKContainerMessageAction> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users);
+    virtual void completed();
 
     enum Enum {
         ACTION_INVALID,
@@ -26,9 +26,10 @@ public:
 
     Q_ENUMS(Enum)
 
-    Q_INVOKABLE int type() { return m_actionType; }
-    Q_INVOKABLE int userId() { return m_actionMid; }
-    Q_INVOKABLE QString text() { return m_actionText; }
+    Q_INVOKABLE int type() const { return m_actionType; }
+    Q_INVOKABLE int userId() const { return m_actionMid; }
+    Q_INVOKABLE QString text() const { return m_actionText; }
+    Q_INVOKABLE QString printable() const;
 
     void setType(int id);
     void setUserId(int id);

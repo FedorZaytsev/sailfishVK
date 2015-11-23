@@ -9,12 +9,16 @@ class VKContainerChatIcon : public VKAbstractContainer
 {
     Q_OBJECT
 public:
-    explicit VKContainerChatIcon(QObject *parent = 0);
+    explicit VKContainerChatIcon(VKStorage *storage, QObject *parent = 0);
     ~VKContainerChatIcon();
     void add(QString icon);
-    Q_INVOKABLE QString get(int idx);
+    Q_INVOKABLE QString get(int idx) const;
     static QString process(QString icon);
+    QList<QString> icons() const;
 
+
+    bool operator==(VKContainerChatIcon const& a);
+    bool operator!=(VKContainerChatIcon const& a);
 signals:
 
 public slots:

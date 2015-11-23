@@ -6,12 +6,10 @@ Page {
     id: dialogsPage
     objectName: "dialogsPage"
     property alias listAlias : dialogsList
-    property int offset
     property int downloadCount: 20
     property bool ready: false
 
     function updatePage() {
-        offset = 0
         dialogsList.model.clear()
         ready = false
         vk.getDialogs(0)
@@ -66,8 +64,8 @@ Page {
         delegate: DialogComponent{}
         onMovementEnded: {
             if (visibleArea.yPosition + visibleArea.heightRatio > 0.99) {
-                console.log("getDialogs scroll");
-                vk.getDialogs(offset + downloadCount)
+                console.log("getDialogs scroll", dialogsList.model.count());
+                vk.getDialogs(dialogsList.model.count())
             }
         }
 

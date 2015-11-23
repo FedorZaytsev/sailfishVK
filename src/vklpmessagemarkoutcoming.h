@@ -7,8 +7,8 @@ class VKLPMessageMarkOutcoming : public VKLPMessageMarkIncoming
 {
     Q_OBJECT
 public:
-    explicit VKLPMessageMarkOutcoming(QObject *parent = 0);
-
+    explicit VKLPMessageMarkOutcoming(VKStorage *storage, QObject *parent = 0);
+    virtual void mark();
 signals:
 
 public slots:

@@ -31,10 +31,10 @@ void VKHandlerUsers::processReply(QJsonValue *reply) {
 
     for (auto e: users) {
         auto user = VKContainerUser::fromJson(storage(), e.toObject());
-        m_users.append(user);
+        storage()->addUser(user);
     }
 
-    //emit ready(this);
+    emit ready(this);
 }
 
 QString VKHandlerUsers::name() {
@@ -51,14 +51,37 @@ void VKHandlerUsers::setFields(QString fields) {
     m_fields = fields;
 }
 
-int VKHandlerUsers::count() {
-    return m_users.count();
+QVector<int> VKHandlerUsers::users() {
+    return m_userIds;
 }
 
-VKContainerUser *VKHandlerUsers::getPtr(int i) {
-    return m_users.at(i).data();
+QString VKHandlerUsers::fields() {
+    return m_fields;
 }
 
-QSharedPointer<VKContainerUser> VKHandlerUsers::get(int i) {
-    return m_users.at(i);
+void VKHandlerUsers::merge(VKAbstractHandler *h) {
+    auto handler = dynamic_cast<VKHandlerUsers*>(h);
+    Q_ASSERT(handler);
+    if (handler) {
+        setUsers( users() + handler->users() );
+
+        setFields( mergeFields(fields(), handler->fields()) );
+    }
+}
+
+QString VKHandlerUsers::mergeFields(QString f1, QString f2) {
+    QSet<QString> flds;
+    auto flds1 = f1.split(",");
+    for (auto e:flds1) {
+        flds.insert(e);
+    }
+    auto flds2 = f2.split(",");
+    for (auto e:flds2) {
+        flds.insert(e);
+    }
+    QStringList sl;
+    for (auto e: flds) {
+        sl.append(e);
+    }
+    return sl.join(",");
 }

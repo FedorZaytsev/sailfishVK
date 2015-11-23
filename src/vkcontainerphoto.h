@@ -12,8 +12,8 @@ class VKContainerPhoto : public VKAbstractContainer
 {
     Q_OBJECT
 public:
-    explicit VKContainerPhoto(QObject *parent = 0);
-    static QSharedPointer<VKContainerPhoto> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users, QVector<int> userIds = QVector<int>());
+    explicit VKContainerPhoto(VKStorage *storage, QObject *parent = 0);
+    static QSharedPointer<VKContainerPhoto> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users);
 
     Q_INVOKABLE int         id()            { return m_id; }
     Q_INVOKABLE int         albumId()       { return m_albumId; }
@@ -46,7 +46,7 @@ public:
     void setDate(QDateTime date);
     void setText(QString text);
 private:
-    QSize calculatePhotoSize(QSize size);
+    QSize calculatePhotoSize(QSize requiredSize);
 signals:
 
 public slots:

@@ -8,20 +8,21 @@
 #include "vkcontainersticker.h"
 #include "vkcontainerlink.h"
 
-VKContainerAttachments::VKContainerAttachments(QObject *parent) :
-    VKAbstractContainer(parent)
+VKContainerAttachments::VKContainerAttachments(VKStorage *storage, QObject *parent) :
+    VKAbstractContainer(storage, parent)
 {
     m_type = eVKContainerAttachment;
 }
 
 QSharedPointer<VKContainerAttachments> VKContainerAttachments::fromJson(VKStorage *storage, QJsonArray obj, QJsonArray users) {
-    auto attachments = QSharedPointer<VKContainerAttachments>(new VKContainerAttachments);
+    auto attachments = QSharedPointer<VKContainerAttachments>(new VKContainerAttachments(storage));
 
     for (auto e: obj) {
         auto el = e.toObject();
         auto type = stringToType(el.value("type").toString());
         attachments->addAttachment(type, getContainer(type, storage, el.value(el.value("type").toString()).toObject(), users));
     }
+    attachments->setValid();
     return attachments;
 }
 

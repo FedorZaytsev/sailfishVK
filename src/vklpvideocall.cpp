@@ -1,7 +1,7 @@
 #include "vklpvideocall.h"
 
-VKLPVideoCall::VKLPVideoCall(QObject *parent) :
-    VKLPAbstract(parent)
+VKLPVideoCall::VKLPVideoCall(VKStorage *storage, QObject *parent) :
+    VKLPAbstract(storage, parent)
 {
     m_type = VKLPEventType::VIDEOCALL;
 }

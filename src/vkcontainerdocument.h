@@ -9,8 +9,8 @@ class VKContainerDocument : public VKAbstractContainer
 {
     Q_OBJECT
 public:
-    explicit VKContainerDocument(QObject *parent = 0);
-    static QSharedPointer<VKContainerDocument> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users, QVector<int> userIds = QVector<int>());
+    explicit VKContainerDocument(VKStorage *storage, QObject *parent = 0);
+    static QSharedPointer<VKContainerDocument> fromJson(VKStorage* storage, QJsonObject obj, const QJsonArray users);
 
     Q_INVOKABLE int id() { return m_id; }
     Q_INVOKABLE int ownerId() { return m_ownerId; }

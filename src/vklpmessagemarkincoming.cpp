@@ -1,23 +1,30 @@
 #include "vklpmessagemarkincoming.h"
 
-VKLPMessageMarkIncoming::VKLPMessageMarkIncoming(QObject *parent) :
-    VKLPAbstract(parent)
+VKLPMessageMarkIncoming::VKLPMessageMarkIncoming(VKStorage *storage, QObject *parent) :
+    VKLPAbstract(storage, parent)
 {
     m_type = VKLPEventType::MESSAGE_MARK_READ_INCOMING;
-    m_userId = 0;
-    m_isChat = false;
-    m_msgId = 0;
+    m_msgIdFrom = 0;
+    m_msgIdTo = 0;
 }
 
 void VKLPMessageMarkIncoming::fromLP(const QJsonArray &data) {
-    setUserId(data.at(1).toInt());
-    m_msgId = data.at(2).toInt();
+    m_msgIdFrom = data.at(1).toInt();
+    m_msgIdTo = data.at(2).toInt();
+
+    mark();
 
     m_valid = true;
 }
 
-
-void VKLPMessageMarkIncoming::setUserId(int id) {
-    m_userId = id > 2000000000 ? id - 2000000000 : id;
-    m_isChat = id > 2000000000;
+void VKLPMessageMarkIncoming::mark() {
+    for (int i=m_msgIdFrom;i<=m_msgIdTo;i++) {
+        if (storage()->isContainsMessage(i)) {
+            auto message = storage()->getMessageById(i);
+            if (message->isIncoming()) {
+                message->setIsRead(true);
+            }
+        }
+    }
 }
+

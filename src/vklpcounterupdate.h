@@ -7,7 +7,7 @@ class VKLPCounterUpdate : public VKLPAbstract
 {
     Q_OBJECT
 public:
-    explicit VKLPCounterUpdate(QObject *parent = 0);
+    explicit VKLPCounterUpdate(VKStorage *storage, QObject *parent = 0);
     void fromLP(const QJsonArray &data);
 
     Q_INVOKABLE int count() { return m_count; }

@@ -34,6 +34,7 @@ int VKVisualMessageModel::rowCount(const QModelIndex &parent) const {
 QVariant VKVisualMessageModel::data(const QModelIndex &index, int role) const {
     if (index.row() < 0 || index.row() >= rowCount()) {
         qDebug()<<"index is out of range"<<index.row()<<"row count"<<rowCount();
+        return QVariant();
     }
 
     auto& obj = m_messages[index.row()];
@@ -52,7 +53,7 @@ QVariant VKVisualMessageModel::data(const QModelIndex &index, int role) const {
     case eRoleIncoming:
         return obj.message()->isIncoming();
     case eRoleIsRead:
-        return obj.message()->readState();
+        return obj.message()->isRead();
     case eRoleMsg:
         return obj.message()->body();
     case eRoleUserName:
@@ -88,18 +89,21 @@ void VKVisualMessageModel::setProperty(int idx, int role, const QVariant &value)
 }
 
 
-void VKVisualMessageModel::addMessage(QSharedPointer<VKContainerMessage> message) {
-    addMessage(message, 0);
+void VKVisualMessageModel::addMessage(QSharedPointer<VKContainerMessage> message, int position) {
+    addMessage(message, position, 0);
 }
 
-void VKVisualMessageModel::appendMessages(VKStorage *storage, int count) {
+void VKVisualMessageModel::appendMessages(VKStorage *storage, int chatId, int count) {
     qDebug()<<"append"<<m_messages.count()<<(m_messages.count() + count - 1);
     beginInsertRows(QModelIndex(), m_messages.count(), m_messages.count() + count - 1);
 
     int from = m_messages.count();
     for (int i=0;i<count;i++) {
-        addMessage(storage->getMessageSortedByTime(from + i));
+        addMessage(storage->getMessageSortedByTime(chatId, from + i), i);
     }
+
+    QObject::connect(storage, &VKStorage::newMessageSorted, this, &VKVisualMessageModel::onMessageCreated, Qt::UniqueConnection);
+    QObject::connect(storage, &VKStorage::messageRemoved, this, &VKVisualMessageModel::onMessageRemoved, Qt::UniqueConnection);
 
     endInsertRows();
 }
@@ -108,21 +112,28 @@ QVariant VKVisualMessageModel::get(int idx, int role) {
     return data(index(idx), role);
 }
 
-void VKVisualMessageModel::addMessage(QSharedPointer<VKContainerMessage> message, int offset) {
-    for (int i=message->countFwd()-1;i>=0;i--) {
-        addMessage(message->getFwd(i), offset + 1);
+void VKVisualMessageModel::addMessage(QSharedPointer<VKContainerMessage> message, int position, int offset) {
+
+    int realPosition = 0;
+    bool found = false;
+    for (int i=0;i<m_messages.size();i++) {
+        if ( realPosition == position) {
+            realPosition = i;
+            found = true;
+            break;
+        }
+        if (m_messages[i].isMain()) {
+            realPosition++;
+        }
+    }
+    if (!found) {
+        realPosition = m_messages.size();
     }
 
-    VKVisualMessageModelData data(message);
+    qDebug()<<"adding message"<<message->debugDescription();
 
-    data.add(eRoleGuid, 0);
-    data.add(eRoleHighlight, false);
-    data.add(eRoleOffset, offset);
-    data.add(eRoleAttachments, processAttachments(message));
+    addMessageAtCalculatedPosition(message, realPosition, offset);
 
-    QObject::connect(message.data(), &VKAbstractContainer::dataChanged, this, &VKVisualMessageModel::someDataChanged);
-
-    m_messages.append(data);
 }
 
 QString VKVisualMessageModel::processAction(QSharedPointer<VKContainerMessage> message) const {
@@ -142,7 +153,7 @@ QString VKVisualMessageModel::processAction(QSharedPointer<VKContainerMessage> m
     case VKContainerMessageAction::ACTION_PHOTO_UPDATED:
         return QString("Photo updated by %1").arg(userName);
     case VKContainerMessageAction::ACTION_TITLE_UPDATED:
-        return QString("%1 updated title to %2").arg(action->text());
+        return QString("%1 updated title to %2").arg(userName, action->text());
     default:
         return "";
     }
@@ -166,6 +177,31 @@ QString VKVisualMessageModel::processDate(QDateTime time) const {
     }
 }
 
+int VKVisualMessageModel::addMessageAtCalculatedPosition(QSharedPointer<VKContainerMessage> message, int position, int offset) {
+
+    int size = 0;
+    for (int i=message->countFwd()-1;i>=0;i--) {
+        size += addMessageAtCalculatedPosition(message->getFwd(i), position + size, offset + 1);
+    }
+
+    VKVisualMessageModelData data(message);
+
+    data.add(eRoleGuid, 0);
+    data.add(eRoleHighlight, false);
+    data.add(eRoleOffset, offset);
+    data.add(eRoleAttachments, processAttachments(message));
+
+    //forwarded messages have id == 0
+    if (message->id() != 0) {
+        data.setIsMain(true);
+    }
+
+    QObject::connect(message.data(), &VKAbstractContainer::dataChanged, this, &VKVisualMessageModel::someDataChanged);
+
+    m_messages.insert(position + size, data);
+    return size + 1;
+}
+
 void VKVisualMessageModel::someDataChanged(VKAbstractContainer *container) {
     auto message = reinterpret_cast<VKContainerMessage*>(container);
 
@@ -180,6 +216,26 @@ void VKVisualMessageModel::someDataChanged(VKAbstractContainer *container) {
 
     qDebug()<<"Cannot find container";
     Q_ASSERT(0);
+}
+
+void VKVisualMessageModel::onMessageCreated(int position, QSharedPointer<VKContainerMessage> message) {
+    qDebug()<<position;
+    if (m_messages.count() <= position) {
+        return;
+    }
+
+    beginInsertRows(QModelIndex(), position, position);
+    addMessage(message,position);
+    for (int i=0;i<3;i++) {
+        qDebug()<<m_messages[i].message()->debugDescription();
+    }
+    endInsertRows();
+
+}
+
+void VKVisualMessageModel::onMessageRemoved(int chatId, int position) {
+    Q_UNUSED(chatId);
+    Q_UNUSED(position);
 }
 
 

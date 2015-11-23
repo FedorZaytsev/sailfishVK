@@ -7,7 +7,7 @@ class VKLPChatUpdated : public VKLPAbstract
 {
     Q_OBJECT
 public:
-    explicit VKLPChatUpdated(QObject *parent = 0);
+    explicit VKLPChatUpdated(VKStorage *storage, QObject *parent = 0);
     void fromLP(const QJsonArray &data);
 
     Q_INVOKABLE int chatId() { return m_chatId; }

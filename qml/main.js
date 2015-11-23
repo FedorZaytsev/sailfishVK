@@ -46,7 +46,7 @@ function requestMessages(data) {
 
     console.log("appending messages to existing model")
 
-    page.listAlias.model.appendMessages(vk.getStorage(), page.downloadCount)
+    page.listAlias.model.appendMessages(vk.getStorage(), page.id, page.downloadCount)
 
 
     /*if (page.offsetTop === -1 && page.offsetBottom === -1 && data.unreadCount() > 0) {
@@ -76,8 +76,9 @@ function requestDialogs(data) {
 
     console.log("appending dialogs to a existing model")
 
-    page.listAlias.model.appendDialogs(vk.getStorage(), page.downloadCount)
-    page.offset += page.downloadCount
+    if (page.listAlias.model.count() === 0) {
+        page.listAlias.model.appendDialogs(vk.getStorage(), page.downloadCount)
+    }
     page.ready = true
 }
 

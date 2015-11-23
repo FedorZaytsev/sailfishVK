@@ -16,10 +16,14 @@
 class VKVisualMessageModelData {
 public:
     VKVisualMessageModelData(){}
-    VKVisualMessageModelData(QSharedPointer<VKContainerMessage> m) { m_message = m; }
+    VKVisualMessageModelData(QSharedPointer<VKContainerMessage> m) {
+        m_message = m;
+        m_isMain = false;
+    }
     VKVisualMessageModelData(const VKVisualMessageModelData &data) {
         this->m_message = data.message();
         this->m_additional = data.additional();
+        this->m_isMain = data.isMain();
     }
 
 
@@ -28,10 +32,13 @@ public:
     QVariant data(int idx) const { return m_additional[idx]; }
     bool contain(int idx) const { return m_additional.contains(idx); }
     void add(int idx, QVariant var) { m_additional[idx] = var; }
+    void setIsMain(bool b) { m_isMain = b; }
+    bool isMain() const { return m_isMain; }
 
 private:
     QSharedPointer<VKContainerMessage> m_message;
     QMap<int, QVariant> m_additional;
+    bool m_isMain;
 };
 
 class VKVisualMessageModel : public QAbstractListModel
@@ -45,8 +52,8 @@ public:
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
     Q_INVOKABLE void setProperty(int index, int role, const QVariant & value);
 
-    void addMessage(QSharedPointer<VKContainerMessage> message);
-    Q_INVOKABLE void appendMessages(VKStorage *storage, int count);
+    void addMessage(QSharedPointer<VKContainerMessage> message, int position = 0);
+    Q_INVOKABLE void appendMessages(VKStorage *storage, int chatId, int count);
 
     Q_INVOKABLE QVariant get(int idx, int role);
 
@@ -69,15 +76,18 @@ public:
 
     Q_ENUMS(Roles)
 private:
-    void addMessage(QSharedPointer<VKContainerMessage> message, int offset);
+    void addMessage(QSharedPointer<VKContainerMessage> message, int position, int offset);
     QString processAction(QSharedPointer<VKContainerMessage> message) const;
     QVariantMap processAttachments(QSharedPointer<VKContainerMessage> message) const;
     QString processDate(QDateTime time) const;
+    int addMessageAtCalculatedPosition(QSharedPointer<VKContainerMessage> message, int position, int offset);
 
 signals:
 
 public slots:
     void someDataChanged(VKAbstractContainer* container);
+    void onMessageCreated(int position, QSharedPointer<VKContainerMessage> message);
+    void onMessageRemoved(int chatId, int position);
 private:
 
     QVector<VKVisualMessageModelData> m_messages;

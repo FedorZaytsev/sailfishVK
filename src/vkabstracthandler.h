@@ -22,13 +22,13 @@ public:
     virtual const QNetworkRequest processRequest() = 0;
     virtual void processReply(QJsonValue*) = 0;
     virtual QString name() = 0;
+    virtual void merge(VKAbstractHandler* handler);
     virtual void requestAdditionInfo(VKAbstractHandler* h);
             QJsonValue data();
 protected:
     const QNetworkRequest generateRequest(QString method, QList<QPair<QString,QString>>& args);
 signals:
-    void partlyReady(VKAbstractHandler* handler);
-    void allDataReady(VKAbstractHandler* handler);
+    void ready(VKAbstractHandler* handler);
     void sendRequest(VKAbstractHandler* handler);
 public slots:
     virtual void additionDataReady(VKAbstractHandler* h);

@@ -1,7 +1,7 @@
 #include "vklpunreadcount.h"
 
-VKLPUnreadCount::VKLPUnreadCount(QObject *parent) :
-    VKLPAbstract(parent)
+VKLPUnreadCount::VKLPUnreadCount(VKStorage *storage, QObject *parent) :
+    VKLPAbstract(storage, parent)
 {
     m_count = 0;
 }

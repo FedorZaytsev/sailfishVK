@@ -1,19 +1,18 @@
 #include "vkcontainerphoto.h"
 
-VKContainerPhoto::VKContainerPhoto(QObject *parent) :
-    VKAbstractContainer(parent)
+VKContainerPhoto::VKContainerPhoto(VKStorage *storage, QObject *parent) :
+    VKAbstractContainer(storage, parent)
 {
     m_type = eVKContainerPhoto;
 }
 
-QSharedPointer<VKContainerPhoto> VKContainerPhoto::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users, QVector<int> userIds) {
+QSharedPointer<VKContainerPhoto> VKContainerPhoto::fromJson(VKStorage *storage, QJsonObject obj, QJsonArray users) {
     Q_UNUSED(storage);
     Q_UNUSED(users);
-    Q_UNUSED(userIds);
-    VKContainerPhoto* photo = new VKContainerPhoto;
+    auto photo = QSharedPointer<VKContainerPhoto>(new VKContainerPhoto(storage));
+    photo->beginObjectChange();
 
     photo->setAlbumId(obj.value("album_id").toInt());
-    photo->setHeight(obj.value("height").toInt());
     photo->setId(obj.value("id").toInt());
     photo->setOwnerId(obj.value("owner_id").toInt());
     photo->setPhoto75(obj.value("photo_75").toString());
@@ -24,10 +23,15 @@ QSharedPointer<VKContainerPhoto> VKContainerPhoto::fromJson(VKStorage *storage, 
     photo->setPhoto2560(obj.value("photo_2560").toString());
     photo->setUserId(obj.value("user_id").toInt());
     photo->setWidth(obj.value("width").toInt());
+    photo->setHeight(obj.value("height").toInt());
 
     QDateTime date;
     date.setTime_t(obj.value("date").toInt());
-    return QSharedPointer<VKContainerPhoto>(photo);
+    photo->setDate(date);
+
+    photo->setValid();
+    photo->endObjectChange();
+    return photo;
 }
 
 QString VKContainerPhoto::maxSuitablePhoto() {
@@ -110,9 +114,10 @@ void VKContainerPhoto::setText(QString text) {
     SET_ARG(m_text, text);
 }
 
-QSize VKContainerPhoto::calculatePhotoSize(QSize size) {
-    float coefWidth = size.width()/m_width;
-    float coefHeight = size.height()/m_height;
+QSize VKContainerPhoto::calculatePhotoSize(QSize requiredSize) {
+    QSize size(m_width, m_height);
+    float coefWidth = requiredSize.width()/size.width();
+    float coefHeight = requiredSize.height()/size.height();
 
     float max = qMax(coefWidth, coefHeight);
 

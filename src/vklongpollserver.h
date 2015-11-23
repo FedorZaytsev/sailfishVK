@@ -39,21 +39,13 @@
 class VKStorage;
 class VK;
 class VKHandlerLongPollUpdateData;
-class VKLongPollServer : public VKAbstractHandler
+class VKLongPollServer : public QObject
 {
     Q_OBJECT
 public:
     explicit VKLongPollServer(VKStorage *storage, QObject *parent = 0);
     void                                init(VK* vk, VKStorage* storage);
     bool                                initilized() {return key() != "" && ts() != 0 && m_initialized;}
-
-    virtual QString                     name() {return "longPollServer";}
-    virtual const QNetworkRequest       processRequest() {qCritical("never called"); return QNetworkRequest();}
-    virtual void                        processReply(QJsonValue*) {qCritical("never called");}
-
-    Q_INVOKABLE int                     count();
-    Q_INVOKABLE VKLPAbstract*           atPtr(int idx);
-    Q_INVOKABLE void                    clean();
 
     QSharedPointer<VKLPAbstract>        at(int idx);
 
@@ -80,10 +72,10 @@ private:
     QNetworkAccessManager&              manager()                           {return m_manager;}
     void                                setVK(VK *vk)                       {m_vk = vk;}
     VK*                                 vk()                                {return m_vk;}
-    void                                processUpdate(QJsonArray &update, QList<QString> &userIds, QList<QString> &messageIds, QList<QString> &chatIds, QList<QString> &checkMessages, QList<QString> &removed);
-    void                                sendUpdateDataRequest(QList<QString> &userIds, QList<QString> &messageIds, QList<QString> &chatIds, QList<QString> &checkMessages, QList<QString> &removed);
+    void                                processUpdate(QJsonArray &update/*, QList<QString> &userIds, QList<QString> &messageIds, QList<QString> &chatIds, QList<QString> &checkMessages, QList<QString> &removed, QVector<QSharedPointer<VKLPAbstract> > &cached*/);
+    void                                sendUpdateDataRequest(QList<QString> &userIds, QList<QString> &messageIds, QList<QString> &chatIds, QList<QString> &checkMessages, QList<QString> &removed, QVector<QSharedPointer<VKLPAbstract> > &cached);
     QString                             type2string(VKLPEventType::E_VKUPDATE type);
-    void                                updateReadyEvents();
+    void                                updateReadyEvents(QVector<QSharedPointer<VKLPAbstract> > events);
 
 
 signals:
@@ -91,7 +83,6 @@ signals:
 public slots:
     void networkDataReady(QNetworkReply* reply);
     void updateDataReady(VKAbstractHandler* handler);
-    void additionalInformationAboutUsersReady(VKAbstractHandler* handler);
     void watchdogTimer();
 private:
     QNetworkAccessManager m_manager;
@@ -103,12 +94,7 @@ private:
     VK* m_vk;
     bool m_initialized;
 
-    QMap<int, QVector<QSharedPointer<VKLPAbstract>>> m_cachedEvents;
-    QVector<QSharedPointer<VKLPAbstract>> m_readyEvents;
 
-    QVector<QSharedPointer<VKContainerDialog>> m_updateDialogs;
-    QVector<QSharedPointer<VKContainerMessage>> m_updateMessages;
-    QVector<QSharedPointer<VKContainerUser>> m_updateUsers;
     QTimer m_timer;
     QDateTime m_lastTime;
 };

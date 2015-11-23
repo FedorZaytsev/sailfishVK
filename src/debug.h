@@ -22,11 +22,12 @@ void vk_assert(const char* cond, const char* file, int line);
 #if defined(QT_NO_DEBUG) && !defined(QT_FORCE_ASSERTS)
 #  define Q_ASSERT(cond) qt_noop()
 #else
-#  if defined(VK_DEBUG)
+#  ifndef VK_DEBUG
 #    define Q_ASSERT(cond) ((!(cond)) ? qt_assert(#cond,__FILE__,__LINE__) : qt_noop())
 #  else
 #    define Q_ASSERT(cond) ((!(cond)) ? vk_assert(#cond,__FILE__,__LINE__) : qt_noop())
 #  endif
 #endif
+
 
 #endif // DEBUG_H

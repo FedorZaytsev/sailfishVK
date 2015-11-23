@@ -4,6 +4,9 @@
 //Class used for implementing custom word wrap, becouse original Qt wrap mode
 //works incorrectly with images inserted in text via html tags
 
+
+//UNUNSED
+
 #include <QObject>
 #include <QFontMetricsF>
 

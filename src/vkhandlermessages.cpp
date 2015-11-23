@@ -69,27 +69,13 @@ void VKHandlerMessages::processReply(QJsonValue *_reply) {
     setOffset(reply.value("offset").toInt());
     m_unreadCount = reply.value("messages").toObject().value("unread").toInt();
 
-    QVector<int> unknownUsers;
     for (auto e: messages) {
-        auto message = e.toObject();
-
-        auto msg = VKContainerMessage::fromJson(storage(), message, users, unknownUsers);
+        auto msg = VKContainerMessage::fromJson(storage(), e.toObject(), users);
         storage()->addMessage(msg);
     }
     m_recievedCount = messages.count();
 
-    emit partlyReady(this);
-
-    //Additional request for case when we don't have info about users in fwd messages
-    if (unknownUsers.length()) {
-        qDebug()<<"We need additional users info about"<<unknownUsers;
-        auto usersHandler = new VKHandlerUsers(storage(), this);
-        usersHandler->setUsers(unknownUsers);
-        //requestAdditionInfo(usersHandler);
-    }
-    //error here
-
-    emit allDataReady(this);
+    emit ready(this);
 }
 
 QString VKHandlerMessages::name() {
@@ -122,27 +108,3 @@ void VKHandlerMessages::setReverse(bool rev) {
     m_reverse = rev;
 }
 
-int VKHandlerMessages::count() {
-    return m_recievedCount;
-}
-/*
-QSharedPointer<VKContainerMessage> VKHandlerMessages::get(int i) {
-    return m_messages.at(i);
-}
-
-VKContainerMessage *VKHandlerMessages::getPtr(int i) {
-    return m_messages.at(i).data();
-}
-*/
-void VKHandlerMessages::additionDataReady(VKAbstractHandler *h) {
-    auto handler = dynamic_cast<VKHandlerUsers*>(h);
-    Q_ASSERT(handler != nullptr);
-
-    //qDebug()<<"additional info ready, updating";
-    //for (auto e: m_messages) {
-    //    e->complete(handler);
-    //}
-
-    //emit ready(this);
-
-}

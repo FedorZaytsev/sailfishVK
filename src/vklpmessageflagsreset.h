@@ -9,7 +9,11 @@ class VKLPMessageFlagsReset : public VKLPMessageFlagsSet
 {
     Q_OBJECT
 public:
-    explicit VKLPMessageFlagsReset(QObject *parent = 0);
+    explicit VKLPMessageFlagsReset(VKStorage *storage, QObject *parent = 0);
+    virtual void completed();
+    virtual bool needPreviousMessage();
+    virtual void process();
+
 signals:
 
 public slots:
